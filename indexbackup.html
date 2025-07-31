@@ -1,0 +1,822 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soumita Chatterjee – Australia Immigration Specialist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* --- Complete & Final Polished CSS --- */
+        
+
+
+        :root {
+            --color-primary: #6a5acd;
+            --color-secondary: #8e6ee6;
+            --color-accent: #ffa726;
+            --color-accent-dark: #f57c00;
+            --color-dark: #12151c;
+            --color-gray-text: #4a5568;
+            --color-light-bg: #f9fbfd;
+            --color-medium-light-bg: #f0f4f8;
+            --color-white: #ffffff;
+            --color-success: #2e7d32;
+            --color-border: #e2e8f0;
+            --color-lavender-light: #e6e6fa;
+            --color-off-white: #f5f5f5;
+
+            --shadow-color: 260, 70%, 55%;
+            --shadow-sm: 0 4px 12px hsl(var(--shadow-color) / 0.08);
+            --shadow-md: 0 8px 24px hsl(var(--shadow-color) / 0.12);
+            --shadow-lg: 0 20px 45px hsl(var(--shadow-color) / 0.18);
+            --shadow-hover: 0 25px 50px -10px hsl(var(--shadow-color) / 0.3);
+
+            --grad-skill-1: linear-gradient(135deg, #6a5acd, #8e6ee6);
+            --grad-skill-2: linear-gradient(135deg, #2193b0, #6dd5ed);
+            --grad-skill-3: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            --grad-skill-4: linear-gradient(135deg, #38ef7d, #11998e);
+
+            --border-radius-card: 18px;
+            --border-radius-button: 50px;
+            --transition-speed-fast: 0.2s;
+            --transition-speed-normal: 0.4s;
+            --transition-speed-slow: 0.8s;
+            --section-padding-y: 6.5rem;
+            --max-width: 1280px;
+        }
+
+        body.dark-mode {
+            --color-primary: #8a78f0;
+            --color-secondary: #a090e8;
+            --color-accent: #ffb84d;
+            --color-dark: #f0f4f8;
+            --color-gray-text: #a0aec0;
+            --color-light-bg: #1a202c;
+            --color-medium-light-bg: #2d3748;
+            --color-white: #2d3748;
+            --color-border: #4a5568;
+            --shadow-color: 250, 80%, 75%;
+            --shadow-hover: 0 8px 16px rgba(0,0,0,0.3), 0 15px 40px hsla(var(--shadow-color), 0.3);
+        }
+        
+        * { cursor: none; }
+        .cursor-dot,
+        .cursor-outline { position: fixed; top: 0; left: 0; pointer-events: none; border-radius: 50%; z-index: 9999; transform: translate(-50%, -50%); transition: transform 0.2s ease-out, width 0.3s ease-out, height 0.3s ease-out, border-color 0.3s ease-out, background-color 0.3s ease-out; }
+        .cursor-dot { width: 8px; height: 8px; background-color: var(--color-primary); }
+        .cursor-outline { width: 40px; height: 40px; border: 2px solid hsla(248, 53%, 58%, 0.5); }
+        
+        .cursor-on-link .cursor-dot { transform: scale(2.5); }
+        .cursor-on-link .cursor-outline { width: 20px; height: 20px; background-color: hsla(248, 53%, 58%, 0.2); border-color: transparent; }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-padding-top: 80px; font-size: 100%; color-scheme: light dark; }
+        body {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            line-height: 1.7;
+            color: var(--color-dark);
+            background-color: var(--color-medium-light-bg);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23e2e8f0' fill-opacity='0.2'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5V0h1v5zm10 0V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5V0h1v5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color var(--transition-speed-normal) ease;
+        }
+        body.dark-mode {
+             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%232d3748' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5V0h1v5zm10 0V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9h-1v-9h-9v9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5V0h1v5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        p { margin-bottom: 1.25rem; }
+        
+        h1, h2, h3, h4, h5, h6 { font-family: 'Playfair Display', serif; color: var(--color-dark); line-height: 1.2; font-weight: 700; margin-bottom: 1.5rem; }
+        :focus-visible { outline: 3px solid var(--color-primary); outline-offset: 3px; border-radius: 4px; }
+        form :focus-visible { outline-offset: 1px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+        }
+        
+        .preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--color-light-bg); display: flex; justify-content: center; align-items: center; z-index: 10001; transition: opacity 0.75s ease, visibility 0.75s ease; }
+        .preloader.loaded { opacity: 0; visibility: hidden; }
+        .preloader-logo { font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 700; color: var(--color-primary); opacity: 0; transform: scale(0.8); animation: preload-anim 1.5s ease-in-out forwards; }
+        @keyframes preload-anim {
+            0% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0; transform: scale(0.8); }
+        }
+        body.dark-mode .preloader { background-color: var(--color-light-bg); }
+
+
+        .aurora-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+        .aurora-bg::before { content: ''; position: absolute; width: 800px; height: 800px; background-image: radial-gradient(circle, hsla(248, 53%, 58%, 0.1) 0%, transparent 50%); top: -200px; left: -200px; animation: move-aurora 15s infinite alternate ease-in-out; will-change: transform; }
+        .aurora-bg::after { content: ''; position: absolute; width: 800px; height: 800px; background-image: radial-gradient(circle, hsla(32, 97%, 55%, 0.1) 0%, transparent 50%); bottom: -200px; right: -200px; animation: move-aurora-2 18s infinite alternate ease-in-out; animation-delay: 3s; will-change: transform; }
+        @keyframes move-aurora { from { transform: translate(-100px, 50px) rotate(0deg) scale(0.8); } to { transform: translate(100px, -50px) rotate(180deg) scale(1.2); } }
+        @keyframes move-aurora-2 { from { transform: translate(50px, 100px) rotate(0deg) scale(0.8); } to { transform: translate(-50px, -100px) rotate(-180deg) scale(1.2); } }
+        
+        .gradient-text { background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-fill-color: transparent; }
+        
+        .btn { padding: 1rem 2.5rem; border-radius: var(--border-radius-button); font-weight: 600; text-decoration: none; transition: all var(--transition-speed-normal) ease-out; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; border: none; }
+        .btn-primary { background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); color: #fff; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; z-index: 1; }
+        .btn-primary::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2); transition: all var(--transition-speed-normal) ease-out; transform: skewX(-20deg); z-index: -1; }
+        .btn-primary:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+        .btn-primary:hover::before { left: 100%; }
+        .btn-secondary { background: transparent; color: var(--color-primary); border: 2px solid var(--color-primary); }
+        .btn-secondary:hover { background: var(--color-primary); color: #fff; transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+        body.dark-mode .btn-primary, body.dark-mode .btn-secondary:hover { color: #12151c; }
+        
+        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(249, 251, 253, 0.8); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid var(--color-border); transition: all var(--transition-speed-normal) cubic-bezier(0.25, 0.46, 0.45, 0.94); padding: 0.9rem 0; }
+        body.dark-mode .nav { background: rgba(26, 32, 44, 0.8); }
+        .nav.scrolled { background: rgba(18, 21, 28, 0.85); padding: 0.6rem 0; box-shadow: var(--shadow-md); border-bottom-color: transparent; }
+        .nav-container { max-width: var(--max-width); margin: 0 auto; padding: 0 2.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { text-decoration: none; display: block; position: relative; height: 50px; }
+        .logo img { height: 100%; width: auto; display: block; transition: opacity var(--transition-speed-normal) ease; }
+        .logo .logo-scrolled { position: absolute; top: 0; left: 0; opacity: 0; }
+        .nav.scrolled .logo .logo-default { opacity: 0; }
+        .nav.scrolled .logo .logo-scrolled { opacity: 1; }
+        .nav-links { display: flex; list-style: none; gap: 2.8rem; }
+        .nav-links a { text-decoration: none; color: var(--color-gray-text); font-weight: 500; font-size: 1rem; transition: all var(--transition-speed-normal) ease; position: relative; padding: 0.5rem 0; }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -6px; left: 0; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); transition: width var(--transition-speed-normal) ease-out; }
+        .nav-links a:hover { color: var(--color-primary); }
+        .nav-links a:hover::after { width: 100%; }
+        .nav.scrolled .nav-links a { color: rgba(255, 255, 255, 0.85); }
+        .nav.scrolled .nav-links a:hover { color: var(--color-accent); }
+        .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
+        .theme-toggle { background: none; border: none; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; position: relative; color: var(--color-primary); }
+        .nav.scrolled .theme-toggle { color: rgba(255,255,255,0.85); }
+        .theme-toggle:hover { color: var(--color-accent); }
+        .theme-toggle svg { position: absolute; transition: transform 0.4s ease, opacity 0.4s ease; }
+        .theme-icon-moon { opacity: 0; transform: rotate(-90deg); }
+        body.dark-mode .theme-icon-sun { opacity: 0; transform: rotate(90deg); }
+        body.dark-mode .theme-icon-moon { opacity: 1; transform: rotate(0); }
+
+        .nav-toggle { display: none; width: 40px; height: 40px; z-index: 1001; background: none; border: none; position: relative; }
+        .hamburger-line { display: block; position: absolute; width: 24px; height: 2px; background-color: var(--color-primary); border-radius: 2px; left: 8px; transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease; }
+        .nav.scrolled .hamburger-line { background-color: rgba(255,255,255,0.85); }
+        .nav-toggle.is-active .hamburger-line { background-color: #f0f4f8; }
+        .hamburger-line:nth-child(1) { top: 12px; }
+        .hamburger-line:nth-child(2) { top: 19px; }
+        .hamburger-line:nth-child(3) { top: 26px; }
+        .nav-toggle.is-active .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .nav-toggle.is-active .hamburger-line:nth-child(2) { opacity: 0; }
+        .nav-toggle.is-active .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        main { display: block; }
+        .hero { min-height: 100vh; display: flex; align-items: center; padding: 0 2.5rem; position: relative; overflow: hidden; }
+        .hero-container { max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: 1fr 1.1fr; gap: 5rem; align-items: center; }
+        .hero-content h2 { font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; font-family: 'Inter', sans-serif; font-weight: 500; color: var(--color-primary); margin-bottom: 1rem; }
+        .hero-content h1 { font-size: clamp(3.5rem, 8vw, 5.5rem); margin-bottom: 1rem; }
+        .hero-subtitle { font-size: clamp(1.2rem, 3vw, 1.5rem); color: var(--color-primary); font-weight: 600; margin-bottom: 2.5rem; min-height: 1.6rem; }
+        
+        .typewriter-text::after { content: '|'; color: var(--color-primary); animation: blink 1s step-end infinite; }
+        @keyframes blink { from, to { color: transparent; } 50% { color: var(--color-primary); } }
+
+        .hero-description { font-size: clamp(1.1rem, 2vw, 1.2rem); color: var(--color-gray-text); margin-bottom: 3rem; line-height: 1.8; max-width: 600px; }
+        .hero-buttons { display: flex; gap: 1.8rem; flex-wrap: wrap; }
+        .hero-image { display: flex; justify-content: center; position: relative; }
+        .profile-container { position: relative; width: clamp(300px, 90vw, 420px); height: clamp(300px, 90vw, 420px); }
+        .profile-circle { padding: 10px; box-shadow: var(--shadow-lg); width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); transition: all var(--transition-speed-normal) ease; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .profile-circle:hover { transform: scale(1.03) translateY(-5px); box-shadow: var(--shadow-hover); }
+        .profile-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 15%;
+            border-radius: 50%;
+            display: block;
+            filter: grayscale(10%);
+            transition: filter var(--transition-speed-normal) ease;
+        }
+        body.dark-mode .profile-circle img { filter: grayscale(20%) brightness(0.9); }
+        .profile-circle:hover img { filter: grayscale(0%) brightness(1.05); }
+        .status-badge { position: absolute; bottom: 30px; right: 30px; padding: 0.9rem 1.4rem; background: var(--color-white); border-radius: var(--border-radius-button); box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 0.7rem; font-weight: 600; color: var(--color-dark); }
+        .status-dot { width: 12px; height: 12px; background: var(--color-success); border-radius: 50%; animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1); }
+        @keyframes pulse { from { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7); } to { box-shadow: 0 0 0 10px rgba(46, 125, 50, 0); } }
+        
+        .section { padding: var(--section-padding-y) 2.5rem; max-width: var(--max-width); margin: 0 auto; position: relative; }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-subtitle { font-size: 0.9rem; font-family: 'Inter', sans-serif; letter-spacing: 3px; color: var(--color-primary); font-weight: 600; margin-bottom: 1rem; text-transform: uppercase; }
+        .section-title { font-size: clamp(2.5rem, 6vw, 3.5rem); margin-bottom: 1rem; }
+        .section-divider { width: 90px; height: 5px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); margin: 0 auto 2rem; border-radius: 2px; transform: scaleX(0); transform-origin: left; transition: transform 1s cubic-bezier(0.23, 1, 0.32, 1); }
+        .section-header.is-visible .section-divider { transform: scaleX(1); }
+        .section-description { font-size: clamp(1.1rem, 2.2vw, 1.25rem); color: var(--color-gray-text); max-width: 700px; margin: 0 auto; line-height: 1.8; }
+        
+        .card { background-color: var(--color-white); border-radius: var(--border-radius-card); box-shadow: var(--shadow-md); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; z-index: 1; overflow: hidden; }
+        .card:hover { transform: translateY(-10px) scale(1.02); box-shadow: var(--shadow-hover); }
+        .card.gradient-border { background-clip: padding-box; border: 2px solid transparent; }
+        body:not(.dark-mode) .card.gradient-border:hover::before { opacity: 1; }
+        .card.gradient-border::before { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: -1; margin: -2px; border-radius: inherit; background: linear-gradient(135deg, var(--color-lavender-light), var(--color-off-white)); opacity: 0; transition: opacity 0.4s ease; }
+        
+        .about-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 5rem; margin-bottom: 5rem; align-items: start; }
+        .about-text { font-size: 1.1rem; line-height: 1.8; color: var(--color-gray-text); }
+        .about-text p { margin-bottom: 1.5rem; }
+        .about-card { padding: 2.8rem; }
+        .about-highlights { display: flex; flex-direction: column; gap: 1.5rem; }
+        .about-highlight-item { display: flex; align-items: center; gap: 0.8rem; color: var(--color-gray-text); font-weight: 500; font-size: 1rem; }
+        .about-highlight-item svg { color: var(--color-accent); width: 24px; height: 24px; flex-shrink: 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; }
+        .stat-card { padding: 2.2rem; text-align: center; }
+        .stat-number { font-size: clamp(2.8rem, 5.5vw, 3.2rem); font-weight: 800; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
+        .stat-label { color: var(--color-gray-text); font-weight: 600; font-size: 1.1rem; }
+        
+        .experience-bg { background-color: var(--color-medium-light-bg); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+        .timeline { position: relative; max-width: 950px; margin: 0 auto; }
+        .timeline::before { content: ''; position: absolute; left: 50%; transform: translateX(-50%); top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--color-primary), var(--color-secondary)); border-radius: 2px; }
+        .timeline-item { position: relative; margin-bottom: 4rem; width: 50%; padding: 0 40px; }
+        .timeline-item:nth-child(odd) { left: 0; }
+        .timeline-item:nth-child(even) { left: 50%; }
+        .timeline-dot { position: absolute; top: 15px; width: 22px; height: 22px; background: var(--color-accent); border-radius: 50%; border: 5px solid var(--color-medium-light-bg); box-shadow: 0 0 0 4px var(--color-accent); z-index: 2; transition: transform var(--transition-speed-normal) ease; }
+        .timeline-item:hover .timeline-dot { transform: scale(1.3); }
+        .timeline-item:nth-child(odd) .timeline-dot { right: -11px; }
+        .timeline-item:nth-child(even) .timeline-dot { left: -11px; }
+        .timeline-card { padding: 1.8rem; }
+        .timeline-title { font-size: 1.4rem; margin-bottom: 0.4rem; }
+        .timeline-date { background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); color: #fff; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-bottom: 0.8rem; }
+        .timeline-company { color: var(--color-primary); font-weight: 700; margin-bottom: 0.8rem; font-size: 1rem; }
+        .timeline-list { list-style: none; }
+        .timeline-list li { display: flex; align-items: flex-start; gap: 0.6rem; margin-bottom: 0.4rem; color: var(--color-gray-text); font-size: 1rem; line-height: 1.6; }
+        .timeline-list li::before { content: ''; width: 16px; height: 16px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232e7d32' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-size: contain; flex-shrink: 0; margin-top: 2px; }
+
+        .education-card { background-color: var(--color-white); padding: 3.5rem; border-radius: var(--border-radius-card); box-shadow: var(--shadow-md); max-width: 850px; margin: 0 auto; display: flex; align-items: flex-start; gap: 3rem; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .education-card:hover { transform: translateY(-16px) scale(1.03); box-shadow: var(--shadow-hover); }
+        .education-icon { width: 80px; height: 80px; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); border-radius: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; transition: transform var(--transition-speed-normal) ease; }
+        .education-icon svg { width: 48px; height: 48px; }
+        .education-card:hover .education-icon { transform: rotate(-10deg) scale(1.1); }
+        .education-details h3 { font-size: clamp(1.6rem, 3vw, 1.8rem); margin-bottom: 0.6rem; }
+        .education-details p { color: var(--color-gray-text); line-height: 1.8; margin-bottom: 1.2rem; }
+        .education-details .university { color: var(--color-accent-dark); font-weight: 600; font-size: 1.1rem; }
+
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; }
+        .icon-card { padding: 2.2rem; text-align: center; }
+        .icon-card .icon-wrapper { width: 65px; height: 65px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.8rem; font-size: 2rem; transition: transform var(--transition-speed-normal) ease; }
+        .icon-card:hover .icon-wrapper { transform: scale(1.1) rotate(5deg); }
+        .icon-card h4 { font-size: 1.3rem; margin-bottom: 0.6rem; }
+        #certifications .icon-wrapper { background: linear-gradient(135deg, var(--color-accent), #f0e68c); color: #12151c; }
+        
+        .skills-grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 2.8rem; margin-bottom: 5rem; }
+        .skills-category-card { padding: 2.8rem; }
+        .skills-category-title { font-size: 1.6rem; margin-bottom: 1.8rem; text-align: center; }
+        .skill-item { margin-bottom: 1.4rem; }
+        .skill-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; }
+        .skill-name { font-size: 1.05rem; font-weight: 500; }
+        .skill-percentage { font-weight: 600; color: var(--color-primary); font-size: 1rem; }
+        .skill-bar { width: 100%; height: 12px; background: var(--color-border); border-radius: 6px; overflow: hidden; }
+        .skill-fill { height: 100%; border-radius: 6px; transition: width 1.5s cubic-bezier(0.165, 0.84, 0.44, 1); width: 0; }
+        #skills-admissions .skill-fill { background: var(--grad-skill-1); }
+        #skills-management .skill-fill { background: var(--grad-skill-2); }
+        #skills-finance .skill-fill { background: var(--grad-skill-3); }
+        #skills-languages .skill-fill { background: var(--grad-skill-4); }
+        
+        .soft-skills-container { text-align: center; margin-top: 5rem; }
+        .soft-skills-title { font-size: 2rem; margin-bottom: 2.5rem; }
+        .soft-skills-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+        .soft-skill-tag { background: rgba(106, 90, 205, 0.1); color: var(--color-primary); padding: 0.8rem 1.6rem; border-radius: 30px; font-weight: 500; font-size: 1rem; transition: all var(--transition-speed-normal) ease; }
+        .soft-skill-tag:hover { background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); color: #fff; transform: translateY(-4px) scale(1.03); box-shadow: var(--shadow-hover); }
+
+        .my-approach-section { background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); color: #fff; padding: 4.5rem; border-radius: var(--border-radius-card); text-align: center; max-width: 1000px; margin: 5.5rem auto 0; box-shadow: 0 20px 50px rgba(106, 90, 205, 0.3); position: relative; overflow: hidden; }
+        .my-approach-section h3 { font-size: clamp(2rem, 4.5vw, 2.8rem); margin-bottom: 1.2rem; color: #fff; }
+        .my-approach-section h3 .gradient-text { background: linear-gradient(135deg, #fff, var(--color-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .my-approach-section .subtitle { font-size: clamp(1.1rem, 2.2vw, 1.3rem); margin-bottom: 2.5rem; opacity: 0.9; }
+        .my-approach-section p { font-size: 1.15rem; line-height: 1.9; max-width: 800px; margin: 0 auto; opacity: 0.9; }
+        .my-approach-section::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 80%); transition: transform var(--transition-speed-slow) ease-out; }
+        .my-approach-section:hover::before { transform: scale(1.1); }
+
+        .linkedin-posts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; }
+        .linkedin-post-card { overflow: hidden; }
+        .linkedin-post-header { display: flex; align-items: center; gap: 1rem; padding: 1.5rem; }
+        .linkedin-profile-pic { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .linkedin-author-info span { display: block; }
+        .linkedin-author-name { font-weight: 600; font-size: 1.1rem; }
+        .linkedin-author-handle { font-size: 0.9rem; color: var(--color-gray-text); }
+        .linkedin-post-body { padding: 0 1.5rem 1.5rem 1.5rem; }
+        .linkedin-post-text { color: var(--color-dark); margin-bottom: 1rem; }
+        .linkedin-post-link { font-weight: 600; color: var(--color-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .linkedin-post-link:hover { text-decoration: underline; }
+
+        .testimonial-carousel-container { position: relative; }
+        .swiper-container { width: 100%; padding: 2rem 0; overflow: hidden; }
+        .swiper-slide { display: flex; justify-content: center; align-items: stretch; height: auto; padding: 1rem; }
+        .testimonial-card { text-align: left; padding: 2.5rem; width: 100%; max-width: 480px; display: flex; flex-direction: column; }
+        .swiper-slide-active .testimonial-card { transform: scale(1) translateY(0); box-shadow: var(--shadow-lg); }
+        .testimonial-card .author-info { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.5rem; }
+        .testimonial-card .author-avatar { width: 50px; height: 50px; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 1.2rem; flex-shrink: 0; }
+        .author-name { font-weight: 700; font-size: 1.1rem; }
+        .author-title { color: var(--color-gray-text); font-size: 0.95rem; }
+        .quote { color: var(--color-gray-text); line-height: 1.7; margin-bottom: 1.5rem; font-style: italic; font-size: 1rem; flex-grow: 1; }
+        .stars { color: var(--color-accent); font-size: 1.1rem; letter-spacing: 2px; }
+        .swiper-button-next, .swiper-button-prev { color: var(--color-primary); transition: transform 0.2s ease; }
+        .swiper-button-next:hover, .swiper-button-prev:hover { transform: scale(1.2); }
+        .swiper-pagination-bullet-active { background: var(--color-primary); }
+
+        .acknowledgment { max-width: var(--max-width); margin: 0 auto; padding: 0 2.5rem; text-align: center; }
+        .acknowledgment .card { padding: 2.5rem; background-color: var(--color-medium-light-bg); border: 1px solid var(--color-border); }
+        .acknowledgment h3 { font-size: 1.5rem; margin-bottom: 1rem; }
+        .acknowledgment p { max-width: 650px; margin: 0 auto; color: var(--color-gray-text); font-size: 1rem; line-height: 1.6; }
+        .acknowledgment a { color: var(--color-primary); font-weight: 600; text-decoration: none; }
+        .acknowledgment a:hover { text-decoration: underline; }
+
+        .contact-wrapper { background-color: var(--color-white); border-radius: var(--border-radius-card); box-shadow: var(--shadow-lg); padding: 4rem; display: grid; grid-template-columns: 1.2fr 1fr; gap: 4rem; align-items: center; position: relative; overflow: hidden; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.95rem; }
+        .form-input, .form-textarea, .form-select { width: 100%; padding: 1rem; border: 1px solid var(--color-border); border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; font-family: 'Inter', sans-serif; background-color: var(--color-light-bg); color: var(--color-dark); }
+        .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--color-primary); background-color: var(--color-white); box-shadow: 0 0 0 4px hsla(var(--shadow-color), 0.2); }
+        body.dark-mode .form-input:focus, body.dark-mode .form-textarea:focus, body.dark-mode .form-select:focus { background-color: var(--color-light-bg); }
+        .form-textarea { min-height: 120px; resize: vertical; }
+        .btn-submit { width: 100%; padding: 1.2rem; border-radius: 10px; font-weight: 600; background: var(--color-primary); color: #fff; border: none; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; }
+        body.dark-mode .btn-submit { color: #12151c; }
+        .btn-submit:hover { background: #5e509e; }
+        .contact-details-group { display: flex; flex-direction: column; gap: 2rem; }
+        .contact-detail-item { display: flex; align-items: center; gap: 1.5rem; }
+        .contact-detail-icon { width: 45px; height: 45px; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.4rem; flex-shrink: 0; }
+        .contact-detail-text span { display: block; }
+        .contact-detail-text a { color: var(--color-primary); text-decoration: none; font-weight: 500; }
+        .contact-detail-text a:hover { text-decoration: underline; }
+
+        .footer { background: #12151c; color: rgba(255, 255, 255, 0.7); padding: 2rem 2.5rem; font-size: 0.9rem; margin-top: var(--section-padding-y); position: relative; }
+        .footer::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, #8a78f0, #ffb84d, #8a78f0); }
+        .footer-container { max-width: var(--max-width); margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+        .footer-left { display: flex; align-items: center; gap: 1rem; }
+        .footer-left .logo { height: 30px; }
+        .footer-left a { color: rgba(255,255,255,0.8); text-decoration: none; font-weight: 500; transition: color 0.3s ease; }
+        .footer-left a:hover { color: #fff; }
+        .footer-center { text-align: center; }
+        .footer-center p { margin-bottom: 0; }
+        .footer-right { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; justify-content: center;}
+        .footer-credits { display: flex; align-items: center; gap: 0.5rem; }
+        .footer-credits p { margin-bottom: 0; }
+        .footer-legal { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+        .footer-right a { color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.3s ease; }
+        .footer-right a:hover { color: #fff; }
+        .footer-credits a { color: #ffb84d; }
+        .gradient-heart { width: 1.1em; height: 1.1em; vertical-align: -0.15em; display: inline-block; }
+        .gradient-heart .heart-fill { fill: url(#heart-gradient); }
+
+        [data-animation] { opacity: 0; transition: opacity 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1); will-change: transform, opacity; }
+        [data-animation="fade-in-up"] { transform: translateY(40px); }
+        [data-animation="fade-in-left"] { transform: translateX(-40px); }
+        [data-animation="fade-in-right"] { transform: translateX(40px); }
+        [data-animation="scale-in"] { transform: scale(0.95); }
+        .is-visible[data-animation] { opacity: 1; transform: translate(0, 0) scale(1); }
+        [data-stagger-children].is-visible > * { transition-delay: calc(var(--stagger-index) * 120ms); }
+
+        @media (max-width: 1024px) {
+            .hero-container, .about-grid, .contact-wrapper, .skills-grid-container { grid-template-columns: 1fr; gap: 4rem; }
+            .hero-container { text-align: center; }
+            .hero-image { order: -1; }
+            .hero-description { margin-left: auto; margin-right: auto; }
+            .hero-buttons { justify-content: center; }
+            .timeline::before { left: 20px; transform: translateX(0); }
+            .timeline-item, .timeline-item:nth-child(even) { width: 100%; left: 0; padding-left: 60px; padding-right: 0; }
+            .timeline-item .timeline-dot, .timeline-item:nth-child(even) .timeline-dot { left: 8px; }
+            .footer-container { flex-direction: column; text-align: center; gap: 2rem; }
+        }
+        @media (max-width: 768px) {
+    :root { --section-padding-y: 5rem; }
+    .section { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .nav-container { padding: 0 1.5rem; }
+
+    /* --- FINAL MOBILE MENU STYLES --- */
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 280px;
+        height: 100%;
+        background-color: var(--color-white); /* Solid White in light mode */
+        box-shadow: -5px 0px 25px rgba(0,0,0,0.1);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 1.25rem;
+        padding-top: 100px;
+        padding-left: 2.5rem;
+        padding-right: 2.5rem;
+        transform: translateX(100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    body.dark-mode .nav-links {
+        background-color: #12151c !important; /* Solid Black in dark mode */
+        box-shadow: -5px 0px 25px rgba(0,0,0,0.2);
+    }
+    .nav-links.is-active {
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: all;
+    }
+    .nav-links a {
+        font-size: 1.2rem; /* Smaller font size */
+        font-weight: 500;
+        color: var(--color-dark); /* Correct contrasting font color */
+    }
+    .nav-links a:hover {
+        color: var(--color-primary);
+    }
+    .nav-toggle {
+        display: flex;
+    }
+    /* --- End Mobile Menu --- */
+
+    .education-card { flex-direction: column; text-align: center; gap: 2rem; padding: 2.5rem; }
+    .education-icon { margin: 0 auto; }
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+    .form-row .form-group { margin-bottom: 1.5rem; }
+    .contact-wrapper { padding: 2.5rem; }
+
+    .hero { padding-top: 120px; padding-bottom: 4rem; min-height: auto; align-items: flex-start; }
+    .hero-image { margin-bottom: 3rem; }
+    .profile-container { width: 220px; height: 220px; margin: 0 auto; }
+    .status-badge { right: 10px; bottom: 10px; padding: 0.6rem 1rem; font-size: 0.9rem;}
+}
+        @media (max-width: 480px) {
+            .btn { padding: 0.9rem 1.8rem; font-size: 0.95rem; }
+            .skills-grid-container { grid-template-columns: 1fr; }
+            .contact-wrapper { padding: 2rem 1.5rem; }
+            .hero-content h1 { font-size: 3.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="preloader" id="preloader">
+        <div class="preloader-logo">SC</div>
+    </div>
+    
+    <script>
+        (function() {
+            function setTheme(theme) {
+                document.body.classList.remove('light-mode', 'dark-mode');
+                document.body.classList.add(theme);
+                localStorage.setItem('theme', theme);
+            }
+            let theme = localStorage.getItem('theme');
+            if (!theme) {
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-mode' : 'light-mode';
+            }
+            setTheme(theme);
+        })();
+    </script>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <header>
+        <nav class="nav" id="navbar">
+            <div class="nav-container">
+                <a href="#home" class="logo"><img src="https://anwe.sh/work/sclogo2.png" alt="Soumita C. Logo" class="logo-default"><img src="https://anwe.sh/work/sclogo1.png" alt="Soumita C. Logo" class="logo-scrolled"></a>
+                <ul class="nav-links" id="nav-menu">
+                    <li><a href="#home">Home</a></li><li><a href="#about">About</a></li><li><a href="#experience">Experience</a></li><li><a href="#skills">Skills</a></li><li><a href="#linkedin">LinkedIn</a></li><li><a href="#testimonials">Testimonials</a></li><li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                        <i class="theme-icon-sun" data-feather="sun"></i>
+                        <i class="theme-icon-moon" data-feather="moon"></i>
+                    </button>
+                    <button class="nav-toggle" id="nav-toggle-main" aria-label="Menu" aria-controls="nav-menu" aria-expanded="false">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="aurora-bg"></div>
+            <div class="hero-container">
+                <div class="hero-content" data-stagger-children>
+                    <h2 class="hero-greeting" data-animation="fade-in-up">Hello, I'm</h2>
+                    <h1 data-animation="fade-in-up"><span class="hero-name">Soumita Chatterjee</span></h1>
+                    <p class="hero-subtitle" data-animation="fade-in-up"><span id="typewriter-subtitle" class="typewriter-text"></span></p>
+                    <p class="hero-description" data-animation="fade-in-up">Driving growth & operational excellence through expertise in <strong>global immigration</strong>, <strong>financial analysis</strong>, <strong>team leadership</strong> & <strong>process optimization</strong>.</p>
+                    <div class="hero-buttons" data-animation="fade-in-up"><a href="#contact" class="btn btn-primary magnetic">Book a Consultation <i data-feather="arrow-right"></i></a><a href="#experience" class="btn btn-secondary magnetic">View Experience <i data-feather="arrow-right"></i></a></div>
+                </div>
+                <div class="hero-image" data-animation="scale-in"><div class="profile-container"><div class="profile-circle"><img class="hero-image" src="https://soumita.space/images/soumita-office-1.jpeg" alt="Soumita Chatterjee professional headshot"></div><div class="status-badge"><div class="status-dot"></div><span>Available for Consultation</span></div></div></div>
+            </div>
+        </section>
+        <section id="about" class="section">
+            <div class="section-header" data-animation="fade-in-up"><div class="section-subtitle">Discover My Journey</div><h2 class="about-title section-title">Bridging Education & <span class="gradient-text">Immigration</span></h2><div class="section-divider"></div><p class="about-description section-description">A unique blend of financial expertise and educational consulting, dedicated to empowering global aspirations.</p></div>
+            <div class="about-grid"><div class="about-text" data-animation="fade-in-right"><p class="about-text">From the meticulous world of <strong>audit and accounting</strong> to the dynamic realm of <strong>education consulting</strong>, my career journey has been a testament to adaptability and continuous growth.</p><p>Beginning as an Audit & Accounts Assistant, I cultivated an unwavering commitment to precision and accuracy. This foundation is now the cornerstone of my approach to education consulting.</p><p>As a <strong>Senior Admission Officer</strong> specializing in Australian immigration, I've discovered my true calling: helping individuals navigate complex educational and immigration landscapes with clarity and confidence.</p><p>My philosophy centers on creating seamless experiences that transform international dreams into reality, backed by rigorous planning, deep industry knowledge, and operational excellence.</p></div><div class="about-card card gradient-border" data-animation="fade-in-left"><h3 style="margin-bottom: 2rem;">Professional Highlights</h3><div class="about-highlights"><div class="about-highlight-item"><i data-feather="globe"></i><span>Australia Immigration Specialist</span></div><div class="about-highlight-item"><i data-feather="briefcase"></i><span>3+ Years Global Experience</span></div><div class="about-highlight-item"><i data-feather="check-circle"></i><span>200+ Successful Applications</span></div><div class="about-highlight-item"><i data-feather="award"></i><span>Bachelor of Science Graduate</span></div></div></div></div>
+            <div class="stats-grid" data-stagger-children><div class="stat-card card gradient-border" data-animation="fade-in-up"><div class="stat-number" data-count-to="7">0</div><div class="stat-label">Years Total Experience</div></div><div class="stat-card card gradient-border" data-animation="fade-in-up"><div class="stat-number" data-count-to="200">0</div><div class="stat-label">Students Guided</div></div><div class="stat-card card gradient-border" data-animation="fade-in-up"><div class="stat-number" data-count-to="50">0</div><div class="stat-label">Partner Institutions</div></div><div class="stat-card card gradient-border" data-animation="fade-in-up"><div class="stat-number" data-count-to="98">0</div><div class="stat-label">Success Rate %</div></div></div>
+        </section>
+        <section id="experience" class="section experience-bg">
+            <div class="aurora-bg"></div><div class="section-header" data-animation="fade-in-up"><div class="section-subtitle">Career Progression</div><h2 class="section-title">Professional <span class="gradient-text">Milestones</span></h2><div class="section-divider"></div><p class="section-description">A journey of continuous growth, evolving expertise, and impactful contributions across diverse sectors.</p></div>
+            <div class="experience-list timeline"><div class="timeline-item" data-animation="fade-in-right"><div class="timeline-dot"></div><div class="timeline-card card gradient-border"><h3 class="timeline-title">Senior Admissions Officer</h3><div class="timeline-date">Aug 2023 – Present</div><div class="timeline-company">EPA Global</div><ul class="timeline-list"><li>Headed Australia immigration specialization.</li><li>Managed cross-functional international teams.</li><li>Oversaw international student admissions.</li><li>Designed advanced training programs.</li><li>Improved operational efficiency by 40%.</li></ul></div></div><div class="timeline-item" data-animation="fade-in-left"><div class="timeline-dot"></div><div class="timeline-card card gradient-border"><h3 class="timeline-title">Admissions Officer</h3><div class="timeline-date">Apr 2022 – Jul 2023</div><div class="timeline-company">EPA Global</div><ul class="timeline-list"><li>Conducted comprehensive application reviews.</li><li>Facilitated student interviews.</li><li>Delivered exceptional client service.</li><li>Processed complex visa applications.</li><li>Guided on immigration compliance.</li></ul></div></div><div class="timeline-item" data-animation="fade-in-right"><div class="timeline-dot"></div><div class="timeline-card card gradient-border"><h3 class="timeline-title">Audit & Accounts Assistant</h3><div class="timeline-date">Feb 2017 – Oct 2019</div><div class="timeline-company">BBKP & ASSOCIATES</div><ul class="timeline-list"><li>Orchestrated accounting software migrations.</li><li>Performed detailed general ledger reconciliations.</li><li>Reviewed financial transactions thoroughly.</li><li>Maintained precise accounting records.</li><li>Streamlined expense reporting.</li></ul></div></div></div>
+        </section>
+        <section id="education" class="section">
+            <div class="section-header" data-animation="fade-in-up"><div class="section-subtitle">Academic Foundation</div><h2 class="section-title">Educational <span class="gradient-text">Background</span></h2><div class="section-divider"></div><p class="section-description">A strong academic grounding that underpins my analytical approach and professional precision.</p></div>
+            <div class="education-card" data-animation="fade-in-up" style="transition-delay: 150ms;">
+                <div class="education-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 8.5L6.94 8.5 12 6l5.06 2.5L12 11.5z"/><path d="M5 13.18V17.5l7 3.5 7-3.5v-4.32l-2 1.09v2.67l-5 2.5-5-2.5v-2.67l-2-1.09z"/></svg>
+                </div>
+                <div class="education-details"><h3>Bachelor of Science</h3><p class="university">Barasat University</p><p>A comprehensive curriculum focused on scientific principles, research methodologies, and data analysis. This foundation in systematic problem-solving and empirical reasoning directly informs the meticulous approach to complex immigration cases.</p></div>
+            </div>
+        </section>
+        <section id="certifications" class="section experience-bg">
+             <div class="aurora-bg"></div><div class="section-header" data-animation="fade-in-up"><div class="section-subtitle">Validate My Expertise</div><h2 class="section-title">Professional <span class="gradient-text">Certifications</span></h2><div class="section-divider"></div><p class="section-description">Formal recognitions of specialized knowledge and skills, enhancing professional credibility.</p></div>
+            <div class="card-grid" data-stagger-children><div class="icon-card card gradient-border" data-animation="fade-in-up"><div class="icon-wrapper"><i data-feather="file-text"></i></div><h4>Certified Industrial Accountant (CIA)</h4><p>Deep expertise in industrial accounting principles and practices.</p></div><div class="icon-card card gradient-border" data-animation="fade-in-up"><div class="icon-wrapper"><i data-feather="users"></i></div><h4>Administrative Human Resources (HR) for Beginners</h4><p>Foundational knowledge in administrative HR functions.</p></div></div>
+        </section>
+        <section id="skills" class="section">
+            <div class="section-header" data-animation="fade-in-up"><div class="section-subtitle">Professional Expertise</div><h2 class="section-title">Skills & <span class="gradient-text">Competencies</span></h2><div class="section-divider"></div><p class="section-description">A comprehensive overview of my technical proficiencies and interpersonal strengths.</p></div>
+            <div class="skills-list skills-grid-container" data-stagger-children>
+                <div id="skills-admissions" class="skills-category-card card gradient-border" data-animation="fade-in-up"><h3 class="skills-category-title">Admissions & Immigration</h3><div class="skill-item"><div class="skill-header"><div class="skill-name">Australia Specialist</div><div class="skill-percentage" data-count-to="95">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="95%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Visa Application Processing</div><div class="skill-percentage" data-count-to="90">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="90%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Immigration Regulations</div><div class="skill-percentage" data-count-to="85">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="85%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Student Counseling</div><div class="skill-percentage" data-count-to="90">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="90%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Application Review</div><div class="skill-percentage" data-count-to="95">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="95%"></div></div></div></div>
+                <div id="skills-management" class="skills-category-card card gradient-border" data-animation="fade-in-up"><h3 class="skills-category-title">Management & Leadership</h3><div class="skill-item"><div class="skill-header"><div class="skill-name">Team Leadership</div><div class="skill-percentage" data-count-to="85">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="85%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Process Optimization</div><div class="skill-percentage" data-count-to="90">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="90%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Training & Development</div><div class="skill-percentage" data-count-to="80">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="80%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Decision-Making</div><div class="skill-percentage" data-count-to="85">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="85%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Stakeholder Management</div><div class="skill-percentage" data-count-to="80">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="80%"></div></div></div></div>
+                <div id="skills-finance" class="skills-category-card card gradient-border" data-animation="fade-in-up"><h3 class="skills-category-title">Finance & Accounting</h3><div class="skill-item"><div class="skill-header"><div class="skill-name">Financial Analysis</div><div class="skill-percentage" data-count-to="85">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="85%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Accounting Software</div><div class="skill-percentage" data-count-to="75">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="75%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Reports Management</div><div class="skill-percentage" data-count-to="90">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="90%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Reconciliation</div><div class="skill-percentage" data-count-to="85">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="85%"></div></div></div></div>
+                <div id="skills-languages" class="skills-category-card card gradient-border" data-animation="fade-in-up"><h3 class="skills-category-title">Languages & Communication</h3><div class="skill-item"><div class="skill-header"><div class="skill-name">English</div><div class="skill-percentage" data-count-to="90">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="90%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Hindi</div><div class="skill-percentage" data-count-to="85">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="85%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Bengali</div><div class="skill-percentage" data-count-to="100">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="100%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Written Communication</div><div class="skill-percentage" data-count-to="90">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="90%"></div></div></div><div class="skill-item"><div class="skill-header"><div class="skill-name">Presentation Skills</div><div class="skill-percentage" data-count-to="85">0%</div></div><div class="skill-bar"><div class="skill-fill" data-width="85%"></div></div></div></div>
+            </div>
+            <div class="soft-skills-container" data-animation="fade-in-up"><h3 class="soft-skills-title">Soft Skills</h3><div class="soft-skills-tags"><span class="soft-skill-tag">Attention to Detail</span><span class="soft-skill-tag">Problem Solving</span><span class="soft-skill-tag">Customer Service</span><span class="soft-skill-tag">Time Management</span><span class="soft-skill-tag">Adaptability</span><span class="soft-skill-tag">Interpersonal Skills</span><span class="soft-skill-tag">Critical Thinking</span><span class="soft-skill-tag">Emotional Intelligence</span><span class="soft-skill-tag">Conflict Resolution</span><span class="soft-skill-tag">Cultural Sensitivity</span><span class="soft-skill-tag">Negotiation</span><span class="soft-skill-tag">Teamwork</span></div></div>
+        </section>
+        <section id="my-approach" class="section"><div class="my-approach-section" data-animation="scale-in"><h3>My <span class="gradient-text">Approach</span></h3><p class="subtitle">Believing in the power of precision and empathy.</p><p>My approach combines meticulous attention to detail with a genuine understanding of each client's unique journey. I am dedicated to providing a seamless and supportive experience, ensuring every individual receives personalized guidance tailored to their educational and immigration goals.</p></div></section>
+        <section id="linkedin" class="section experience-bg">
+            <div class="aurora-bg"></div><div class="section-header" data-animation="fade-in-up"><div class="section-subtitle">Stay Connected</div><h2 class="section-title">Recent LinkedIn <span class="gradient-text">Activity</span></h2><div class="section-divider"></div><p class="section-description">A snapshot of my latest insights and professional updates. Follow my journey on LinkedIn for more.</p></div>
+            <div class="linkedin-posts-grid" data-stagger-children><div class="linkedin-post-card card gradient-border" data-animation="fade-in-up"><div class="linkedin-post-header"><img src="https://soumita.space/images/soumita-office-1.jpeg" alt="Soumita Chatterjee" class="linkedin-profile-pic"><div class="linkedin-author-info"><span class="linkedin-author-name">Soumita Chatterjee</span><span class="linkedin-author-handle">Australia Immigration Specialist</span></div></div><div class="linkedin-post-body"><p class="linkedin-post-text">Excited to share a deep dive into the latest updates for the Global Talent Visa (subclass 858). A game-changer for professionals in key sectors! #AustraliaImmigration #GlobalTalent</p><a href="https://www.linkedin.com/in/soumita-chatterjee" target="_blank" rel="noopener noreferrer" class="linkedin-post-link">Read more on LinkedIn <i data-feather="arrow-right" style="width:16px;"></i></a></div></div><div class="linkedin-post-card card gradient-border" data-animation="fade-in-up"><div class="linkedin-post-header"><img src="https://soumita.space/images/soumita-office-1.jpeg" alt="Soumita Chatterjee" class="linkedin-profile-pic"><div class="linkedin-author-info"><span class="linkedin-author-name">Soumita Chatterjee</span><span class="linkedin-author-handle">Australia Immigration Specialist</span></div></div><div class="linkedin-post-body"><p class="linkedin-post-text">Process optimization isn't just a buzzword; it's the core of providing a seamless client experience. Thrilled to have reduced application processing times by 40% this quarter.</p><a href="https://www.linkedin.com/in/soumita-chatterjee" target="_blank" rel="noopener noreferrer" class="linkedin-post-link">Read more on LinkedIn <i data-feather="arrow-right" style="width:16px;"></i></a></div></div><div class="linkedin-post-card card gradient-border" data-animation="fade-in-up"><div class="linkedin-post-header"><img src="https://soumita.space/images/soumita-office-1.jpeg" alt="Soumita Chatterjee" class="linkedin-profile-pic"><div class="linkedin-author-info"><span class="linkedin-author-name">Soumita Chatterjee</span><span class="linkedin-author-handle">Australia Immigration Specialist</span></div></div><div class="linkedin-post-body"><p class="linkedin-post-text">Mentoring the next generation of admissions officers has been a highlight of my career. It's rewarding to see the team grow and excel in providing top-tier guidance to students.</p><a href="https://www.linkedin.com/in/soumita-chatterjee" target="_blank" rel="noopener noreferrer" class="linkedin-post-link">Read more on LinkedIn <i data-feather="arrow-right" style="width:16px;"></i></a></div></div></div>
+        </section>
+        <section id="testimonials" class="section">
+             <div class="aurora-bg"></div><div class="section-header" data-animation="fade-in-up"><div class="section-subtitle">Client Success Stories</div><h2 class="section-title">What Clients <span class="gradient-text">Say</span></h2><div class="section-divider"></div></div>
+            <div class="testimonials-list testimonial-carousel-container" data-animation="fade-in-up"><div class="swiper-container"><div class="swiper-wrapper"><div class="swiper-slide"><div class="testimonial-card card gradient-border"><div class="author-info"><div class="author-avatar">A</div><div><h4 class="author-name">Ananya S.</h4><p class="author-title">Master's Student</p></div></div><p class="quote">"Soumita transformed my dream of studying in Australia into reality. Her meticulous approach was exceptional."</p><div class="stars">★★★★★</div></div></div><div class="swiper-slide"><div class="testimonial-card card gradient-border"><div class="author-info"><div class="author-avatar">P</div><div><h4 class="author-name">Priya S.</h4><p class="author-title">Senior Colleague</p></div></div><p class="quote">"Her commitment to excellence and process optimization has elevated our entire team's performance."</p><div class="stars">★★★★★</div></div></div><div class="swiper-slide"><div class="testimonial-card card gradient-border"><div class="author-info"><div class="author-avatar">V</div><div><h4 class="author-name">Vikram N.</h4><p class="author-title">Parent of Applicant</p></div></div><p class="quote">"Her guidance for my son's application was invaluable. She is trustworthy, knowledgeable, and incredibly patient."</p><div class="stars">★★★★★</div></div></div><div class="swiper-slide"><div class="testimonial-card card gradient-border"><div class="author-info"><div class="author-avatar">S</div><div><h4 class="author-name">Sunita K.</h4><p class="author-title">Skilled Migration Applicant</p></div></div><p class="quote">"The entire visa process was demystified thanks to Soumita. I felt supported at every single step."</p><div class="stars">★★★★★</div></div></div></div><div class="swiper-pagination"></div></div><div class="swiper-button-next"></div><div class="swiper-button-prev"></div></div>
+        </section>
+        
+        <section class="acknowledgment" data-animation="fade-in-up">
+            <div class="card">
+                <h3>Professional Acknowledgment</h3>
+                <p>Soumita proudly contributes her expertise as a Senior Admissions Officer at <a href="https://epaglobal.com/" target="_blank" rel="noopener noreferrer">EPA Global</a>, one of Australia's leading education and immigration consultancies. This portfolio is a personal showcase of her professional journey and skills. All client services are provided exclusively through EPA Global.</p>
+            </div>
+        </section>
+
+        <section id="contact" class="section">
+             <div class="section-header" data-animation="fade-in-up"><div class="section-subtitle">Start Your Journey</div><h2 class="section-title">Let's <span class="gradient-text">Connect</span></h2><div class="section-divider"></div><p class="section-description">Ready to transform your educational aspirations into reality? Reach out today for a personalized consultation.</p></div>
+             <div class="contact-wrapper" data-animation="scale-in">
+                 <div class="aurora-bg"></div><div class="contact-form-container"><h3 style="font-size: 2rem; margin-bottom: 2rem;">Send a Message</h3><form id="contact-form"><div class="form-row"><div class="form-group"><label for="firstName" class="form-label">First Name</label><input type="text" id="firstName" name="firstName" class="form-input" required></div><div class="form-group"><label for="lastName" class="form-label">Last Name</label><input type="text" id="lastName" name="lastName" class="form-input" required></div></div><div class="form-group"><label for="email" class="form-label">Email Address</label><input type="email" id="email" name="email" class="form-input" required></div><div class="form-group"><label for="message" class="form-label">Message</label><textarea id="message" name="message" class="form-textarea" placeholder="Share your goals and how I can assist you..." required></textarea></div><button type="submit" class="btn-submit magnetic">Submit Request <i data-feather="send"></i></button></form></div>
+                 <div class="contact-details-group"><h3 style="font-size: 2rem; margin-bottom: 1rem;">Contact Details</h3><div class="contact-detail-item"><div class="contact-detail-icon"><i data-feather="mail"></i></div><div class="contact-detail-text"><span>Email</span><a href="mailto:soumi.integrity@gmail.com" class="contact-email">hello@soumita.space</a></div></div><div class="contact-detail-item"><div class="contact-detail-icon"><i data-feather="linkedin"></i></div><div class="contact-detail-text"><span>LinkedIn</span><a href="https://www.linkedin.com/in/soumita-chatterjee" target="_blank" rel="noopener noreferrer" class="contact-linkedin">Connect Professionally</a></div></div><div class="contact-detail-item"><div class="contact-detail-icon"><i data-feather="map-pin"></i></div><div class="contact-detail-text"><span>Location</span><span class="contact-location">Kolkata, India</span></div></div></div>
+             </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <svg style="width:0;height:0;position:absolute;" aria-hidden="true" focusable="false">
+            <defs><linearGradient id="heart-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#8e6ee6" /><stop offset="100%" style="stop-color:#ffa726" /></linearGradient></defs>
+        </svg>
+        <div class="footer-container">
+             <div class="footer-left">
+                <a href="#home" class="logo"><img src="https://anwe.sh/work/sclogo1.png" alt="Soumita C. Logo"></a>
+                <a href="https://soumita.space" target="_blank" rel="noopener noreferrer">Soumita.Space</a>
+            </div>
+            <div class="footer-center">
+                 <p>&copy; 2025 Soumita Chatterjee. All Rights Reserved.</p>
+            </div>
+            <div class="footer-right">
+                <div class="footer-legal">
+                    <a href="/disclaimer.html">Disclaimer</a>
+                    <a href="/privacy.html">Privacy Policy</a>
+                    <a href="/terms.html">Terms</a>
+                </div>
+                 <div class="footer-credits">
+                    <p>Created with <svg class="gradient-heart" viewBox="0 0 24 24" aria-hidden="true"><path class="heart-fill" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> by <a href="https://anwe.sh" target="_blank" rel="noopener noreferrer">Anwesh</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        (function() {
+            function setTheme(theme) {
+                document.body.classList.remove('light-mode', 'dark-mode');
+                document.body.classList.add(theme);
+                localStorage.setItem('theme', theme);
+            }
+            let theme = localStorage.getItem('theme');
+            if (!theme) {
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-mode' : 'light-mode';
+            }
+            setTheme(theme);
+        })();
+
+        const preloader = document.getElementById('preloader');
+        window.addEventListener('load', function() {
+            if (preloader) {
+                setTimeout(function() {
+                    preloader.classList.add('loaded');
+                }, 200);
+                setTimeout(function() {
+                    preloader.style.display = 'none';
+                }, 1000); 
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+
+            const bodyForCursor = document.body; 
+            const cursorDot = document.querySelector('.cursor-dot');
+            const cursorOutline = document.querySelector('.cursor-outline');
+            window.addEventListener('mousemove', function (e) {
+                const posX = e.clientX;
+                const posY = e.clientY;
+                cursorDot.style.left = `${posX}px`;
+                cursorDot.style.top = `${posY}px`;
+                gsap.to(cursorOutline, { duration: 0.4, left: posX, top: posY, ease: "power2.out" });
+            });
+            
+            const interactiveElements = document.querySelectorAll('a, button, .card, .swiper-button-next, .swiper-button-prev, .soft-skill-tag');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    if (el.tagName === 'A' || el.tagName === 'BUTTON') {
+                        bodyForCursor.classList.add('cursor-on-link');
+                    }
+                });
+                el.addEventListener('mouseleave', () => {
+                    bodyForCursor.classList.remove('cursor-on-link');
+                });
+            });
+
+            const magneticButtons = document.querySelectorAll('.magnetic');
+            magneticButtons.forEach(btn => {
+                btn.addEventListener('mousemove', function(e) {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    gsap.to(btn, { duration: 0.3, x: x * 0.2, y: y * 0.2, ease: "power2.out" });
+                });
+                btn.addEventListener('mouseleave', function(e) {
+                    gsap.to(btn, { duration: 0.3, x: 0, y: 0, ease: "power2.out" });
+                });
+            });
+
+            const parallaxBgs = document.querySelectorAll('.aurora-bg');
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                gsap.to(parallaxBgs, { y: scrollY * 0.1, ease: "power2.out" });
+            });
+            
+            // Typewriter functionality - will be initialized after content loads
+            window.initTypewriter = function() {
+                const typewriterElement = document.getElementById('typewriter-subtitle');
+                if (typewriterElement) {
+                    // Make titles globally accessible for website-loader.js
+                    window.typewriterTitles = ["Australia Immigration Specialist", "Team Leader", "Certified Industrial Accountant", "Senior Admissions Officer"];
+                    let titles = window.typewriterTitles;
+                    let titleIndex = 0;
+                    let charIndex = 0;
+                    let isDeleting = false;
+                    const typeSpeed = 100;
+                    const deleteSpeed = 50;
+                    const delayBetweenTitles = 2000;
+                    
+                    function type() {
+                        const currentTitle = titles[titleIndex];
+                        let typeTimeout = isDeleting ? deleteSpeed : typeSpeed;
+                        if (isDeleting) {
+                            typewriterElement.textContent = currentTitle.substring(0, charIndex - 1);
+                            charIndex--;
+                        } else {
+                            typewriterElement.textContent = currentTitle.substring(0, charIndex + 1);
+                            charIndex++;
+                        }
+                        if (!isDeleting && charIndex === currentTitle.length) {
+                            isDeleting = true;
+                            typeTimeout = delayBetweenTitles;
+                        } else if (isDeleting && charIndex === 0) {
+                            isDeleting = false;
+                            titleIndex = (titleIndex + 1) % titles.length;
+                            typeTimeout = 500;
+                        }
+                        setTimeout(type, typeTimeout);
+                    }
+                    setTimeout(type, 500);
+                }
+            };
+            
+            // Initialize typewriter after a short delay to let content load
+            setTimeout(() => {
+                if (window.initTypewriter) {
+                    window.initTypewriter();
+                }
+            }, 1000);
+
+            const nav = document.getElementById('navbar');
+            const navToggle = document.getElementById('nav-toggle-main');
+            const navMenu = document.getElementById('nav-menu');
+            if (navToggle) {
+                const navLinks = navMenu.querySelectorAll('a');
+                window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 50));
+                const themeToggle = document.getElementById('theme-toggle');
+                themeToggle.addEventListener('click', () => {
+                    const isDarkMode = document.body.classList.contains('dark-mode');
+                    const newTheme = isDarkMode ? 'light-mode' : 'dark-mode';
+                    document.body.classList.remove('light-mode', 'dark-mode');
+                    document.body.classList.add(newTheme);
+                    localStorage.setItem('theme', newTheme);
+                });
+                navToggle.addEventListener('click', () => {
+                    const isActive = navToggle.classList.toggle('is-active');
+                    navMenu.classList.toggle('is-active');
+                    navToggle.setAttribute('aria-expanded', isActive);
+                });
+                navLinks.forEach(link => link.addEventListener('click', () => {
+                    if (navMenu.classList.contains('is-active')) {
+                        navMenu.classList.remove('is-active');
+                        navToggle.classList.remove('is-active');
+                        navToggle.setAttribute('aria-expanded', 'false');
+                    }
+                }));
+            }
+
+            const animateCountUp = (el) => {
+                const target = parseInt(el.dataset.countTo, 10);
+                const duration = 2000;
+                const suffix = el.innerText.includes('%') ? '%' : '';
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    el.innerText = Math.floor(progress * target) + suffix;
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            };
+
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        if (entry.target.hasAttribute('data-stagger-children')) {
+                            const children = entry.target.children;
+                            for (let i = 0; i < children.length; i++) {
+                                children[i].style.setProperty('--stagger-index', i);
+                            }
+                        }
+                        if (entry.target.dataset.countTo) {
+                            animateCountUp(entry.target);
+                        }
+                        const skillFill = entry.target.querySelector('.skill-fill');
+                        if (skillFill) {
+                            skillFill.style.width = skillFill.dataset.width;
+                        }
+                        const skillPercentage = entry.target.querySelector('.skill-percentage[data-count-to]');
+                        if(skillPercentage) {
+                            animateCountUp(skillPercentage);
+                        }
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('[data-animation], [data-count-to], .skill-item, .section-header').forEach(el => observer.observe(el));
+
+            const contactForm = document.getElementById('contact-form');
+            if(contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const btn = this.querySelector('button[type="submit"]');
+                    const originalContent = btn.innerHTML;
+                    btn.innerHTML = 'Sending... <i data-feather="loader" class="spin"></i>';
+                    feather.replace();
+                    btn.disabled = true;
+                    setTimeout(() => {
+                        alert('Thank you for your message! Soumita will get back to you soon.');
+                        this.reset();
+                        btn.innerHTML = originalContent;
+                        feather.replace();
+                        btn.disabled = false;
+                    }, 2000);
+                });
+            }
+            
+            new Swiper('.swiper-container', {
+                loop: true,
+                slidesPerView: 1,
+                spaceBetween: 30,
+                centeredSlides: true,
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+            });
+
+            const style = document.createElement('style');
+            style.innerHTML = `@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } .spin { animation: spin 1s linear infinite; }`;
+            document.head.appendChild(style);
+        });
+    </script>
+    <script src="website-loader.js"></script>
+</body>
+</html>
