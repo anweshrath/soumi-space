@@ -772,6 +772,12 @@ body::before {
     box-shadow: 0 8px 25px rgba(106, 90, 205, 0.15);
 }
 
+/* Fix for resume editor frame - prevent scrolling on hover */
+#resume-preview.preview-frame:hover {
+    transform: none !important;
+    box-shadow: 0 4px 20px rgba(106, 90, 205, 0.1) !important;
+}
+
 /* Experience Editor */
 .experience-list {
     margin-bottom: 2rem;
@@ -5711,4 +5717,42 @@ body.dark-mode .custom-contact-link-item {
 body.dark-mode .custom-contact-link-item:hover {
     border-color: var(--primary-color);
     background: #4a5568;
+}
+
+/* Fix for Load Content button hover issue in resume editor */
+button[onclick*="loadResumeContent"]:hover {
+    transform: none !important;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+button[onclick*="loadResumeContent"]:active {
+    transform: none !important;
+    transition: background-color 0.1s ease !important;
+}
+
+/* Ensure the button remains clickable */
+button[onclick*="loadResumeContent"] {
+    position: relative;
+    z-index: 10;
+}
+
+/* Resume Editor Toolbar Button Hover Effects */
+#resume-editor-toolbar button:hover {
+    background-color: #f3f4f6 !important;
+    transform: none !important;
+    transition: background-color 0.2s ease !important;
+}
+
+#resume-editor-toolbar button:active {
+    background-color: #e5e7eb !important;
+    transform: none !important;
+}
+
+#resume-editor-toolbar select:hover {
+    background-color: #f3f4f6 !important;
+}
+
+#resume-editor-toolbar input[type="color"]:hover {
+    transform: scale(1.05) !important;
+    transition: transform 0.2s ease !important;
 }

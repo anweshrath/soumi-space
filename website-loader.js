@@ -1304,6 +1304,20 @@ My philosophy centers on creating seamless experiences that transform internatio
                 }
             };
             footerLegal.appendChild(legalLink);
+            
+            // Always add the Download Resume link
+            const resumeLink = document.createElement('a');
+            resumeLink.href = '#';
+            resumeLink.textContent = 'Download Resume';
+            resumeLink.onclick = (e) => {
+                e.preventDefault();
+                if (typeof window.downloadResume === 'function') {
+                    window.downloadResume();
+                } else {
+                    console.log('downloadResume function not found');
+                }
+            };
+            footerLegal.appendChild(resumeLink);
         }
         
         // Update copyright

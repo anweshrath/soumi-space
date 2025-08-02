@@ -100,6 +100,9 @@
                     <a href="javascript:void(0)" class="nav-item" data-section="linkedin">
                         <i class="fab fa-linkedin"></i> LinkedIn Posts
                     </a>
+                    <a href="javascript:void(0)" class="nav-item" data-section="resume">
+                        <i class="fas fa-file-alt"></i> Resume Generator
+                    </a>
                     <a href="javascript:void(0)" class="nav-item" data-section="contact">
                         <i class="fas fa-envelope"></i> Contact
                     </a>
@@ -483,7 +486,302 @@ My philosophy centers on creating seamless experiences that transform internatio
                     </button>
                 </div>
 
+                <!-- Resume Generator Section Editor -->
+                <div id="resume-editor" class="editor-section">
+                    <div class="section-header">
+                        <h2>Resume Generator</h2>
+                        <button class="btn-primary" onclick="adminPanel.generateResume()">
+                            <i class="fas fa-download"></i> Generate & Download Resume
+                        </button>
+                    </div>
+                    <div class="editor-grid">
+                        <div class="editor-form">
+                            <div class="form-section">
+                                <h3>Resume Template</h3>
+                                <div class="form-group">
+                                    <label>Select Template</label>
+                                    <select id="resume-template" class="form-input">
+                                        <option value="architect">The Architect - Modern Two Column</option>
+                                        <option value="analyst">The Analyst - Classic Single Column</option>
+                                        <option value="engineer">The Engineer - Timeline Focused</option>
+                                        <option value="innovator">The Innovator - Asymmetrical Design</option>
+                                        <option value="professional">The Professional - Traditional Format</option>
+                                        <option value="minimalist">The Minimalist - Ultra Clean</option>
+                                        <option value="chrono">The Chrono - Timeline Visual</option>
+                                        <option value="portfolio">The Portfolio - Projects Focus</option>
+                                        <option value="coder">The Coder - Dark Code Theme</option>
+                                        <option value="hybrid">The Hybrid - Header + Two Column</option>
+                                        <option value="dashboard">The Dashboard - Data-Driven Layout</option>
+                                        <option value="glassmorphism">The Glassmorphism - Modern Glass Effect</option>
+                                        <option value="neon">The Neon - Futuristic Design</option>
+                                        <option value="gradient">The Gradient - Colorful Modern</option>
+                                        <option value="card">The Card - Card-Based Layout</option>
+                                        <option value="infographic">The Infographic - Visual Data</option>
+                                        <option value="magazine">The Magazine - Editorial Style</option>
+                                        <option value="dashboard-dark">The Dashboard Dark - Dark Data</option>
+                                        <option value="minimal-color">The Minimal Color - Subtle Accents</option>
+                                        <option value="geometric">The Geometric - Angular Design</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3>Resume Type</h3>
+                                <div class="form-group">
+                                    <label>Resume Length</label>
+                                    <select id="resume-length" class="form-input">
+                                        <option value="single">Single Page Resume</option>
+                                        <option value="long">Long Winded Resume</option>
+                                    </select>
+                                    <small>Single Page: Concise, focused content. Long: Detailed descriptions and full experience.</small>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3>Resume Sections</h3>
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="resume-include-about" checked> Include About Section
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="resume-include-education" checked> Include Education
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="resume-include-experience" checked> Include Experience
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="resume-include-skills" checked> Include Skills & Languages
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="resume-include-contact" checked> Include Contact Info
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="resume-include-photo" checked> Include Profile Photo
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3>Profile Photo Settings</h3>
+                                <div class="form-group">
+                                    <label>Photo Source</label>
+                                    <select id="resume-photo-source" class="form-input">
+                                        <option value="index">Use Photo from Website</option>
+                                        <option value="upload">Upload New Photo</option>
+                                        <option value="url">Use Photo URL</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="resume-photo-upload-group" style="display: none;">
+                                    <label>Upload Photo</label>
+                                    <input type="file" id="resume-photo-upload" accept="image/*" class="form-input">
+                                    <small>Recommended: Square image, max 2MB</small>
+                                </div>
+                                <div class="form-group" id="resume-photo-url-group" style="display: none;">
+                                    <label>Photo URL</label>
+                                    <input type="url" id="resume-photo-url" placeholder="https://example.com/photo.jpg" class="form-input">
+                                    <small>Enter direct link to your profile photo</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Photo Style</label>
+                                    <select id="resume-photo-style" class="form-input">
+                                        <option value="circle">Circular</option>
+                                        <option value="rounded">Rounded Square</option>
+                                        <option value="square">Square</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3>Resume Settings</h3>
+                                <div class="form-group">
+                                    <label>Page Size</label>
+                                    <select id="resume-page-size" class="form-input">
+                                        <option value="A4">A4 (Standard)</option>
+                                        <option value="Letter">Letter (US)</option>
+                                        <option value="Legal">Legal</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Orientation</label>
+                                    <select id="resume-orientation" class="form-input">
+                                        <option value="portrait">Portrait</option>
+                                        <option value="landscape">Landscape</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Font Size</label>
+                                    <select id="resume-font-size" class="form-input">
+                                        <option value="small">Small (10pt)</option>
+                                        <option value="medium" selected>Medium (12pt)</option>
+                                        <option value="large">Large (14pt)</option>
+                                    </select>
+                                </div>
+                            </div>
 
+
+
+                            <!-- Template Customization -->
+                            <div class="form-section">
+                                <h3>Template Customization</h3>
+                                <div class="form-group">
+                                    <label>Primary Color</label>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="color" id="resume-primary-color" value="#2c3e50" class="form-input color-picker" style="width: 60px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
+                                        <div id="primary-color-preview" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ddd; background: #2c3e50;"></div>
+                                        <span style="font-size: 12px; color: #666;">Main color for headers and accents</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Secondary Color</label>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="color" id="resume-secondary-color" value="#3498db" class="form-input color-picker" style="width: 60px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
+                                        <div id="secondary-color-preview" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ddd; background: #3498db;"></div>
+                                        <span style="font-size: 12px; color: #666;">Accent color for highlights</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Background Color</label>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="color" id="resume-bg-color" value="#ffffff" class="form-input color-picker" style="width: 60px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
+                                        <div id="bg-color-preview" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ddd; background: #ffffff;"></div>
+                                        <span style="font-size: 12px; color: #666;">Main background color</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Text Color</label>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="color" id="resume-text-color" value="#333333" class="form-input color-picker" style="width: 60px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
+                                        <div id="text-color-preview" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ddd; background: #333333;"></div>
+                                        <span style="font-size: 12px; color: #666;">Main text color</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Layout Options -->
+                            <div class="form-section">
+                                <h3>Layout Options</h3>
+                                <div class="form-group">
+                                    <label>Show Profile Picture</label>
+                                    <input type="checkbox" id="resume-show-photo" checked>
+                                    <small>Include profile picture in resume</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Show Icons</label>
+                                    <input type="checkbox" id="resume-show-icons" checked>
+                                    <small>Show icons for contact info and sections</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Show Skill Tags</label>
+                                    <input type="checkbox" id="resume-show-skill-tags" checked>
+                                    <small>Display skills as colored tags</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Show Timeline</label>
+                                    <input type="checkbox" id="resume-show-timeline">
+                                    <small>Show timeline for experience (where applicable)</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="editor-preview">
+                            <h3>Resume Editor & Preview</h3>
+                            <div id="resume-preview" class="preview-frame">
+                                <div id="resume-editor-toolbar" style="padding: 15px; border-bottom: 2px solid #e5e7eb; background: #f8fafc; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                    <!-- Text Formatting -->
+                                    <div style="display: flex; gap: 4px; align-items: center; padding: 4px 8px; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <button type="button" onclick="adminPanel.execCommand('bold')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-weight: bold; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Bold">B</button>
+                                        <button type="button" onclick="adminPanel.execCommand('italic')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-style: italic; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Italic">I</button>
+                                        <button type="button" onclick="adminPanel.execCommand('underline')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; text-decoration: underline; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Underline">U</button>
+                                        <button type="button" onclick="adminPanel.execCommand('strikeThrough')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; text-decoration: line-through; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Strikethrough">S</button>
+                                    </div>
+                                    
+                                    <!-- Text Alignment -->
+                                    <div style="display: flex; gap: 4px; align-items: center; padding: 4px 8px; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <button type="button" onclick="adminPanel.execCommand('justifyLeft')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Align Left">⫷</button>
+                                        <button type="button" onclick="adminPanel.execCommand('justifyCenter')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Align Center">⫸</button>
+                                        <button type="button" onclick="adminPanel.execCommand('justifyRight')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Align Right">⫹</button>
+                                        <button type="button" onclick="adminPanel.execCommand('justifyFull')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Justify">⫺</button>
+                                    </div>
+                                    
+                                    <!-- Lists -->
+                                    <div style="display: flex; gap: 4px; align-items: center; padding: 4px 8px; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <button type="button" onclick="adminPanel.execCommand('insertUnorderedList')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Bullet List">•</button>
+                                        <button type="button" onclick="adminPanel.execCommand('insertOrderedList')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Numbered List">1.</button>
+                                        <button type="button" onclick="adminPanel.execCommand('outdent')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Decrease Indent">←</button>
+                                        <button type="button" onclick="adminPanel.execCommand('indent')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Increase Indent">→</button>
+                                    </div>
+                                    
+                                    <!-- Headings -->
+                                    <div style="display: flex; gap: 4px; align-items: center; padding: 4px 8px; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <button type="button" onclick="adminPanel.execCommand('formatBlock', 'h1')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 16px; font-weight: bold; min-width: 32px; border-radius: 4px;" title="Heading 1">H1</button>
+                                        <button type="button" onclick="adminPanel.execCommand('formatBlock', 'h2')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 14px; font-weight: bold; min-width: 32px; border-radius: 4px;" title="Heading 2">H2</button>
+                                        <button type="button" onclick="adminPanel.execCommand('formatBlock', 'h3')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 12px; font-weight: bold; min-width: 32px; border-radius: 4px;" title="Heading 3">H3</button>
+                                        <button type="button" onclick="adminPanel.execCommand('formatBlock', 'p')" style="padding: 6px 8px; border: none; background: transparent; cursor: pointer; font-size: 14px; min-width: 32px; border-radius: 4px;" title="Paragraph">P</button>
+                                    </div>
+                                    
+                                    <!-- Font Size -->
+                                    <div style="display: flex; gap: 4px; align-items: center; padding: 4px 8px; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <select onchange="adminPanel.execCommand('fontSize', this.value)" style="padding: 4px 6px; border: none; background: transparent; cursor: pointer; font-size: 12px; border-radius: 4px;" title="Font Size">
+                                            <option value="1">10px</option>
+                                            <option value="2">12px</option>
+                                            <option value="3" selected>14px</option>
+                                            <option value="4">16px</option>
+                                            <option value="5">18px</option>
+                                            <option value="6">20px</option>
+                                            <option value="7">24px</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Font Family -->
+                                    <div style="display: flex; gap: 4px; align-items: center; padding: 4px 8px; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <select onchange="adminPanel.execCommand('fontName', this.value)" style="padding: 4px 6px; border: none; background: transparent; cursor: pointer; font-size: 12px; border-radius: 4px;" title="Font Family">
+                                            <option value="Arial">Arial</option>
+                                            <option value="Times New Roman">Times New Roman</option>
+                                            <option value="Courier New">Courier New</option>
+                                            <option value="Georgia">Georgia</option>
+                                            <option value="Verdana">Verdana</option>
+                                            <option value="Inter" selected>Inter</option>
+                                            <option value="Helvetica">Helvetica</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Text Color -->
+                                    <div style="display: flex; gap: 4px; align-items: center; padding: 4px 8px; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <input type="color" onchange="adminPanel.execCommand('foreColor', this.value)" style="width: 32px; height: 32px; border: none; border-radius: 4px; cursor: pointer;" title="Text Color" value="#000000">
+                                    </div>
+                                    
+                                    <!-- Background Color -->
+                                    <div style="display: flex; gap: 4px; align-items: center; padding: 4px 8px; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <input type="color" onchange="adminPanel.execCommand('hiliteColor', this.value)" style="width: 32px; height: 32px; border: none; border-radius: 4px; cursor: pointer;" title="Background Color" value="#ffffff">
+                                    </div>
+                                    
+                                    <div style="width: 1px; height: 30px; background: #d1d5db; margin: 0 8px;"></div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <button type="button" onclick="adminPanel.loadResumeContent()" style="padding: 8px 12px; border: 1px solid #d1d5db; background: #3b82f6; color: white; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">Load Content</button>
+                                    <button type="button" onclick="adminPanel.clearEditor()" style="padding: 8px 12px; border: 1px solid #d1d5db; background: #ef4444; color: white; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">Clear</button>
+                                    <button type="button" onclick="adminPanel.downloadResume()" style="padding: 8px 12px; border: 1px solid #d1d5db; background: #10b981; color: white; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">Download PDF</button>
+                                </div>
+                                <div id="resume-editor-content" contenteditable="true" class="resume-preview-content" style="padding: 0; min-height: 600px; outline: none; font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; overflow-y: auto;">
+                                    <div style="text-align: center; padding: 40px; color: #6b7280; font-style: italic;">
+                                        <p>Click "Load Content" to load the current resume for editing...</p>
+                                        <p>Edit directly in this window - all changes will be saved to your PDF</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Contact Section Editor -->
                 <div id="contact-editor" class="editor-section">

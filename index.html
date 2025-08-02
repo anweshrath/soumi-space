@@ -1733,6 +1733,7 @@
             <div class="footer-right">
                 <div class="footer-legal">
                     <a href="#" onclick="openLegalModal()">Legal</a>
+                    <a href="#" onclick="downloadResume()">Download Resume</a>
                 </div>
                  <div class="footer-credits">
                     <p>Created with <svg class="gradient-heart" viewBox="0 0 24 24" aria-hidden="true"><path class="heart-fill" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> by <a href="https://anwe.sh" target="_blank" rel="noopener noreferrer">Anwesh</a></p>
@@ -2198,6 +2199,141 @@
             style.innerHTML = `@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } .spin { animation: spin 1s linear infinite; }`;
             document.head.appendChild(style);
         });
+
+        // Function to download resume
+        window.downloadResume = async function() {
+            try {
+                // Get website data from localStorage
+                const websiteData = JSON.parse(localStorage.getItem('websiteData') || '{}');
+                
+                // Create a simple resume HTML (using classic template)
+                const hero = websiteData.hero || {};
+                const about = websiteData.about || {};
+                const experience = websiteData.experience || [];
+                const skills = websiteData.skills || [];
+                const contact = websiteData.contact || {};
+
+                const resumeHtml = `
+                    <div style="font-family: 'Times New Roman', serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+                        <!-- Header -->
+                        <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px;">
+                            <h1 style="margin: 0; color: #333; font-size: 28px;">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 10px 0; color: #666; font-size: 16px;">${hero.subtitle || 'Professional Title'}</p>
+                            <div style="margin-top: 15px; font-size: 14px; color: #555;">
+                                ${contact.email ? `<div>📧 ${contact.email}</div>` : ''}
+                                ${contact.phone ? `<div>📞 ${contact.phone}</div>` : ''}
+                                ${contact.location ? `<div>📍 ${contact.location}</div>` : ''}
+                            </div>
+                        </div>
+
+                        <!-- About Section -->
+                        ${about.description ? `
+                            <div style="margin-bottom: 25px;">
+                                <h2 style="color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 15px;">PROFESSIONAL SUMMARY</h2>
+                                <p style="margin: 0; line-height: 1.6; color: #444;">${about.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Experience Section -->
+                        ${experience.length > 0 ? `
+                            <div style="margin-bottom: 25px;">
+                                <h2 style="color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 15px;">PROFESSIONAL EXPERIENCE</h2>
+                                ${experience.map(exp => `
+                                    <div style="margin-bottom: 20px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                            <h3 style="margin: 0; color: #333; font-size: 16px;">${exp.title}</h3>
+                                            <span style="color: #666; font-size: 14px;">${exp.period}</span>
+                                        </div>
+                                        <div style="color: #666; font-size: 14px; margin-bottom: 10px;">${exp.company}</div>
+                                        <p style="margin: 0; line-height: 1.5; color: #444;">${exp.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Section -->
+                        ${skills.length > 0 ? `
+                            <div style="margin-bottom: 25px;">
+                                <h2 style="color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 15px;">SKILLS & EXPERTISE</h2>
+                                ${skills.map(category => `
+                                    <div style="margin-bottom: 15px;">
+                                        <h3 style="margin: 0 0 8px 0; color: #333; font-size: 14px;">${category.name}</h3>
+                                        <p style="margin: 0; color: #444; font-size: 13px;">${category.skills.join(', ')}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                // Create temporary container
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = resumeHtml;
+                document.body.appendChild(tempContainer);
+
+                // Load html2pdf library if not already loaded
+                if (typeof html2pdf === 'undefined') {
+                    await new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                }
+
+                // Generate PDF
+                const opt = {
+                    margin: 10,
+                    filename: `${hero.name || 'resume'}_classic.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                await html2pdf().set(opt).from(tempContainer).save();
+
+                // Clean up
+                document.body.removeChild(tempContainer);
+
+                // Show success message
+                const message = document.createElement('div');
+                message.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #4CAF50;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 5px;
+                    z-index: 10000;
+                    font-family: Arial, sans-serif;
+                `;
+                message.textContent = 'Resume downloaded successfully!';
+                document.body.appendChild(message);
+                setTimeout(() => document.body.removeChild(message), 3000);
+
+            } catch (error) {
+                console.error('Error downloading resume:', error);
+                
+                // Show error message
+                const message = document.createElement('div');
+                message.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #f44336;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 5px;
+                    z-index: 10000;
+                    font-family: Arial, sans-serif;
+                `;
+                message.textContent = 'Error downloading resume. Please try again.';
+                document.body.appendChild(message);
+                setTimeout(() => document.body.removeChild(message), 3000);
+            }
+        };
     </script>
 </body>
 </html>

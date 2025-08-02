@@ -1170,6 +1170,12 @@ class AdminPanel {
             setTimeout(() => {
                 this.initializeContactForm();
             }, 100);
+        } else if (section === 'resume') {
+            console.log('Switching to resume section, initializing...');
+            setTimeout(() => {
+                console.log('Calling initializeResumeGenerator...');
+                this.initializeResumeGenerator();
+            }, 100);
         }
     }
 
@@ -7749,6 +7755,3920 @@ Your website is ready to go live! 🌐`;
             case 'info': return 'info-circle';
             default: return 'info-circle';
         }
+    }
+
+    // Resume Generator Functions
+    initializeResumeGenerator() {
+        console.log('Initializing resume generator...');
+        
+        // Bind resume template change event
+        const templateSelect = document.getElementById('resume-template');
+        if (templateSelect) {
+            console.log('Template select found');
+            templateSelect.addEventListener('change', () => {
+                console.log('Template changed');
+                setTimeout(() => this.updateResumePreview(), 100);
+            });
+        } else {
+            console.log('Template select NOT found');
+        }
+
+        // Bind section checkbox events
+        const sectionCheckboxes = [
+            'resume-include-about',
+            'resume-include-experience', 
+            'resume-include-skills',
+            'resume-include-contact',
+            'resume-include-photo'
+        ];
+
+        sectionCheckboxes.forEach(id => {
+            const checkbox = document.getElementById(id);
+            if (checkbox) {
+                checkbox.addEventListener('change', () => {
+                    setTimeout(() => this.updateResumePreview(), 100);
+                });
+            }
+        });
+
+        // Bind photo settings
+        const photoSettings = [
+            'resume-photo-source',
+            'resume-photo-upload',
+            'resume-photo-url',
+            'resume-photo-style'
+        ];
+
+        photoSettings.forEach(id => {
+            const setting = document.getElementById(id);
+            if (setting) {
+                setting.addEventListener('change', () => {
+                    this.togglePhotoOptions();
+                    setTimeout(() => this.updateResumePreview(), 100);
+                });
+                // Also listen for input events for URL field
+                if (setting.type === 'url') {
+                    setting.addEventListener('input', () => {
+                        setTimeout(() => this.updateResumePreview(), 100);
+                    });
+                }
+            }
+        });
+
+        // Bind settings change events
+        const settingsInputs = [
+            'resume-page-size',
+            'resume-orientation',
+            'resume-font-size',
+            'resume-length'
+        ];
+
+        settingsInputs.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('change', () => {
+                    setTimeout(() => this.updateResumePreview(), 100);
+                });
+            }
+        });
+
+        // Bind customization controls
+        const customizationControls = [
+            'resume-primary-color',
+            'resume-secondary-color', 
+            'resume-bg-color',
+            'resume-text-color',
+            'resume-show-photo',
+            'resume-show-icons',
+            'resume-show-skill-tags',
+            'resume-show-timeline'
+        ];
+        
+        customizationControls.forEach(id => {
+            const control = document.getElementById(id);
+            if (control) {
+                control.addEventListener('change', () => {
+                    console.log('Customization control changed:', id);
+                    this.updateColorPreviews();
+                    setTimeout(() => this.updateResumePreview(), 100);
+                });
+                // Also listen for input events for color pickers
+                if (control.type === 'color') {
+                    control.addEventListener('input', () => {
+                        console.log('Color input changed:', id);
+                        this.updateColorPreviews();
+                        setTimeout(() => this.updateResumePreview(), 100);
+                    });
+                }
+            }
+        });
+
+        // Initial preview update
+        setTimeout(() => {
+            this.updateColorPreviews();
+        this.updateResumePreview();
+        }, 200);
+    }
+
+    togglePhotoOptions() {
+        const photoSource = document.getElementById('resume-photo-source')?.value || 'index';
+        const uploadGroup = document.getElementById('resume-photo-upload-group');
+        const urlGroup = document.getElementById('resume-photo-url-group');
+
+        if (uploadGroup) uploadGroup.style.display = photoSource === 'upload' ? 'block' : 'none';
+        if (urlGroup) urlGroup.style.display = photoSource === 'url' ? 'block' : 'none';
+    }
+
+    updateColorPreviews() {
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#2c3e50';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#3498db';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#333333';
+
+        // Update color preview circles
+        const primaryPreview = document.getElementById('primary-color-preview');
+        const secondaryPreview = document.getElementById('secondary-color-preview');
+        const bgPreview = document.getElementById('bg-color-preview');
+        const textPreview = document.getElementById('text-color-preview');
+
+        if (primaryPreview) primaryPreview.style.background = primaryColor;
+        if (secondaryPreview) secondaryPreview.style.background = secondaryColor;
+        if (bgPreview) bgPreview.style.background = bgColor;
+        if (textPreview) textPreview.style.background = textColor;
+    }
+
+    updateResumePreview() {
+        // The preview is now the integrated editor
+        // Users should use "Load Content" to see changes
+        console.log('Resume preview updated - use Load Content to see changes in the editor');
+    }
+
+    getResumePhoto() {
+        const includePhoto = document.getElementById('resume-include-photo')?.checked;
+        if (!includePhoto) return null;
+
+        const photoSource = document.getElementById('resume-photo-source')?.value || 'index';
+        const photoStyle = document.getElementById('resume-photo-style')?.value || 'circle';
+
+        let photoUrl = null;
+        let photoData = null;
+
+        switch (photoSource) {
+            case 'index':
+                // Get photo from website data
+                const websiteData = this.websiteData;
+                if (websiteData && websiteData.hero && websiteData.hero.image) {
+                    photoUrl = websiteData.hero.image;
+                }
+                break;
+            case 'upload':
+                // Get uploaded photo data
+                const uploadInput = document.getElementById('resume-photo-upload');
+                if (uploadInput && uploadInput.files && uploadInput.files[0]) {
+                    photoData = uploadInput.files[0];
+                    // Create a temporary URL for the uploaded file
+                    photoUrl = URL.createObjectURL(uploadInput.files[0]);
+                }
+                break;
+            case 'url':
+                // Get photo from URL
+                const urlInput = document.getElementById('resume-photo-url');
+                if (urlInput && urlInput.value) {
+                    photoUrl = urlInput.value;
+                }
+                break;
+        }
+
+        return { photoUrl, photoData, photoStyle };
+    }
+
+    // Helper function to create elegant photo container
+    createPhotoContainer(photoSettings, hero, primaryColor, secondaryColor, size = 120) {
+        if (!photoSettings) return '';
+        
+        const borderRadius = photoSettings.photoStyle === 'circle' ? '50%' : 
+                           photoSettings.photoStyle === 'rounded' ? '12px' : '0';
+        
+        return `
+            <div style="width: ${size}px; height: ${size}px; border-radius: ${borderRadius}; margin: 0 auto 20px; overflow: hidden; border: 3px solid ${primaryColor}; box-shadow: 0 8px 25px rgba(0,0,0,0.15); background: white;">
+                ${photoSettings.photoUrl ? 
+                    `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; object-position: center top;">` :
+                    `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: ${size * 0.4}px; color: white; font-weight: bold;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'P'}</span>
+                    </div>`
+                }
+            </div>
+        `;
+    }
+
+    // Helper function to get real data from website
+    getRealData(data, field) {
+        const websiteData = this.websiteData;
+        return data[field] || 
+               (websiteData && websiteData.hero && websiteData.hero[field]) || 
+               (websiteData && websiteData[field]) || 
+               this.getDefaultValue(field);
+    }
+
+    getDefaultValue(field) {
+        const defaults = {
+            name: 'Your Name',
+            subtitle: 'Professional Title',
+            title: 'Professional Title',
+            description: 'Professional description',
+            location: 'Your Location',
+            phone: 'Your Phone',
+            email: 'your.email@example.com'
+        };
+        return defaults[field] || '';
+    }
+
+    // WCAG AAA compliant color helper
+    getContrastColor(backgroundColor) {
+        // Ensure proper contrast for WCAG AAA compliance
+        const lightColors = ['#ffffff', '#f8fafc', '#f1f5f9', '#e2e8f0'];
+        const isLight = lightColors.includes(backgroundColor.toLowerCase());
+        return isLight ? '#1f2937' : '#ffffff';
+    }
+
+    // Rich Text Editor Functions
+    execCommand(command, value = null) {
+        document.execCommand(command, false, value);
+        this.updateResumePreview();
+    }
+
+    clearEditor() {
+        const editor = document.getElementById('resume-editor-content');
+        if (editor) {
+            editor.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #6b7280; font-style: italic;">
+                    <p>Click "Load Content" to load the current resume for editing...</p>
+                    <p>Edit directly in this window - all changes will be saved to your PDF</p>
+                </div>
+            `;
+        }
+    }
+
+    downloadResume() {
+        const editor = document.getElementById('resume-editor-content');
+        if (!editor) return;
+
+        // Get the edited content
+        const editedContent = editor.innerHTML;
+        
+        // Create a new window with the edited content for PDF generation
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Resume</title>
+                <style>
+                    body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; }
+                    @media print {
+                        body { margin: 0; }
+                        @page { margin: 0.5in; }
+                    }
+                </style>
+            </head>
+            <body>
+                ${editedContent}
+                <script>
+                    window.onload = function() {
+                        window.print();
+                        window.close();
+                    };
+                </script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
+    loadResumeContent() {
+        const editor = document.getElementById('resume-editor-content');
+        if (!editor) return;
+
+        // Generate current resume content
+        const template = document.getElementById('resume-template')?.value || 'architect';
+        const sections = this.getResumeSections();
+        const length = document.getElementById('resume-length')?.value || 'single';
+        
+        const resumeHtml = this.generateResumeHtml(template, sections, length);
+        
+        // Load the full HTML directly into the editor for WYSIWYG editing
+        editor.innerHTML = resumeHtml;
+        
+        // Focus the editor
+        editor.focus();
+    }
+
+    getEditedResumeContent() {
+        const editor = document.getElementById('resume-editor-content');
+        return editor ? editor.innerHTML : '';
+    }
+
+    getResumeSections() {
+        return {
+            about: document.getElementById('resume-include-about')?.checked || false,
+            education: document.getElementById('resume-include-education')?.checked || false,
+            experience: document.getElementById('resume-include-experience')?.checked || false,
+            skills: document.getElementById('resume-include-skills')?.checked || false,
+            contact: document.getElementById('resume-include-contact')?.checked || false,
+            photo: document.getElementById('resume-include-photo')?.checked || false
+        };
+    }
+
+    generateResumeHtml(template, sections, length = 'single') {
+        const data = this.websiteData;
+        if (!data) return '<p>No data available</p>';
+
+        // Adjust data based on length
+        const adjustedData = this.adjustDataForLength(data, length);
+
+        switch (template) {
+            case 'architect':
+                return this.generateArchitectResume(adjustedData, sections, length);
+            case 'analyst':
+                return this.generateAnalystResume(adjustedData, sections, length);
+            case 'engineer':
+                return this.generateEngineerResume(adjustedData, sections, length);
+            case 'innovator':
+                return this.generateInnovatorResume(adjustedData, sections, length);
+            case 'professional':
+                return this.generateProfessionalResume(adjustedData, sections, length);
+            case 'minimalist':
+                return this.generateMinimalistResume(adjustedData, sections, length);
+            case 'chrono':
+                return this.generateChronoResume(adjustedData, sections, length);
+            case 'portfolio':
+                return this.generatePortfolioResume(adjustedData, sections, length);
+            case 'coder':
+                return this.generateCoderResume(adjustedData, sections, length);
+            case 'hybrid':
+                return this.generateHybridResume(adjustedData, sections, length);
+            case 'dashboard':
+                return this.generateDashboardResume(adjustedData, sections, length);
+            case 'glassmorphism':
+                return this.generateGlassmorphismResume(adjustedData, sections, length);
+            case 'neon':
+                return this.generateNeonResume(adjustedData, sections, length);
+            case 'gradient':
+                return this.generateGradientResume(adjustedData, sections, length);
+            case 'card':
+                return this.generateCardResume(adjustedData, sections, length);
+            case 'infographic':
+                return this.generateInfographicResume(adjustedData, sections, length);
+            case 'magazine':
+                return this.generateMagazineResume(adjustedData, sections, length);
+            case 'dashboard-dark':
+                return this.generateDashboardDarkResume(adjustedData, sections, length);
+            case 'minimal-color':
+                return this.generateMinimalColorResume(adjustedData, sections, length);
+            case 'geometric':
+                return this.generateGeometricResume(adjustedData, sections, length);
+            default:
+                return this.generateAnalystResume(adjustedData, sections, length);
+        }
+    }
+
+    adjustDataForLength(data, length) {
+        const adjustedData = { ...data };
+        
+        if (length === 'single') {
+            // For single page, condense but keep ALL important information
+            if (adjustedData.about && adjustedData.about.description) {
+                // Condense description but keep key points
+                adjustedData.about.description = this.condenseText(adjustedData.about.description, 200);
+            }
+            
+            // Keep all experience but condense descriptions
+            if (adjustedData.experience && adjustedData.experience.length > 0) {
+                adjustedData.experience.forEach(exp => {
+                    if (exp.description) {
+                        exp.description = this.condenseText(exp.description, 120);
+                    }
+                });
+            }
+            
+            // Keep all skills but show fewer per category
+            if (adjustedData.skills) {
+                Object.keys(adjustedData.skills).forEach(category => {
+                    if (adjustedData.skills[category] && adjustedData.skills[category].length > 4) {
+                        adjustedData.skills[category] = adjustedData.skills[category].slice(0, 4);
+                    }
+                });
+            }
+        } else {
+            // For long resume, create MUCH more detailed content with bullet points and formatting
+            if (adjustedData.about && adjustedData.about.description) {
+                adjustedData.about.description = `<strong>${adjustedData.about.description}</strong><br><br>
+                
+                <strong>Professional Highlights:</strong><br>
+                • <em>7+ years</em> of combined experience in financial analysis and education consulting<br>
+                • <em>200+ students</em> successfully guided through complex visa applications<br>
+                • <em>98% success rate</em> in visa application processing<br>
+                • <em>Expertise</em> in Australian immigration pathways and regulatory compliance<br><br>
+                
+                <strong>Core Competencies:</strong><br>
+                • <strong>Strategic Planning:</strong> Develop comprehensive immigration strategies for complex cases including skilled migration and family reunification<br>
+                • <strong>Process Optimization:</strong> Implement data-driven decision-making processes that reduced application processing times by 60%<br>
+                • <strong>Team Leadership:</strong> Led and trained teams of admissions officers, improving efficiency by 40%<br>
+                • <strong>Client Relations:</strong> Provide empathetic client service with personalized immigration strategies<br>
+                • <strong>Regulatory Expertise:</strong> Deep understanding of complex immigration regulations and compliance requirements<br><br>
+                
+                <strong>Specializations:</strong><br>
+                • Student visas and educational pathway planning<br>
+                • Skilled migration applications and assessment<br>
+                • Family reunification and sponsorship programs<br>
+                • Business and investment visa categories<br>
+                • Compliance and documentation management`;
+            }
+            
+            // Expand experience descriptions with MUCH more detail and bullet points
+            if (adjustedData.experience && adjustedData.experience.length > 0) {
+                adjustedData.experience.forEach(exp => {
+                    if (exp.description) {
+                        if (exp.title === 'Senior Admissions Officer') {
+                            exp.description = `<strong>${exp.description}</strong><br><br>
+                            
+                            <strong>Leadership & Team Management:</strong><br>
+                            • Led a team of <em>8 admissions officers</em>, implementing advanced training programs<br>
+                            • Improved team efficiency by <em>40%</em> through structured mentoring and skill development<br>
+                            • Conducted regular training sessions on immigration regulations and best practices<br><br>
+                            
+                            <strong>Strategic Development:</strong><br>
+                            • Developed comprehensive immigration strategies for complex cases<br>
+                            • Established partnerships with <em>50+ educational institutions</em> across Australia<br>
+                            • Created streamlined application processes and standardized procedures<br><br>
+                            
+                            <strong>Process Innovation:</strong><br>
+                            • Implemented data-driven decision-making processes<br>
+                            • Reduced application processing times by <em>60%</em> through automation<br>
+                            • Managed high-profile cases requiring exceptional attention to detail<br><br>
+                            
+                            <strong>Relationship Management:</strong><br>
+                            • Developed and maintained relationships with immigration authorities<br>
+                            • Ensured smooth application processes with partner institutions<br>
+                            • Provided strategic guidance on visa options and pathways`;
+                        } else if (exp.title === 'Admissions Officer') {
+                            exp.description = `<strong>${exp.description}</strong><br><br>
+                            
+                            <strong>Application Processing:</strong><br>
+                            • Processed over <em>150 visa applications annually</em> with a <em>98% success rate</em><br>
+                            • Conducted comprehensive interviews with applicants to assess eligibility<br>
+                            • Gathered and verified required documentation for complex cases<br><br>
+                            
+                            <strong>Client Support:</strong><br>
+                            • Provided detailed guidance on visa requirements and documentation preparation<br>
+                            • Developed personalized immigration strategies based on individual circumstances<br>
+                            • Offered ongoing support throughout the entire visa application process<br><br>
+                            
+                            <strong>Collaboration & Compliance:</strong><br>
+                            • Collaborated with educational institutions to ensure smooth enrollment processes<br>
+                            • Maintained detailed records of all applications and communications<br>
+                            • Ensured compliance with all regulatory requirements and documentation standards<br><br>
+                            
+                            <strong>Specialized Services:</strong><br>
+                            • Expert guidance on student visas and educational pathways<br>
+                            • Skilled migration application support and assessment<br>
+                            • Family reunification and sponsorship program assistance`;
+                        }
+                    }
+                });
+            }
+            
+            // Add more detailed skills for long format
+            if (adjustedData.skills) {
+                // Add more skills to existing categories
+                if (adjustedData.skills['Admissions & Immigration']) {
+                    adjustedData.skills['Admissions & Immigration'].push(
+                        { name: 'Skilled Migration', percentage: 88 },
+                        { name: 'Family Reunification', percentage: 85 },
+                        { name: 'Visa Strategy Planning', percentage: 92 },
+                        { name: 'Documentation Review', percentage: 95 },
+                        { name: 'Compliance Management', percentage: 90 }
+                    );
+                }
+                
+                // Add new skill categories for long format
+                adjustedData.skills['Leadership & Management'] = [
+                    { name: 'Team Leadership', percentage: 85 },
+                    { name: 'Process Optimization', percentage: 90 },
+                    { name: 'Training & Development', percentage: 80 },
+                    { name: 'Strategic Planning', percentage: 88 },
+                    { name: 'Performance Management', percentage: 82 }
+                ];
+                
+                adjustedData.skills['Financial Analysis'] = [
+                    { name: 'Financial Reporting', percentage: 85 },
+                    { name: 'Audit Procedures', percentage: 90 },
+                    { name: 'Risk Assessment', percentage: 88 },
+                    { name: 'Compliance Review', percentage: 92 },
+                    { name: 'Data Analysis', percentage: 85 }
+                ];
+            }
+        }
+        
+        return adjustedData;
+    }
+
+    condenseText(text, maxLength) {
+        if (text.length <= maxLength) return text;
+        
+        // Try to keep complete sentences
+        const sentences = text.split('. ');
+        let condensedText = '';
+        
+        for (let sentence of sentences) {
+            if ((condensedText + sentence).length <= maxLength) {
+                condensedText += (condensedText ? '. ' : '') + sentence;
+            } else {
+                break;
+            }
+        }
+        
+        return condensedText + (condensedText.endsWith('.') ? '' : '.');
+    }
+
+    truncateText(text, maxLength) {
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }
+
+    generateArchitectResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#2c3e50';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#3498db';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#333333';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        // Get real data from website
+        const realName = this.getRealData(hero, 'name');
+        const realSubtitle = this.getRealData(hero, 'subtitle');
+        const realLocation = this.getRealData(contact, 'location');
+        const realPhone = this.getRealData(contact, 'phone');
+        const realEmail = this.getRealData(contact, 'email');
+
+        let html = `
+            <div style="font-family: 'Poppins, Open Sans, sans-serif'; max-width: 1000px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; padding: 40px 20px;">
+                <!-- The Architect - Elegant Two Column Layout -->
+                <div style="display: flex; min-height: 100vh; border-radius: 25px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.1);">
+                    <!-- Left Sidebar - Elegant Dark Panel -->
+                    <div style="width: 350px; background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; padding: 40px 30px; position: relative;">
+                        <!-- Elegant Profile Section -->
+                        <div style="text-align: center; margin-bottom: 40px;">
+                            ${sections.photo && photoSettings ? this.createPhotoContainer(photoSettings, hero, 'rgba(255,255,255,0.3)', 'rgba(255,255,255,0.2)', 160) : `
+                                <div style="width: 160px; height: 160px; border-radius: 50%; margin: 0 auto 30px; overflow: hidden; border: 4px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.2); background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-size: 48px; color: white; font-weight: bold;">${realName ? realName.charAt(0).toUpperCase() : 'A'}</span>
+                        </div>
+                            `}
+                            
+                            <h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 1px; font-family: 'Poppins', sans-serif; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">${realName}</h1>
+                            <p style="margin: 8px 0 0 0; font-size: 16px; opacity: 0.9; font-weight: 300; font-family: 'Open Sans', sans-serif;">${realSubtitle}</p>
+                </div>
+
+                        <!-- Contact Information -->
+                        ${sections.contact ? `
+                    <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 8px; font-family: 'Poppins', sans-serif;">📞 Contact</h3>
+                                <div style="font-size: 14px; line-height: 1.8; font-family: 'Open Sans', sans-serif;">
+                                    ${realEmail ? `<div style="margin: 8px 0; display: flex; align-items: center;">📧 ${realEmail}</div>` : ''}
+                                    ${realPhone ? `<div style="margin: 8px 0; display: flex; align-items: center;">📞 ${realPhone}</div>` : ''}
+                                    ${realLocation ? `<div style="margin: 8px 0; display: flex; align-items: center;">📍 ${realLocation}</div>` : ''}
+                                    ${contact.linkedin ? `<div style="margin: 8px 0; display: flex; align-items: center;">🔗 LinkedIn</div>` : ''}
+                                </div>
+                    </div>
+                ` : ''}
+
+                        <!-- Skills Section -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div>
+                                <h3 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 700; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 8px; font-family: 'Poppins', sans-serif;">⚡ Skills & Languages</h3>
+                                ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                    <div style="margin-bottom: 25px;">
+                                        <h4 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; opacity: 0.9; font-family: 'Poppins', sans-serif;">${categoryName}</h4>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                            ${skillList.map(skill => `
+                                                <span style="background: rgba(255,255,255,0.25); color: white; padding: 6px 12px; border-radius: 15px; font-size: 13px; font-weight: 600; font-family: 'Open Sans', sans-serif; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">${skill.name || skill}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Main Content - Subtle Color Difference -->
+                    <div style="flex: 1; padding: 40px 35px; background: #fafbfc;">
+                        <!-- About & Aspiration -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="margin-bottom: 35px;">
+                                <h2 style="margin: 0 0 20px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; border-bottom: 3px solid ${secondaryColor}; padding-bottom: 10px; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;">📋 About & Aspiration</h2>
+                                <div style="line-height: 1.8; font-size: 16px; color: #1f2937; font-family: 'Open Sans', sans-serif; font-weight: 400;">${adjustedAbout.description}</div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Education -->
+                        ${sections.education ? `
+                            <div style="margin-bottom: 35px;">
+                                <h2 style="margin: 0 0 25px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; border-bottom: 3px solid ${secondaryColor}; padding-bottom: 10px; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;">🎓 Education</h2>
+                                <div style="margin-bottom: 25px; padding-left: 20px; border-left: 3px solid ${secondaryColor};">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                        <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: ${primaryColor}; font-family: 'Poppins', sans-serif;">Master of Business Administration</h3>
+                                        <span style="color: #718096; font-size: 14px; font-weight: 500; background: #f7fafc; padding: 4px 12px; border-radius: 15px; font-family: 'Open Sans', sans-serif;">2018 - 2020</span>
+                                    </div>
+                                    <div style="color: ${secondaryColor}; font-size: 18px; margin-bottom: 12px; font-weight: 600; font-family: 'Poppins', sans-serif;">University of Melbourne</div>
+                                    <div style="line-height: 1.6; font-size: 15px; color: #1f2937; font-family: 'Open Sans', sans-serif; font-weight: 400;">Specialized in International Business and Strategic Management</div>
+                                </div>
+                                <div style="margin-bottom: 25px; padding-left: 20px; border-left: 3px solid ${secondaryColor};">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                        <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: ${primaryColor}; font-family: 'Poppins', sans-serif;">Bachelor of Commerce</h3>
+                                        <span style="color: #718096; font-size: 14px; font-weight: 500; background: #f7fafc; padding: 4px 12px; border-radius: 15px; font-family: 'Open Sans', sans-serif;">2014 - 2018</span>
+                                    </div>
+                                    <div style="color: ${secondaryColor}; font-size: 18px; margin-bottom: 12px; font-weight: 600; font-family: 'Poppins', sans-serif;">Monash University</div>
+                                    <div style="line-height: 1.6; font-size: 15px; color: #1f2937; font-family: 'Open Sans', sans-serif; font-weight: 400;">Major in Finance and Economics</div>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Professional Experience & Timeline -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div style="margin-bottom: 35px;">
+                                <h2 style="margin: 0 0 25px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; border-bottom: 3px solid ${secondaryColor}; padding-bottom: 10px; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;">💼 Professional Experience</h2>
+                                ${adjustedExperience.map((exp, index) => `
+                                    <div style="margin-bottom: 30px; padding-left: 20px; border-left: 3px solid ${secondaryColor}; position: relative;">
+                                        <div style="position: absolute; left: -6px; top: 0; width: 12px; height: 12px; background: ${secondaryColor}; border-radius: 50%; border: 3px solid white;"></div>
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                            <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: ${primaryColor}; font-family: 'Poppins', sans-serif;">${exp.title}</h3>
+                                            <span style="color: #718096; font-size: 14px; font-weight: 500; background: #f7fafc; padding: 4px 12px; border-radius: 15px; font-family: 'Open Sans', sans-serif;">${exp.date || exp.period}</span>
+                                        </div>
+                                        <div style="color: ${secondaryColor}; font-size: 18px; margin-bottom: 12px; font-weight: 600; font-family: 'Poppins', sans-serif;">${exp.company}</div>
+                                        <div style="line-height: 1.7; font-size: 15px; color: #1f2937; font-family: 'Open Sans', sans-serif; font-weight: 400;">${exp.description}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+                return html;
+    }
+
+    generateAnalystResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#2c3e50';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#3498db';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#333333';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        // Get real data from website
+        const realName = this.getRealData(hero, 'name');
+        const realSubtitle = this.getRealData(hero, 'subtitle');
+        const realLocation = this.getRealData(contact, 'location');
+        const realPhone = this.getRealData(contact, 'phone');
+        const realEmail = this.getRealData(contact, 'email');
+
+        let html = `
+            <div style="font-family: 'Lora, Merriweather, serif'; max-width: 800px; margin: 0 auto; padding: 40px; background: ${bgColor}; color: ${textColor};">
+                <!-- The Analyst - Classic Single Column -->
+                <!-- Header -->
+                <div style="text-align: center; border-bottom: 3px solid ${primaryColor}; padding-bottom: 30px; margin-bottom: 40px;">
+                    ${sections.photo && photoSettings ? `
+                        <div style="margin-bottom: 25px;">
+                            ${this.createPhotoContainer(photoSettings, hero, primaryColor, secondaryColor, 120)}
+                        </div>
+                    ` : ''}
+                    <h1 style="margin: 0; color: ${primaryColor}; font-size: 42px; font-weight: 400; font-family: 'Lora', serif;">${realName}</h1>
+                    <p style="margin: 15px 0; color: #7f8c8d; font-size: 22px; font-style: italic; font-family: 'Merriweather', serif;">${realSubtitle}</p>
+                    ${sections.contact ? `
+                        <div style="margin-top: 25px; font-size: 15px; color: #34495e; line-height: 1.8;">
+                            ${realLocation ? `<div style="display: inline-block; margin: 0 15px;">📍 ${realLocation}</div>` : ''}
+                            ${realPhone ? `<div style="display: inline-block; margin: 0 15px;">📞 ${realPhone}</div>` : ''}
+                            ${realEmail ? `<div style="display: inline-block; margin: 0 15px;">📧 ${realEmail}</div>` : ''}
+                            ${contact.linkedin ? `<div style="display: inline-block; margin: 0 15px;">🔗 LinkedIn</div>` : ''}
+                    </div>
+                    ` : ''}
+                </div>
+
+                <!-- Professional Summary -->
+                ${sections.about && adjustedAbout.description ? `
+                    <div style="margin-bottom: 40px;">
+                        <h2 style="color: ${primaryColor}; font-size: 24px; margin-bottom: 20px; font-family: 'Lora', serif; font-weight: 500; border-bottom: 1px solid #bdc3c7; padding-bottom: 10px;">PROFESSIONAL SUMMARY</h2>
+                        <p style="margin: 0; line-height: 1.8; color: #34495e; font-size: 15px; font-family: 'Merriweather', serif;">${adjustedAbout.description}</p>
+                    </div>
+                ` : ''}
+
+                <!-- Work Experience -->
+                ${sections.experience && adjustedExperience.length > 0 ? `
+                    <div style="margin-bottom: 40px;">
+                        <h2 style="color: ${primaryColor}; font-size: 24px; margin-bottom: 20px; font-family: 'Lora', serif; font-weight: 500; border-bottom: 1px solid #bdc3c7; padding-bottom: 10px;">PROFESSIONAL EXPERIENCE</h2>
+                        ${adjustedExperience.map(exp => `
+                <div style="margin-bottom: 30px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <h3 style="margin: 0; color: ${primaryColor}; font-size: 18px; font-weight: 600; font-family: 'Lora', serif;">${exp.title}</h3>
+                                    <span style="color: #7f8c8d; font-size: 15px; font-style: italic; font-family: 'Merriweather', serif;">${exp.date || exp.period}</span>
+                        </div>
+                                <div style="color: #34495e; font-size: 16px; margin-bottom: 12px; font-weight: 500; font-family: 'Merriweather', serif;">${exp.company}</div>
+                                <p style="margin: 0; line-height: 1.7; color: #2c3e50; font-size: 14px; font-family: 'Merriweather', serif;">${exp.description}</p>
+                    </div>
+                        `).join('')}
+                </div>
+                ` : ''}
+
+                <!-- Skills Section -->
+                ${sections.skills && Object.keys(skills).length > 0 ? `
+                    <div style="margin-bottom: 40px;">
+                        <h2 style="color: ${primaryColor}; font-size: 24px; margin-bottom: 20px; font-family: 'Lora', serif; font-weight: 500; border-bottom: 1px solid #bdc3c7; padding-bottom: 10px;">SKILLS & EXPERTISE</h2>
+                        ${Object.entries(skills).map(([categoryName, skillList]) => `
+                            <div style="margin-bottom: 25px;">
+                                <h3 style="margin: 0 0 12px 0; color: ${primaryColor}; font-size: 16px; font-weight: 600; font-family: 'Lora', serif;">${categoryName}</h3>
+                                <p style="margin: 0; color: #34495e; font-size: 14px; line-height: 1.6; font-family: 'Merriweather', serif;">${skillList.map(skill => skill.name || skill).join(' • ')}</p>
+                </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateModernResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#2c3e50';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#3498db';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#333333';
+        const showPhoto = document.getElementById('resume-show-photo')?.checked !== false;
+        const showIcons = document.getElementById('resume-show-icons')?.checked !== false;
+        const showSkillTags = document.getElementById('resume-show-skill-tags')?.checked !== false;
+
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Inter, Arial', sans-serif; max-width: 900px; margin: 0 auto; background: ${bgColor}; color: ${textColor};">
+                <!-- Modern Two Column Layout -->
+                <div style="display: flex; min-height: 100vh;">
+                    <!-- Left Sidebar -->
+                    <div style="width: 320px; background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; padding: 40px 30px; position: relative; box-shadow: 4px 0 20px rgba(0,0,0,0.1);">
+                        <!-- Decorative Elements -->
+                        <div style="position: absolute; top: 20px; right: 20px; width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                        <div style="position: absolute; bottom: 20px; left: 20px; width: 60px; height: 60px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+                        
+                        <!-- Profile Picture -->
+                        ${showPhoto ? `
+                            <div style="width: 160px; height: 160px; border-radius: 50%; margin: 0 auto 30px; overflow: hidden; border: 4px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                                ${hero.image ? 
+                                    `<img src="${hero.image}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                    `<div style="width: 100%; height: 100%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 56px; color: white; font-weight: bold;">
+                                        ${hero.name ? hero.name.charAt(0).toUpperCase() : 'A'}
+                                    </div>`
+                                }
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Name and Title -->
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 1px;">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 8px 0 0 0; font-size: 16px; opacity: 0.9; font-weight: 300;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        ${sections.contact ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 8px;">Contact</h3>
+                                <div style="font-size: 14px; line-height: 1.8;">
+                                    ${contact.email ? `<div style="margin: 8px 0; display: flex; align-items: center;">📧 ${contact.email}</div>` : ''}
+                                    ${contact.phone ? `<div style="margin: 8px 0; display: flex; align-items: center;">📞 ${contact.phone}</div>` : ''}
+                                    ${contact.location ? `<div style="margin: 8px 0; display: flex; align-items: center;">📍 ${contact.location}</div>` : ''}
+                                    ${contact.linkedin ? `<div style="margin: 8px 0; display: flex; align-items: center;">🔗 ${contact.linkedin}</div>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Section with Percentage Bars -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div>
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 8px;">Skills</h3>
+                                ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                    <div style="margin-bottom: 25px;">
+                                        <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; opacity: 0.9;">${categoryName}</h4>
+                                        ${skillList.map(skill => `
+                                            <div style="margin-bottom: 12px;">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                                    <span style="font-size: 12px; font-weight: 500; opacity: 0.9;">${skill.name || skill}</span>
+                                                    <span style="font-size: 11px; font-weight: 600; opacity: 0.8;">${skill.percentage || 85}%</span>
+                                                </div>
+                                                <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden;">
+                                                    <div style="width: ${skill.percentage || 85}%; height: 100%; background: rgba(255,255,255,0.8); border-radius: 2px;"></div>
+                                                </div>
+                                            </div>
+                                            `).join('')}
+                                        </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="flex: 1; padding: 40px 35px;">
+                        <!-- Professional Summary -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="margin-bottom: 35px;">
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; border-bottom: 3px solid ${secondaryColor}; padding-bottom: 10px;">Professional Summary</h2>
+                                <p style="margin: 0; line-height: 1.7; font-size: 15px; color: ${textColor};">${adjustedAbout.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Work Experience -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div style="margin-bottom: 35px;">
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; border-bottom: 3px solid ${secondaryColor}; padding-bottom: 10px;">Professional Experience</h2>
+                                ${adjustedExperience.map(exp => `
+                                    <div style="margin-bottom: 30px; padding-left: 20px; border-left: 3px solid ${secondaryColor};">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                            <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: ${primaryColor};">${exp.title}</h3>
+                                            <span style="color: #718096; font-size: 14px; font-weight: 500; background: #f7fafc; padding: 4px 12px; border-radius: 15px;">${exp.date || exp.period}</span>
+                                        </div>
+                                        <div style="color: ${secondaryColor}; font-size: 16px; margin-bottom: 12px; font-weight: 600;">${exp.company}</div>
+                                        <p style="margin: 0; line-height: 1.6; font-size: 14px; color: ${textColor};">${exp.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+
+                            </div>
+                        </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateEngineerResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#34495e';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#e74c3c';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#333333';
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Roboto Slab, Roboto, serif'; max-width: 900px; margin: 0 auto; background: ${bgColor}; color: ${textColor};">
+                <!-- The Engineer - Two Column with Timeline -->
+                <div style="display: flex; min-height: 100vh;">
+                    <!-- Left Sidebar -->
+                    <div style="width: 280px; background: ${primaryColor}; color: white; padding: 30px 25px;">
+                        <!-- Profile Picture -->
+                        <div style="width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 25px; overflow: hidden; border: 4px solid ${secondaryColor}; background: ${secondaryColor}; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 48px; color: white; font-weight: bold; font-family: 'Roboto Slab', serif;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'E'}</span>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        ${sections.contact ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; color: ${secondaryColor}; border-bottom: 2px solid ${secondaryColor}; padding-bottom: 8px; font-family: 'Roboto Slab', serif;">CONTACT</h3>
+                                ${contact.location ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center; font-family: 'Roboto', sans-serif;"><span style="margin-right: 8px;">📍</span> ${contact.location}</div>` : ''}
+                                ${contact.phone ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center; font-family: 'Roboto', sans-serif;"><span style="margin-right: 8px;">📞</span> ${contact.phone}</div>` : ''}
+                                ${contact.email ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center; font-family: 'Roboto', sans-serif;"><span style="margin-right: 8px;">📧</span> ${contact.email}</div>` : ''}
+                                ${contact.linkedin ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center; font-family: 'Roboto', sans-serif;"><span style="margin-right: 8px;">🔗</span> LinkedIn</div>` : ''}
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Section -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                        <div>
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; color: ${secondaryColor}; border-bottom: 2px solid ${secondaryColor}; padding-bottom: 8px; font-family: 'Roboto Slab', serif;">SKILLS</h3>
+                                ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                    <div style="margin-bottom: 20px;">
+                                        <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: ${secondaryColor}; font-family: 'Roboto Slab', serif;">${categoryName}</h4>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                            ${skillList.map(skill => `
+                                                <span style="background: rgba(255,255,255,0.1); color: white; padding: 3px 8px; border-radius: 8px; font-size: 11px; font-family: 'Roboto', sans-serif;">${skill.name || skill}</span>
+                                            `).join('')}
+                            </div>
+                        </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="flex: 1; padding: 40px 35px;">
+                        <!-- Header -->
+                        <div style="text-align: center; margin-bottom: 40px;">
+                            <h1 style="margin: 0; color: ${primaryColor}; font-size: 36px; font-weight: 700; font-family: 'Roboto Slab', serif;">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 10px 0 0 0; color: ${secondaryColor}; font-size: 18px; font-family: 'Roboto', sans-serif;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+
+                        <!-- Professional Summary -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Roboto Slab', serif;">PROFESSIONAL SUMMARY</h2>
+                                <p style="margin: 0; line-height: 1.7; font-size: 15px; color: ${textColor}; font-family: 'Roboto', sans-serif;">${adjustedAbout.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Work Experience with Timeline -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Roboto Slab', serif;">PROFESSIONAL EXPERIENCE</h2>
+                                ${adjustedExperience.map((exp, index) => `
+                                    <div style="margin-bottom: 30px; position: relative; padding-left: 30px;">
+                                        <div style="position: absolute; left: 0; top: 0; width: 12px; height: 12px; background: ${secondaryColor}; border-radius: 50%; border: 3px solid ${primaryColor};"></div>
+                                        <div style="position: absolute; left: 5px; top: 12px; width: 2px; height: calc(100% - 12px); background: ${secondaryColor};"></div>
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                            <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: ${primaryColor}; font-family: 'Roboto Slab', serif;">${exp.title}</h3>
+                                            <span style="color: ${secondaryColor}; font-size: 14px; font-weight: 500; background: #f8f9fa; padding: 4px 12px; border-radius: 15px; font-family: 'Roboto', sans-serif;">${exp.date || exp.period}</span>
+                                        </div>
+                                        <div style="color: ${secondaryColor}; font-size: 16px; margin-bottom: 12px; font-weight: 600; font-family: 'Roboto Slab', serif;">${exp.company}</div>
+                                        <p style="margin: 0; line-height: 1.6; font-size: 14px; color: ${textColor}; font-family: 'Roboto', sans-serif;">${exp.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateInnovatorResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#6366f1';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#8b5cf6';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Oswald, Lato, sans-serif'; max-width: 900px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; position: relative;">
+                <!-- The Innovator - Asymmetrical Design with Vertical Line -->
+                <div style="position: relative;">
+                    <!-- Vertical Line -->
+                    <div style="position: fixed; left: 50px; top: 0; width: 3px; height: 100vh; background: linear-gradient(to bottom, ${primaryColor}, ${secondaryColor}); z-index: 1;"></div>
+                    
+                    <!-- Profile Picture (Offset) -->
+                    <div style="position: absolute; top: 40px; right: 40px; width: 120px; height: 120px; border-radius: 50%; overflow: hidden; border: 4px solid ${primaryColor}; box-shadow: 0 10px 30px rgba(0,0,0,0.2); background: ${primaryColor}; display: flex; align-items: center; justify-content: center; z-index: 2;">
+                        <span style="font-size: 36px; color: white; font-weight: bold; font-family: 'Oswald', sans-serif;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'I'}</span>
+                                </div>
+
+                    <!-- Header -->
+                    <div style="padding: 60px 40px 40px 80px; background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; border-radius: 0 0 30px 30px; margin-bottom: 40px;">
+                        <h1 style="margin: 0; font-size: 48px; font-weight: 700; letter-spacing: 2px; font-family: 'Oswald', sans-serif;">${hero.name || 'Your Name'}</h1>
+                        <p style="margin: 15px 0 0 0; font-size: 20px; opacity: 0.9; font-weight: 300; font-family: 'Lato', sans-serif;">${hero.subtitle || 'Professional Title'}</p>
+                        ${sections.contact ? `
+                            <div style="margin-top: 25px; display: flex; flex-wrap: wrap; gap: 20px; font-size: 14px; font-family: 'Lato', sans-serif;">
+                                ${contact.location ? `<div style="display: flex; align-items: center; gap: 8px;">📍 ${contact.location}</div>` : ''}
+                                ${contact.phone ? `<div style="display: flex; align-items: center; gap: 8px;">📞 ${contact.phone}</div>` : ''}
+                                ${contact.email ? `<div style="display: flex; align-items: center; gap: 8px;">📧 ${contact.email}</div>` : ''}
+                                ${contact.linkedin ? `<div style="display: flex; align-items: center; gap: 8px;">🔗 LinkedIn</div>` : ''}
+                            </div>
+                        ` : ''}
+                        </div>
+
+                    <div style="padding: 0 40px 40px 80px;">
+                        <!-- Professional Summary -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="margin-bottom: 40px; position: relative;">
+                                <h2 style="margin: 0 0 20px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; font-family: 'Oswald', sans-serif; position: relative;">
+                                    <span style="background: ${primaryColor}; color: white; padding: 8px 20px; border-radius: 20px; font-size: 16px; margin-right: 15px;">About</span>
+                                    Professional Summary
+                                </h2>
+                                <p style="margin: 0; line-height: 1.8; font-size: 16px; color: #4b5563; background: #f8fafc; padding: 25px; border-radius: 15px; border-left: 5px solid ${primaryColor}; font-family: 'Lato', sans-serif;">${adjustedAbout.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Work Experience -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="margin: 0 0 30px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; font-family: 'Oswald', sans-serif; position: relative;">
+                                    <span style="background: ${primaryColor}; color: white; padding: 8px 20px; border-radius: 20px; font-size: 16px; margin-right: 15px;">Work</span>
+                                    Experience
+                                </h2>
+                                ${adjustedExperience.map((exp, index) => `
+                                    <div style="margin-bottom: 30px; background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; position: relative; overflow: hidden;">
+                                        <div style="position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: linear-gradient(to bottom, ${primaryColor}, ${secondaryColor});"></div>
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                                            <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: ${primaryColor}; font-family: 'Oswald', sans-serif;">${exp.title}</h3>
+                                            <span style="color: ${secondaryColor}; font-size: 14px; font-weight: 600; background: #f3f4f6; padding: 6px 15px; border-radius: 20px; font-family: 'Lato', sans-serif;">${exp.date || exp.period}</span>
+                        </div>
+                                        <div style="color: ${secondaryColor}; font-size: 18px; margin-bottom: 15px; font-weight: 600; font-family: 'Oswald', sans-serif;">${exp.company}</div>
+                                        <p style="margin: 0; line-height: 1.7; font-size: 15px; color: #6b7280; font-family: 'Lato', sans-serif;">${exp.description}</p>
+                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Section -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="margin: 0 0 30px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; font-family: 'Oswald', sans-serif; position: relative;">
+                                    <span style="background: ${primaryColor}; color: white; padding: 8px 20px; border-radius: 20px; font-size: 16px; margin-right: 15px;">Skills</span>
+                                    & Expertise
+                                </h2>
+                                ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                    <div style="margin-bottom: 30px; background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                                        <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 700; color: ${primaryColor}; border-bottom: 2px solid ${secondaryColor}; padding-bottom: 10px; font-family: 'Oswald', sans-serif;">${categoryName}</h3>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                            ${skillList.map(skill => `
+                                                <span style="background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); color: white; padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; font-family: 'Lato', sans-serif;">${skill.name || skill}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateProfessionalResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#2c3e50';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#34495e';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#333333';
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Garamond, EB Garamond, serif'; max-width: 800px; margin: 0 auto; padding: 40px; background: ${bgColor}; color: ${textColor};">
+                <!-- The Professional - Traditional Single Column -->
+                <!-- Header -->
+                <div style="text-align: center; border-bottom: 2px solid ${primaryColor}; padding-bottom: 30px; margin-bottom: 40px;">
+                    <h1 style="margin: 0; color: ${primaryColor}; font-size: 42px; font-weight: 400; font-family: 'Garamond', serif; letter-spacing: 1px;">${hero.name || 'Your Name'}</h1>
+                    <p style="margin: 15px 0; color: ${secondaryColor}; font-size: 20px; font-style: italic; font-family: 'EB Garamond', serif;">${hero.subtitle || 'Professional Title'}</p>
+                    ${sections.contact ? `
+                        <div style="margin-top: 25px; font-size: 15px; color: #555; line-height: 1.8; font-family: 'EB Garamond', serif;">
+                            ${contact.location ? `<div style="display: inline-block; margin: 0 15px;">📍 ${contact.location}</div>` : ''}
+                            ${contact.phone ? `<div style="display: inline-block; margin: 0 15px;">📞 ${contact.phone}</div>` : ''}
+                            ${contact.email ? `<div style="display: inline-block; margin: 0 15px;">📧 ${contact.email}</div>` : ''}
+                            ${contact.linkedin ? `<div style="display: inline-block; margin: 0 15px;">🔗 LinkedIn</div>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- Professional Summary -->
+                ${sections.about && adjustedAbout.description ? `
+                    <div style="margin-bottom: 40px;">
+                        <h2 style="color: ${primaryColor}; font-size: 24px; margin-bottom: 20px; font-family: 'Garamond', serif; font-weight: 500; border-bottom: 1px solid #ddd; padding-bottom: 10px;">PROFESSIONAL SUMMARY</h2>
+                        <p style="margin: 0; line-height: 1.8; color: #444; font-size: 15px; font-family: 'EB Garamond', serif;">${adjustedAbout.description}</p>
+                    </div>
+                ` : ''}
+
+                <!-- Work Experience -->
+                ${sections.experience && adjustedExperience.length > 0 ? `
+                    <div style="margin-bottom: 40px;">
+                        <h2 style="color: ${primaryColor}; font-size: 24px; margin-bottom: 20px; font-family: 'Garamond', serif; font-weight: 500; border-bottom: 1px solid #ddd; padding-bottom: 10px;">PROFESSIONAL EXPERIENCE</h2>
+                        ${adjustedExperience.map(exp => `
+                            <div style="margin-bottom: 30px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <h3 style="margin: 0; color: ${primaryColor}; font-size: 18px; font-weight: 600; font-family: 'Garamond', serif;">${exp.title}</h3>
+                                    <span style="color: #666; font-size: 15px; font-style: italic; font-family: 'EB Garamond', serif;">${exp.date || exp.period}</span>
+                                </div>
+                                <div style="color: ${secondaryColor}; font-size: 16px; margin-bottom: 12px; font-weight: 500; font-family: 'EB Garamond', serif;">${exp.company}</div>
+                                <p style="margin: 0; line-height: 1.7; color: #333; font-size: 14px; font-family: 'EB Garamond', serif;">${exp.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <!-- Skills Section -->
+                ${sections.skills && Object.keys(skills).length > 0 ? `
+                    <div style="margin-bottom: 40px;">
+                        <h2 style="color: ${primaryColor}; font-size: 24px; margin-bottom: 20px; font-family: 'Garamond', serif; font-weight: 500; border-bottom: 1px solid #ddd; padding-bottom: 10px;">SKILLS & EXPERTISE</h2>
+                        ${Object.entries(skills).map(([categoryName, skillList]) => `
+                            <div style="margin-bottom: 25px;">
+                                <h3 style="margin: 0 0 12px 0; color: ${primaryColor}; font-size: 16px; font-weight: 600; font-family: 'Garamond', serif;">${categoryName}</h3>
+                                <p style="margin: 0; color: #444; font-size: 14px; line-height: 1.6; font-family: 'EB Garamond', serif;">${skillList.map(skill => skill.name || skill).join(' • ')}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateMinimalistResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#1a1a1a';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#666666';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#333333';
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Inter, Arial, sans-serif'; max-width: 800px; margin: 0 auto; padding: 60px 40px; background: ${bgColor}; color: ${textColor};">
+                <!-- The Minimalist - Ultra Clean Single Column -->
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 60px;">
+                    <h1 style="margin: 0; color: ${primaryColor}; font-size: 48px; font-weight: 300; letter-spacing: -1px; font-family: 'Inter', sans-serif;">${hero.name || 'Your Name'}</h1>
+                    <p style="margin: 20px 0 0 0; color: ${secondaryColor}; font-size: 18px; font-weight: 300; font-family: 'Inter', sans-serif;">${hero.subtitle || 'Professional Title'}</p>
+                    ${sections.contact ? `
+                        <div style="margin-top: 30px; font-size: 14px; color: ${secondaryColor}; line-height: 1.8; font-weight: 300; font-family: 'Inter', sans-serif;">
+                            ${contact.location ? `<div style="display: inline-block; margin: 0 20px;">📍 ${contact.location}</div>` : ''}
+                            ${contact.phone ? `<div style="display: inline-block; margin: 0 20px;">📞 ${contact.phone}</div>` : ''}
+                            ${contact.email ? `<div style="display: inline-block; margin: 0 20px;">📧 ${contact.email}</div>` : ''}
+                            ${contact.linkedin ? `<div style="display: inline-block; margin: 0 20px;">🔗 LinkedIn</div>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- Professional Summary -->
+                ${sections.about && adjustedAbout.description ? `
+                    <div style="margin-bottom: 50px;">
+                        <h2 style="color: ${primaryColor}; font-size: 20px; margin-bottom: 25px; font-weight: 400; font-family: 'Inter', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 15px;">PROFESSIONAL SUMMARY</h2>
+                        <p style="margin: 0; line-height: 1.8; color: ${textColor}; font-size: 15px; font-weight: 300; font-family: 'Inter', sans-serif;">${adjustedAbout.description}</p>
+                    </div>
+                ` : ''}
+
+                <!-- Work Experience -->
+                ${sections.experience && adjustedExperience.length > 0 ? `
+                    <div style="margin-bottom: 50px;">
+                        <h2 style="color: ${primaryColor}; font-size: 20px; margin-bottom: 25px; font-weight: 400; font-family: 'Inter', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 15px;">PROFESSIONAL EXPERIENCE</h2>
+                        ${adjustedExperience.map(exp => `
+                <div style="margin-bottom: 40px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                    <h3 style="margin: 0; color: ${primaryColor}; font-size: 16px; font-weight: 500; font-family: 'Inter', sans-serif;">${exp.title}</h3>
+                                    <span style="color: ${secondaryColor}; font-size: 14px; font-weight: 300; font-family: 'Inter', sans-serif;">${exp.date || exp.period}</span>
+                                </div>
+                                <div style="color: ${secondaryColor}; font-size: 15px; margin-bottom: 15px; font-weight: 400; font-family: 'Inter', sans-serif;">${exp.company}</div>
+                                <p style="margin: 0; line-height: 1.7; color: ${textColor}; font-size: 14px; font-weight: 300; font-family: 'Inter', sans-serif;">${exp.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <!-- Skills Section -->
+                ${sections.skills && Object.keys(skills).length > 0 ? `
+                    <div style="margin-bottom: 50px;">
+                        <h2 style="color: ${primaryColor}; font-size: 20px; margin-bottom: 25px; font-weight: 400; font-family: 'Inter', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 15px;">SKILLS & EXPERTISE</h2>
+                        ${Object.entries(skills).map(([categoryName, skillList]) => `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 15px 0; color: ${primaryColor}; font-size: 15px; font-weight: 500; font-family: 'Inter', sans-serif;">${categoryName}</h3>
+                                <p style="margin: 0; color: ${textColor}; font-size: 14px; line-height: 1.6; font-weight: 300; font-family: 'Inter', sans-serif;">${skillList.map(skill => skill.name || skill).join(' • ')}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateChronoResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#2c3e50';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#e74c3c';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#333333';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Montserrat, Source Sans Pro, sans-serif'; max-width: 900px; margin: 0 auto; background: ${bgColor}; color: ${textColor};">
+                <!-- The Chrono - Timeline Focused Layout -->
+                <!-- Header -->
+                <div style="text-align: center; padding: 40px; background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; border-radius: 0 0 30px 30px; margin-bottom: 50px;">
+                    ${sections.photo && photoSettings ? `
+                        <div style="margin-bottom: 20px;">
+                            <div style="width: 120px; height: 120px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '15px' : '0'}; margin: 0 auto; overflow: hidden; border: 4px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.2); background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;">
+                                ${photoSettings.photoUrl ? 
+                                    `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                    `<span style="font-size: 48px; color: white; font-weight: bold; font-family: 'Montserrat', sans-serif;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'C'}</span>`
+                                }
+                            </div>
+                        </div>
+                    ` : ''}
+                    <h1 style="margin: 0; font-size: 42px; font-weight: 700; letter-spacing: 1px; font-family: 'Montserrat', sans-serif;">${hero.name || 'Your Name'}</h1>
+                    <p style="margin: 15px 0 0 0; font-size: 20px; opacity: 0.9; font-weight: 300; font-family: 'Source Sans Pro', sans-serif;">${hero.subtitle || 'Professional Title'}</p>
+                    ${sections.contact ? `
+                        <div style="margin-top: 25px; display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 14px; font-family: 'Source Sans Pro', sans-serif;">
+                            ${contact.location ? `<div style="display: flex; align-items: center; gap: 8px;">📍 ${contact.location}</div>` : ''}
+                            ${contact.phone ? `<div style="display: flex; align-items: center; gap: 8px;">📞 ${contact.phone}</div>` : ''}
+                            ${contact.email ? `<div style="display: flex; align-items: center; gap: 8px;">📧 ${contact.email}</div>` : ''}
+                            ${contact.linkedin ? `<div style="display: flex; align-items: center; gap: 8px;">🔗 LinkedIn</div>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div style="padding: 0 40px 40px;">
+                                            <!-- Professional Summary -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="margin-bottom: 50px;">
+                                <h2 style="margin: 0 0 25px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; font-family: 'Montserrat', sans-serif;">PROFESSIONAL SUMMARY</h2>
+                                <div style="line-height: 1.8; font-size: 16px; color: ${textColor}; font-family: 'Source Sans Pro', sans-serif;">${adjustedAbout.description}</div>
+                            </div>
+                        ` : ''}
+
+                    <!-- Work Experience with Visual Timeline -->
+                    ${sections.experience && adjustedExperience.length > 0 ? `
+                        <div style="margin-bottom: 50px;">
+                            <h2 style="margin: 0 0 40px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; font-family: 'Montserrat', sans-serif;">PROFESSIONAL EXPERIENCE</h2>
+                            <div style="position: relative;">
+                                <!-- Timeline Line -->
+                                <div style="position: absolute; left: 120px; top: 0; width: 3px; height: 100%; background: ${secondaryColor};"></div>
+                                ${adjustedExperience.map((exp, index) => `
+                                    <div style="margin-bottom: 40px; position: relative; padding-left: 200px;">
+                                        <!-- Timeline Dot -->
+                                        <div style="position: absolute; left: 110px; top: 0; width: 20px; height: 20px; background: ${secondaryColor}; border-radius: 50%; border: 4px solid ${bgColor}; box-shadow: 0 0 0 3px ${secondaryColor};"></div>
+                                        <!-- Date -->
+                                        <div style="position: absolute; left: 0; top: 0; width: 100px; text-align: right;">
+                                            <div style="color: ${secondaryColor}; font-size: 14px; font-weight: 600; font-family: 'Montserrat', sans-serif;">${exp.date || exp.period}</div>
+                                        </div>
+                                        <!-- Content -->
+                                        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); border-left: 4px solid ${secondaryColor};">
+                                            <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 700; color: ${primaryColor}; font-family: 'Montserrat', sans-serif;">${exp.title}</h3>
+                                            <div style="color: ${secondaryColor}; font-size: 16px; margin-bottom: 15px; font-weight: 600; font-family: 'Montserrat', sans-serif;">${exp.company}</div>
+                                            <p style="margin: 0; line-height: 1.7; font-size: 15px; color: ${textColor}; font-family: 'Source Sans Pro', sans-serif;">${exp.description}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Skills Section -->
+                    ${sections.skills && Object.keys(skills).length > 0 ? `
+                        <div style="margin-bottom: 50px;">
+                            <h2 style="margin: 0 0 30px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; font-family: 'Montserrat', sans-serif;">SKILLS & EXPERTISE</h2>
+                            ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                <div style="margin-bottom: 30px; background: white; border-radius: 15px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                                    <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 700; color: ${primaryColor}; border-bottom: 2px solid ${secondaryColor}; padding-bottom: 10px; font-family: 'Montserrat', sans-serif;">${categoryName}</h3>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                        ${skillList.map(skill => `
+                                            <span style="background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); color: white; padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; font-family: 'Source Sans Pro', sans-serif;">${skill.name || skill}</span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generatePortfolioResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#1e40af';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#3b82f6';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Fira Sans, Work Sans, sans-serif'; max-width: 1000px; margin: 0 auto; background: ${bgColor}; color: ${textColor};">
+                <!-- The Portfolio - Two Column with Projects Focus -->
+                <div style="display: flex; min-height: 100vh;">
+                    <!-- Left Sidebar -->
+                    <div style="width: 300px; background: ${primaryColor}; color: white; padding: 40px 30px;">
+                        <!-- Profile Picture -->
+                        <div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 30px; overflow: hidden; border: 4px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.2); background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 48px; color: white; font-weight: bold; font-family: 'Fira Sans', sans-serif;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'P'}</span>
+                        </div>
+                        
+                        <!-- Name and Title -->
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px; font-family: 'Fira Sans', sans-serif;">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9; font-weight: 300; font-family: 'Work Sans', sans-serif;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+
+                        <!-- Contact Information -->
+                        ${sections.contact ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 20px 0; font-size: 16px; font-weight: 600; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 8px; font-family: 'Fira Sans', sans-serif;">CONTACT</h3>
+                                <div style="font-size: 13px; line-height: 1.8; font-family: 'Work Sans', sans-serif;">
+                                    ${contact.email ? `<div style="margin: 8px 0; display: flex; align-items: center;">📧 ${contact.email}</div>` : ''}
+                                    ${contact.phone ? `<div style="margin: 8px 0; display: flex; align-items: center;">📞 ${contact.phone}</div>` : ''}
+                                    ${contact.location ? `<div style="margin: 8px 0; display: flex; align-items: center;">📍 ${contact.location}</div>` : ''}
+                                    ${contact.linkedin ? `<div style="margin: 8px 0; display: flex; align-items: center;">🔗 LinkedIn</div>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Section -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div>
+                                <h3 style="margin: 0 0 20px 0; font-size: 16px; font-weight: 600; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 8px; font-family: 'Fira Sans', sans-serif;">SKILLS</h3>
+                                ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                    <div style="margin-bottom: 20px;">
+                                        <h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 600; opacity: 0.9; font-family: 'Fira Sans', sans-serif;">${categoryName}</h4>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                            ${skillList.map(skill => `
+                                                <span style="background: rgba(255,255,255,0.2); color: white; padding: 3px 8px; border-radius: 8px; font-size: 11px; font-weight: 500; font-family: 'Work Sans', sans-serif;">${skill.name || skill}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="flex: 1; padding: 40px 35px;">
+                        <!-- Professional Summary -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Fira Sans', sans-serif;">PROFESSIONAL SUMMARY</h2>
+                                <p style="margin: 0; line-height: 1.7; font-size: 15px; color: ${textColor}; font-family: 'Work Sans', sans-serif;">${adjustedAbout.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Work Experience -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Fira Sans', sans-serif;">PROFESSIONAL EXPERIENCE</h2>
+                                ${adjustedExperience.map(exp => `
+                                    <div style="margin-bottom: 30px; padding-left: 20px; border-left: 3px solid ${secondaryColor};">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                            <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: ${primaryColor}; font-family: 'Fira Sans', sans-serif;">${exp.title}</h3>
+                                            <span style="color: #718096; font-size: 14px; font-weight: 500; background: #f7fafc; padding: 4px 12px; border-radius: 15px; font-family: 'Work Sans', sans-serif;">${exp.date || exp.period}</span>
+                                        </div>
+                                        <div style="color: ${secondaryColor}; font-size: 16px; margin-bottom: 12px; font-weight: 600; font-family: 'Fira Sans', sans-serif;">${exp.company}</div>
+                                        <p style="margin: 0; line-height: 1.6; font-size: 14px; color: ${textColor}; font-family: 'Work Sans', sans-serif;">${exp.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        <!-- Projects Section (Enhanced) -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Fira Sans', sans-serif;">PROJECTS & TECHNOLOGIES</h2>
+                                ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                    <div style="margin-bottom: 30px; background: white; border-radius: 15px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
+                                        <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 700; color: ${primaryColor}; border-bottom: 2px solid ${secondaryColor}; padding-bottom: 10px; font-family: 'Fira Sans', sans-serif;">${categoryName}</h3>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                            ${skillList.map(skill => `
+                                                <span style="background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); color: white; padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; font-family: 'Work Sans', sans-serif;">${skill.name || skill}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateCoderResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#1a1a1a';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#00ff00';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#0a0a0a';
+        const textColor = document.getElementById('resume-text-color')?.value || '#ffffff';
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Space Mono, JetBrains Mono, monospace'; max-width: 900px; margin: 0 auto; background: ${bgColor}; color: ${textColor};">
+                <!-- The Coder - Dark Theme with Code Style -->
+                <div style="display: flex; min-height: 100vh;">
+                    <!-- Left Sidebar -->
+                    <div style="width: 280px; background: #111111; color: white; padding: 30px 25px; border-right: 2px solid ${secondaryColor};">
+                        <!-- Profile Picture -->
+                        <div style="width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 25px; overflow: hidden; border: 4px solid ${secondaryColor}; background: ${secondaryColor}; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 48px; color: ${bgColor}; font-weight: bold; font-family: 'Space Mono', monospace;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'C'}</span>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        ${sections.contact ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; color: ${secondaryColor}; border-bottom: 2px solid ${secondaryColor}; padding-bottom: 8px; font-family: 'Space Mono', monospace;">// CONTACT</h3>
+                                ${contact.location ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center; font-family: 'JetBrains Mono', monospace;"><span style="margin-right: 8px; color: ${secondaryColor};">📍</span> ${contact.location}</div>` : ''}
+                                ${contact.phone ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center; font-family: 'JetBrains Mono', monospace;"><span style="margin-right: 8px; color: ${secondaryColor};">📞</span> ${contact.phone}</div>` : ''}
+                                ${contact.email ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center; font-family: 'JetBrains Mono', monospace;"><span style="margin-right: 8px; color: ${secondaryColor};">📧</span> ${contact.email}</div>` : ''}
+                                ${contact.linkedin ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center; font-family: 'JetBrains Mono', monospace;"><span style="margin-right: 8px; color: ${secondaryColor};">🔗</span> LinkedIn</div>` : ''}
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Section -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div>
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; color: ${secondaryColor}; border-bottom: 2px solid ${secondaryColor}; padding-bottom: 8px; font-family: 'Space Mono', monospace;">// SKILLS</h3>
+                                ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                    <div style="margin-bottom: 20px;">
+                                        <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: ${secondaryColor}; font-family: 'Space Mono', monospace;">// ${categoryName}</h4>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                            ${skillList.map(skill => `
+                                                <span style="background: rgba(0,255,0,0.1); color: ${secondaryColor}; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-family: 'JetBrains Mono', monospace; border: 1px solid ${secondaryColor};">${skill.name || skill}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="flex: 1; padding: 40px 35px;">
+                        <!-- Header -->
+                        <div style="text-align: center; margin-bottom: 40px;">
+                            <h1 style="margin: 0; color: ${secondaryColor}; font-size: 36px; font-weight: 700; font-family: 'Space Mono', monospace;">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 10px 0 0 0; color: #888; font-size: 18px; font-family: 'JetBrains Mono', monospace;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+
+                        <!-- Professional Summary -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${secondaryColor}; font-family: 'Space Mono', monospace;">// PROFESSIONAL SUMMARY</h2>
+                                <p style="margin: 0; line-height: 1.7; font-size: 15px; color: ${textColor}; font-family: 'JetBrains Mono', monospace;">${adjustedAbout.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Work Experience -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 700; color: ${secondaryColor}; font-family: 'Space Mono', monospace;">// WORK EXPERIENCE</h2>
+                                ${adjustedExperience.map((exp, index) => `
+                                    <div style="margin-bottom: 30px; background: #111111; border-radius: 8px; padding: 25px; border: 1px solid #333;">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                            <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: ${secondaryColor}; font-family: 'Space Mono', monospace;">${exp.title}</h3>
+                                            <span style="color: #888; font-size: 14px; font-weight: 500; background: #222; padding: 4px 12px; border-radius: 4px; font-family: 'JetBrains Mono', monospace;">${exp.date || exp.period}</span>
+                                        </div>
+                                        <div style="color: #888; font-size: 16px; margin-bottom: 12px; font-weight: 600; font-family: 'Space Mono', monospace;">${exp.company}</div>
+                                        <p style="margin: 0; line-height: 1.6; font-size: 14px; color: ${textColor}; font-family: 'JetBrains Mono', monospace;">${exp.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateHybridResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#2c3e50';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#3498db';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#333333';
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Playfair Display, Raleway, serif'; max-width: 900px; margin: 0 auto; background: ${bgColor}; color: ${textColor};">
+                <!-- The Hybrid - Single Column Header + Two Column Layout -->
+                <!-- Header Section -->
+                <div style="text-align: center; padding: 50px 40px; background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; border-radius: 0 0 30px 30px; margin-bottom: 40px;">
+                    <h1 style="margin: 0; font-size: 48px; font-weight: 700; letter-spacing: 1px; font-family: 'Playfair Display', serif;">${hero.name || 'Your Name'}</h1>
+                    <p style="margin: 15px 0 0 0; font-size: 22px; opacity: 0.9; font-weight: 300; font-family: 'Raleway', sans-serif;">${hero.subtitle || 'Professional Title'}</p>
+                    ${sections.contact ? `
+                        <div style="margin-top: 25px; display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 15px; font-family: 'Raleway', sans-serif;">
+                            ${contact.location ? `<div style="display: flex; align-items: center; gap: 8px;">📍 ${contact.location}</div>` : ''}
+                            ${contact.phone ? `<div style="display: flex; align-items: center; gap: 8px;">📞 ${contact.phone}</div>` : ''}
+                            ${contact.email ? `<div style="display: flex; align-items: center; gap: 8px;">📧 ${contact.email}</div>` : ''}
+                            ${contact.linkedin ? `<div style="display: flex; align-items: center; gap: 8px;">🔗 LinkedIn</div>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- Two Column Layout -->
+                <div style="display: flex; padding: 0 40px 40px;">
+                    <!-- Left Column -->
+                    <div style="width: 300px; padding-right: 30px;">
+                        <!-- Professional Summary -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Playfair Display', serif;">PROFESSIONAL SUMMARY</h2>
+                                <p style="margin: 0; line-height: 1.8; font-size: 15px; color: ${textColor}; font-family: 'Raleway', sans-serif;">${adjustedAbout.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Section -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div>
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Playfair Display', serif;">SKILLS & EXPERTISE</h2>
+                                ${Object.entries(skills).map(([categoryName, skillList]) => `
+                    <div style="margin-bottom: 25px;">
+                                        <h3 style="margin: 0 0 12px 0; color: ${primaryColor}; font-size: 16px; font-weight: 600; font-family: 'Playfair Display', serif;">${categoryName}</h3>
+                                        <p style="margin: 0; color: ${textColor}; font-size: 14px; line-height: 1.6; font-family: 'Raleway', sans-serif;">${skillList.map(skill => skill.name || skill).join(' • ')}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Right Column -->
+                    <div style="flex: 1;">
+                        <!-- Work Experience -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div>
+                                <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Playfair Display', serif;">PROFESSIONAL EXPERIENCE</h2>
+                                ${adjustedExperience.map(exp => `
+                                    <div style="margin-bottom: 35px; padding-left: 20px; border-left: 3px solid ${secondaryColor};">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                            <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: ${primaryColor}; font-family: 'Playfair Display', serif;">${exp.title}</h3>
+                                            <span style="color: #718096; font-size: 14px; font-weight: 500; background: #f7fafc; padding: 4px 12px; border-radius: 15px; font-family: 'Raleway', sans-serif;">${exp.date || exp.period}</span>
+                                        </div>
+                                        <div style="color: ${secondaryColor}; font-size: 16px; margin-bottom: 12px; font-weight: 600; font-family: 'Playfair Display', serif;">${exp.company}</div>
+                                        <p style="margin: 0; line-height: 1.7; font-size: 14px; color: ${textColor}; font-family: 'Raleway', sans-serif;">${exp.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateDashboardResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#1e40af';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#3b82f6';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#f8fafc';
+        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        // Get real subtitle from website data
+        const websiteData = this.websiteData;
+        const realSubtitle = hero.subtitle || hero.title || (websiteData && websiteData.hero && websiteData.hero.subtitle) || (websiteData && websiteData.hero && websiteData.hero.title) || 'Professional Title';
+
+        let html = `
+            <div style="font-family: 'Inter, system-ui, sans-serif'; max-width: 1200px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; padding: 40px 20px;">
+                <!-- The Dashboard - Elegant Data-Driven Layout -->
+                <div style="display: grid; grid-template-columns: 320px 1fr; gap: 0; min-height: 100vh; border-radius: 25px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.1);">
+                    <!-- Left Sidebar - Elegant Info Panel -->
+                    <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; padding: 40px 30px; position: relative;">
+                        <!-- Elegant Profile Section -->
+                        <div style="text-align: center; margin-bottom: 40px;">
+                            ${sections.photo && photoSettings ? this.createPhotoContainer(photoSettings, hero, 'rgba(255,255,255,0.3)', 'rgba(255,255,255,0.2)', 140) : ''}
+                            <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">${realName}</h1>
+                            <p style="margin: 12px 0 0 0; font-size: 16px; color: rgba(255,255,255,0.9); font-weight: 400;">${realSubtitle}</p>
+                        </div>
+
+                        <!-- Elegant Stats Dashboard -->
+                        <div style="margin-bottom: 40px;">
+                            <h3 style="margin: 0 0 25px 0; font-size: 18px; font-weight: 600; color: rgba(255,255,255,0.9); text-align: center;">📊 Key Metrics</h3>
+                            <div style="display: grid; gap: 12px;">
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
+                                    <div style="font-size: 22px; font-weight: 700;">7+</div>
+                                    <div style="font-size: 11px; opacity: 0.9;">Years Experience</div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
+                                    <div style="font-size: 22px; font-weight: 700;">200+</div>
+                                    <div style="font-size: 11px; opacity: 0.9;">Students Guided</div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
+                                    <div style="font-size: 22px; font-weight: 700;">98%</div>
+                                    <div style="font-size: 11px; opacity: 0.9;">Success Rate</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Info -->
+                        ${sections.contact ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">📞 Contact</h3>
+                                <div style="font-size: 14px; line-height: 1.6; color: #374151;">
+                                    ${contact.location ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📍 ${contact.location}</div>` : ''}
+                                    ${contact.phone ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📞 ${contact.phone}</div>` : ''}
+                                    ${contact.email ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📧 ${contact.email}</div>` : ''}
+                                    ${contact.linkedin ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">🔗 LinkedIn</div>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- About Summary for Left Column -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">📋 About</h3>
+                                <div style="font-size: 14px; line-height: 1.6; color: #374151;">
+                                    ${this.truncateText(adjustedAbout.description, 200)}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Chart -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div>
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">⚡ Skills Overview</h3>
+                                ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                            <span style="font-size: 14px; font-weight: 500; color: #374151;">${categoryName}</span>
+                                            <span style="font-size: 12px; color: #6b7280;">${skillList.length} skills</span>
+                        </div>
+                                        <div style="width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                            <div style="width: ${Math.min(skillList.length * 20, 100)}%; height: 100%; background: linear-gradient(90deg, ${primaryColor}, ${secondaryColor}); border-radius: 3px;"></div>
+                    </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                </div>
+
+                    <!-- Main Content -->
+                    <div style="display: flex; flex-direction: column; gap: 30px;">
+                        <!-- Professional Summary -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    📋 Professional Summary
+                                </h2>
+                                <div style="line-height: 1.7; font-size: 15px; color: #1f2937;">${adjustedAbout.description}</div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Experience Table -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    💼 Professional Experience
+                                </h2>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                        <thead>
+                                            <tr style="background: ${primaryColor}; color: white;">
+                                                <th style="padding: 15px; text-align: left; border-radius: 8px 0 0 8px;">Position</th>
+                                                <th style="padding: 15px; text-align: left;">Company</th>
+                                                <th style="padding: 15px; text-align: left;">Duration</th>
+                                                <th style="padding: 15px; text-align: left; border-radius: 0 8px 8px 0;">Key Achievements</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${adjustedExperience.map((exp, index) => `
+                                                <tr style="border-bottom: 1px solid #e5e7eb; ${index % 2 === 0 ? 'background: #f9fafb;' : ''}">
+                                                    <td style="padding: 15px; font-weight: 600; color: ${primaryColor};">${exp.title}</td>
+                                                    <td style="padding: 15px; color: #374151;">${exp.company}</td>
+                                                    <td style="padding: 15px; color: #6b7280; font-size: 13px;">${exp.date || exp.period}</td>
+                                                    <td style="padding: 15px; color: #1f2937; line-height: 1.5;">${exp.description}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Grid -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    🎯 Skills & Expertise
+                                </h2>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                    ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                        <div style="background: #f8fafc; border-radius: 15px; padding: 20px; border-left: 4px solid ${primaryColor};">
+                                            <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">${categoryName}</h3>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                                ${skillList.map(skill => `
+                                                    <span style="background: white; color: ${primaryColor}; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid ${primaryColor};">${skill.name || skill}</span>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateGlassmorphismResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#6366f1';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#8b5cf6';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#f8fafc';
+        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        // Get real data from website
+        const realName = this.getRealData(hero, 'name');
+        const realSubtitle = this.getRealData(hero, 'subtitle');
+        const realLocation = this.getRealData(contact, 'location');
+        const realPhone = this.getRealData(contact, 'phone');
+        const realEmail = this.getRealData(contact, 'email');
+
+        let html = `
+            <div style="font-family: 'Inter, system-ui, sans-serif'; max-width: 1200px; margin: 0 auto; background: linear-gradient(135deg, ${bgColor} 0%, #e0e7ff 100%); color: ${textColor}; min-height: 100vh; padding: 40px 20px;">
+                <!-- The Glassmorphism - Modern Glass Effect -->
+                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.2); padding: 40px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);">
+                    <!-- Header with Glass Effect -->
+                    <div style="text-align: center; margin-bottom: 50px; padding: 40px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.3);">
+                        ${sections.photo && photoSettings ? `
+                            <div style="width: 150px; height: 150px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '20px' : '0'}; margin: 0 auto 30px; overflow: hidden; border: 3px solid rgba(255, 255, 255, 0.4); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px);">
+                                ${photoSettings.photoUrl ? 
+                                    `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                    `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 60px; color: white; font-weight: bold;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'G'}</span>
+                                    </div>`
+                                }
+                            </div>
+                        ` : ''}
+                        <h1 style="margin: 0; font-size: 48px; font-weight: 700; background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${realName}</h1>
+                        <p style="margin: 15px 0 0 0; font-size: 20px; color: rgba(255, 255, 255, 0.9); font-weight: 500;">${realSubtitle}</p>
+                    </div>
+
+                    <!-- Content Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <!-- Left Column -->
+                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                            <!-- About Section -->
+                            ${sections.about && adjustedAbout.description ? `
+                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                        ✨ About Me
+                                    </h2>
+                                    <div style="line-height: 1.8; font-size: 16px; color: rgba(255, 255, 255, 0.9);">${adjustedAbout.description}</div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Contact Info -->
+                            ${sections.contact ? `
+                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                        📞 Contact
+                                    </h2>
+                                    <div style="font-size: 15px; line-height: 1.8; color: rgba(255, 255, 255, 0.95);">
+                                        ${realLocation ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📍 ${realLocation}</div>` : ''}
+                                        ${realPhone ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📞 ${realPhone}</div>` : ''}
+                                        ${realEmail ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📧 ${realEmail}</div>` : ''}
+                                        ${contact.linkedin ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">🔗 LinkedIn</div>` : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Skills Glass Cards -->
+                            ${sections.skills && Object.keys(skills).length > 0 ? `
+                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                                    <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                        🎯 Skills
+                                    </h2>
+                                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                                        ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                            <div style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                                <h3 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 600; color: ${secondaryColor};">${categoryName}</h3>
+                                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                                    ${skillList.map(skill => `
+                                                        <span style="background: rgba(255, 255, 255, 0.2); color: ${primaryColor}; padding: 8px 16px; border-radius: 25px; font-size: 13px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3);">${skill.name || skill}</span>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Right Column -->
+                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                            <!-- Experience Timeline -->
+                            ${sections.experience && adjustedExperience.length > 0 ? `
+                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                                    <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                        💼 Experience
+                                    </h2>
+                                    <div style="position: relative;">
+                                        ${adjustedExperience.map((exp, index) => `
+                                            <div style="position: relative; margin-bottom: 30px; padding-left: 30px;">
+                                                <div style="position: absolute; left: 0; top: 0; width: 12px; height: 12px; background: ${primaryColor}; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.3);"></div>
+                                                ${index < adjustedExperience.length - 1 ? `<div style="position: absolute; left: 5px; top: 12px; width: 2px; height: 40px; background: linear-gradient(to bottom, ${primaryColor}, transparent);"></div>` : ''}
+                                                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                                        <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: ${secondaryColor};">${exp.title}</h3>
+                                                        <span style="font-size: 13px; color: rgba(255, 255, 255, 0.7); background: rgba(255, 255, 255, 0.1); padding: 4px 12px; border-radius: 12px;">${exp.date || exp.period}</span>
+                                                    </div>
+                                                    <p style="margin: 0 0 10px 0; font-size: 15px; color: rgba(255, 255, 255, 0.8); font-weight: 500;">${exp.company}</p>
+                                                    <div style="line-height: 1.6; font-size: 14px; color: rgba(255, 255, 255, 0.9);">${exp.description}</div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateNeonResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#00ff88';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#ff0080';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#0a0a0a';
+        const textColor = document.getElementById('resume-text-color')?.value || '#ffffff';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        // Get real data from website
+        const realName = this.getRealData(hero, 'name');
+        const realSubtitle = this.getRealData(hero, 'subtitle');
+        const realLocation = this.getRealData(contact, 'location');
+        const realPhone = this.getRealData(contact, 'phone');
+        const realEmail = this.getRealData(contact, 'email');
+
+        let html = `
+            <div style="font-family: 'Orbitron, monospace'; max-width: 1200px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; min-height: 100vh; padding: 40px 20px; position: relative; overflow: hidden;">
+                <!-- Neon Grid Background -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: 
+                    linear-gradient(rgba(${primaryColor}, 0.1) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(${primaryColor}, 0.1) 1px, transparent 1px);
+                    background-size: 50px 50px; z-index: 1;"></div>
+                
+                <!-- Main Content -->
+                <div style="position: relative; z-index: 2;">
+                    <!-- Header with Neon Effect -->
+                    <div style="text-align: center; margin-bottom: 50px; padding: 40px; background: rgba(0, 0, 0, 0.8); border-radius: 20px; border: 2px solid ${primaryColor}; box-shadow: 0 0 30px ${primaryColor}, inset 0 0 30px rgba(0, 255, 136, 0.1);">
+                        ${sections.photo && photoSettings ? `
+                            <div style="width: 150px; height: 150px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '20px' : '0'}; margin: 0 auto 30px; overflow: hidden; border: 3px solid ${primaryColor}; box-shadow: 0 0 20px ${primaryColor};">
+                                ${photoSettings.photoUrl ? 
+                                    `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">` :
+                                    `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 60px; color: ${bgColor}; font-weight: bold;">${realName ? realName.charAt(0).toUpperCase() : 'N'}</span>
+                                    </div>`
+                                }
+                            </div>
+                        ` : ''}
+                        <h1 style="margin: 0; font-size: 48px; font-weight: 700; color: ${primaryColor}; text-shadow: 0 0 20px ${primaryColor}, 0 0 40px ${primaryColor};">${realName}</h1>
+                        <p style="margin: 15px 0 0 0; font-size: 20px; color: ${secondaryColor}; text-shadow: 0 0 10px ${secondaryColor}; font-weight: 500;">${realSubtitle}</p>
+                    </div>
+
+                    <!-- Content Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <!-- Left Column -->
+                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                            <!-- About Section -->
+                            ${sections.about && adjustedAbout.description ? `
+                                <div style="background: rgba(0, 0, 0, 0.8); border-radius: 20px; padding: 30px; border: 2px solid ${primaryColor}; box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; text-shadow: 0 0 10px ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                        ⚡ About
+                                    </h2>
+                                    <div style="line-height: 1.8; font-size: 16px; color: ${textColor};">${adjustedAbout.description}</div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Contact Info -->
+                            ${sections.contact ? `
+                                <div style="background: rgba(0, 0, 0, 0.8); border-radius: 20px; padding: 30px; border: 2px solid ${secondaryColor}; box-shadow: 0 0 20px rgba(255, 0, 128, 0.3);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: ${secondaryColor}; text-shadow: 0 0 10px ${secondaryColor}; display: flex; align-items: center; gap: 10px;">
+                                        📡 Contact
+                                    </h2>
+                                    <div style="font-size: 15px; line-height: 1.8; color: ${textColor};">
+                                        ${contact.location ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📍 ${contact.location}</div>` : ''}
+                                        ${contact.phone ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📞 ${contact.phone}</div>` : ''}
+                                        ${contact.email ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📧 ${contact.email}</div>` : ''}
+                                        ${contact.linkedin ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">🔗 LinkedIn</div>` : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Skills with Neon Bars -->
+                            ${sections.skills && Object.keys(skills).length > 0 ? `
+                                <div style="background: rgba(0, 0, 0, 0.8); border-radius: 20px; padding: 30px; border: 2px solid ${primaryColor}; box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);">
+                                    <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; text-shadow: 0 0 10px ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                        🎯 Skills
+                                    </h2>
+                                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                                        ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                            <div style="background: rgba(0, 0, 0, 0.5); border-radius: 15px; padding: 20px; border: 1px solid ${primaryColor};">
+                                                <h3 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 600; color: ${secondaryColor}; text-shadow: 0 0 5px ${secondaryColor};">${categoryName}</h3>
+                                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                                    ${skillList.map(skill => `
+                                                        <span style="background: rgba(0, 255, 136, 0.2); color: ${primaryColor}; padding: 8px 16px; border-radius: 25px; font-size: 13px; font-weight: 500; border: 1px solid ${primaryColor}; box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);">${skill.name || skill}</span>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Right Column -->
+                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                            <!-- Experience Timeline -->
+                            ${sections.experience && adjustedExperience.length > 0 ? `
+                                <div style="background: rgba(0, 0, 0, 0.8); border-radius: 20px; padding: 30px; border: 2px solid ${secondaryColor}; box-shadow: 0 0 20px rgba(255, 0, 128, 0.3);">
+                                    <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 600; color: ${secondaryColor}; text-shadow: 0 0 10px ${secondaryColor}; display: flex; align-items: center; gap: 10px;">
+                                        💼 Experience
+                                    </h2>
+                                    <div style="position: relative;">
+                                        ${adjustedExperience.map((exp, index) => `
+                                            <div style="position: relative; margin-bottom: 30px; padding-left: 30px;">
+                                                <div style="position: absolute; left: 0; top: 0; width: 12px; height: 12px; background: ${secondaryColor}; border-radius: 50%; box-shadow: 0 0 10px ${secondaryColor};"></div>
+                                                ${index < adjustedExperience.length - 1 ? `<div style="position: absolute; left: 5px; top: 12px; width: 2px; height: 40px; background: linear-gradient(to bottom, ${secondaryColor}, transparent); box-shadow: 0 0 5px ${secondaryColor};"></div>` : ''}
+                                                <div style="background: rgba(0, 0, 0, 0.5); border-radius: 15px; padding: 20px; border: 1px solid ${secondaryColor};">
+                                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                                        <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: ${primaryColor}; text-shadow: 0 0 5px ${primaryColor};">${exp.title}</h3>
+                                                        <span style="font-size: 13px; color: ${secondaryColor}; background: rgba(255, 0, 128, 0.2); padding: 4px 12px; border-radius: 12px; border: 1px solid ${secondaryColor};">${exp.date || exp.period}</span>
+                                                    </div>
+                                                    <p style="margin: 0 0 10px 0; font-size: 15px; color: ${textColor}; font-weight: 500;">${exp.company}</p>
+                                                    <div style="line-height: 1.6; font-size: 14px; color: ${textColor};">${exp.description}</div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateGradientResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#667eea';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#764ba2';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#f093fb';
+        const textColor = document.getElementById('resume-text-color')?.value || '#ffffff';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        // Get real data from website
+        const realName = this.getRealData(hero, 'name');
+        const realSubtitle = this.getRealData(hero, 'subtitle');
+        const realLocation = this.getRealData(contact, 'location');
+        const realPhone = this.getRealData(contact, 'phone');
+        const realEmail = this.getRealData(contact, 'email');
+
+        let html = `
+            <div style="font-family: 'Poppins, sans-serif'; max-width: 1200px; margin: 0 auto; background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 50%, ${bgColor} 100%); color: ${textColor}; min-height: 100vh; padding: 40px 20px;">
+                <!-- The Gradient - Colorful Modern -->
+                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.2); padding: 40px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);">
+                    <!-- Header with Gradient -->
+                    <div style="text-align: center; margin-bottom: 50px; padding: 40px; background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%); border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.3);">
+                        ${sections.photo && photoSettings ? `
+                            <div style="width: 150px; height: 150px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '20px' : '0'}; margin: 0 auto 30px; overflow: hidden; border: 4px solid rgba(255, 255, 255, 0.4); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);">
+                                ${photoSettings.photoUrl ? 
+                                    `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                    `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 60px; color: white; font-weight: bold;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'G'}</span>
+                                    </div>`
+                                }
+                            </div>
+                        ` : ''}
+                        <h1 style="margin: 0; font-size: 48px; font-weight: 700; color: white; text-shadow: 0 4px 8px rgba(0,0,0,0.3);">${realName}</h1>
+                        <p style="margin: 15px 0 0 0; font-size: 20px; color: rgba(255, 255, 255, 0.9); font-weight: 500;">${realSubtitle}</p>
+                    </div>
+
+                    <!-- Content Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <!-- Left Column -->
+                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                            <!-- About Section -->
+                            ${sections.about && adjustedAbout.description ? `
+                                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.3);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px;">
+                                        🌈 About Me
+                                    </h2>
+                                    <div style="line-height: 1.8; font-size: 16px; color: rgba(255, 255, 255, 0.95);">${adjustedAbout.description}</div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Contact Info -->
+                            ${sections.contact ? `
+                                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.3);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px;">
+                                        📞 Contact
+                                    </h2>
+                                    <div style="font-size: 15px; line-height: 1.8; color: rgba(255, 255, 255, 0.95);">
+                                        ${contact.location ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📍 ${contact.location}</div>` : ''}
+                                        ${contact.phone ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📞 ${contact.phone}</div>` : ''}
+                                        ${contact.email ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📧 ${contact.email}</div>` : ''}
+                                        ${contact.linkedin ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">🔗 LinkedIn</div>` : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Skills with Gradient Bars -->
+                            ${sections.skills && Object.keys(skills).length > 0 ? `
+                                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.3);">
+                                    <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 600; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px;">
+                                        🎯 Skills
+                                    </h2>
+                                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                                        ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                            <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                                                <h3 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 600; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">${categoryName}</h3>
+                                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                                    ${skillList.map(skill => `
+                                                        <span style="background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.2) 100%); color: white; padding: 8px 16px; border-radius: 25px; font-size: 13px; font-weight: 500; border: 1px solid rgba(255, 255, 255, 0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.3);">${skill.name || skill}</span>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Right Column -->
+                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                            <!-- Experience Timeline -->
+                            ${sections.experience && adjustedExperience.length > 0 ? `
+                                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.3);">
+                                    <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 600; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px;">
+                                        💼 Experience
+                                    </h2>
+                                    <div style="position: relative;">
+                                        ${adjustedExperience.map((exp, index) => `
+                                            <div style="position: relative; margin-bottom: 30px; padding-left: 30px;">
+                                                <div style="position: absolute; left: 0; top: 0; width: 12px; height: 12px; background: white; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.5); box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);"></div>
+                                                ${index < adjustedExperience.length - 1 ? `<div style="position: absolute; left: 5px; top: 12px; width: 2px; height: 40px; background: linear-gradient(to bottom, white, transparent);"></div>` : ''}
+                                                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                                        <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">${exp.title}</h3>
+                                                        <span style="font-size: 13px; color: white; background: rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.3);">${exp.date || exp.period}</span>
+                                                    </div>
+                                                    <p style="margin: 0 0 10px 0; font-size: 15px; color: rgba(255, 255, 255, 0.9); font-weight: 500;">${exp.company}</p>
+                                                    <div style="line-height: 1.6; font-size: 14px; color: rgba(255, 255, 255, 0.95);">${exp.description}</div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateCardResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#3b82f6';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#1e40af';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#f8fafc';
+        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Inter, system-ui, sans-serif'; max-width: 1200px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; min-height: 100vh; padding: 40px 20px;">
+                <!-- The Card - Card-Based Layout -->
+                <div style="display: grid; grid-template-columns: 300px 1fr; gap: 30px;">
+                    <!-- Left Sidebar Cards -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Profile Card -->
+                        <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
+                            ${sections.photo && photoSettings ? `
+                                <div style="width: 120px; height: 120px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '15px' : '0'}; margin: 0 auto 20px; overflow: hidden; border: 4px solid ${primaryColor}; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                                    ${photoSettings.photoUrl ? 
+                                        `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                        `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); display: flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 48px; color: white; font-weight: bold;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'C'}</span>
+                                        </div>`
+                                    }
+                                </div>
+                            ` : ''}
+                            <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: ${primaryColor};">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 8px 0 0 0; font-size: 16px; color: #6b7280; font-weight: 500;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+
+                        <!-- Contact Card -->
+                        ${sections.contact ? `
+                            <div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: ${primaryColor};">📞 Contact</h3>
+                                <div style="font-size: 14px; line-height: 1.6; color: #6b7280;">
+                                    ${contact.location ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">📍 ${contact.location}</div>` : ''}
+                                    ${contact.phone ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">📞 ${contact.phone}</div>` : ''}
+                                    ${contact.email ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">📧 ${contact.email}</div>` : ''}
+                                    ${contact.linkedin ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">🔗 LinkedIn</div>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Card -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: ${primaryColor};">🎯 Skills</h3>
+                                <div style="display: flex; flex-direction: column; gap: 15px;">
+                                    ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                        <div>
+                                            <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: ${secondaryColor};">${categoryName}</h4>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                                ${skillList.map(skill => `
+                                                    <span style="background: ${primaryColor}; color: white; padding: 4px 10px; border-radius: 15px; font-size: 11px; font-weight: 500;">${skill.name || skill}</span>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Main Content Cards -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <!-- About Card -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    📋 About Me
+                                </h2>
+                                <div style="line-height: 1.7; font-size: 15px; color: ${textColor};">${adjustedAbout.description}</div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Experience Cards -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    💼 Experience
+                                </h2>
+                                <div style="display: flex; flex-direction: column; gap: 20px;">
+                                    ${adjustedExperience.map((exp, index) => `
+                                        <div style="background: #f8fafc; border-radius: 15px; padding: 20px; border-left: 4px solid ${primaryColor};">
+                                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                                <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: ${primaryColor};">${exp.title}</h3>
+                                                <span style="font-size: 12px; color: #6b7280; background: #e5e7eb; padding: 4px 10px; border-radius: 10px;">${exp.date || exp.period}</span>
+                                            </div>
+                                            <p style="margin: 0 0 10px 0; font-size: 15px; color: ${secondaryColor}; font-weight: 500;">${exp.company}</p>
+                                            <div style="line-height: 1.6; font-size: 14px; color: ${textColor};">${exp.description}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateInfographicResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#10b981';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#059669';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Inter, system-ui, sans-serif'; max-width: 1200px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; min-height: 100vh; padding: 40px 20px;">
+                <!-- The Infographic - Visual Data -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                    <!-- Left Column -->
+                    <div style="display: flex; flex-direction: column; gap: 30px;">
+                        <!-- Header with Stats -->
+                        <div style="text-align: center; padding: 40px; background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);">
+                            ${sections.photo && photoSettings ? `
+                                <div style="width: 120px; height: 120px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '15px' : '0'}; margin: 0 auto 20px; overflow: hidden; border: 4px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                                    ${photoSettings.photoUrl ? 
+                                        `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                        `<div style="width: 100%; height: 100%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 48px; color: white; font-weight: bold;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'I'}</span>
+                                        </div>`
+                                    }
+                                </div>
+                            ` : ''}
+                            <h1 style="margin: 0; font-size: 36px; font-weight: 700;">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.9;">${hero.subtitle || 'Professional Title'}</p>
+                            
+                            <!-- Stats Row -->
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 28px; font-weight: 700;">7+</div>
+                                    <div style="font-size: 12px; opacity: 0.8;">Years</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 28px; font-weight: 700;">200+</div>
+                                    <div style="font-size: 12px; opacity: 0.8;">Projects</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 28px; font-weight: 700;">98%</div>
+                                    <div style="font-size: 12px; opacity: 0.8;">Success</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- About Section -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    📊 About
+                                </h2>
+                                <div style="line-height: 1.7; font-size: 15px; color: ${textColor};">${adjustedAbout.description}</div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Contact Info -->
+                        ${sections.contact ? `
+                            <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    📞 Contact
+                                </h2>
+                                <div style="font-size: 15px; line-height: 1.8; color: #6b7280;">
+                                    ${contact.location ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📍 ${contact.location}</div>` : ''}
+                                    ${contact.phone ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📞 ${contact.phone}</div>` : ''}
+                                    ${contact.email ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📧 ${contact.email}</div>` : ''}
+                                    ${contact.linkedin ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">🔗 LinkedIn</div>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Right Column -->
+                    <div style="display: flex; flex-direction: column; gap: 30px;">
+                        <!-- Skills Chart -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    📈 Skills Overview
+                                </h2>
+                                <div style="display: flex; flex-direction: column; gap: 20px;">
+                                    ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                        <div>
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                                <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: ${secondaryColor};">${categoryName}</h3>
+                                                <span style="font-size: 12px; color: #6b7280;">${skillList.length} skills</span>
+                                            </div>
+                                            <div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden;">
+                                                <div style="width: ${Math.min(skillList.length * 15, 100)}%; height: 100%; background: linear-gradient(90deg, ${primaryColor}, ${secondaryColor}); border-radius: 4px;"></div>
+                                            </div>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+                                                ${skillList.map(skill => `
+                                                    <span style="background: #f3f4f6; color: ${primaryColor}; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; border: 1px solid #e5e7eb;">${skill.name || skill}</span>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Experience Timeline -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    📅 Experience Timeline
+                                </h2>
+                                <div style="position: relative;">
+                                    ${adjustedExperience.map((exp, index) => `
+                                        <div style="position: relative; margin-bottom: 30px; padding-left: 40px;">
+                                            <div style="position: absolute; left: 0; top: 0; width: 16px; height: 16px; background: ${primaryColor}; border-radius: 50%; border: 4px solid white; box-shadow: 0 0 0 3px ${primaryColor};"></div>
+                                            ${index < adjustedExperience.length - 1 ? `<div style="position: absolute; left: 7px; top: 16px; width: 2px; height: 50px; background: ${primaryColor};"></div>` : ''}
+                                            <div style="background: #f8fafc; border-radius: 15px; padding: 20px; border-left: 4px solid ${primaryColor};">
+                                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                                    <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: ${primaryColor};">${exp.title}</h3>
+                                                    <span style="font-size: 12px; color: #6b7280; background: #e5e7eb; padding: 4px 10px; border-radius: 10px;">${exp.date || exp.period}</span>
+                                                </div>
+                                                <p style="margin: 0 0 10px 0; font-size: 15px; color: ${secondaryColor}; font-weight: 500;">${exp.company}</p>
+                                                <div style="line-height: 1.6; font-size: 14px; color: ${textColor};">${exp.description}</div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateMagazineResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#1f2937';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#6b7280';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Playfair Display, serif'; max-width: 1200px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; min-height: 100vh; padding: 40px 20px;">
+                <!-- The Magazine - Editorial Style -->
+                <div style="background: white; border-radius: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.1); overflow: hidden;">
+                    <!-- Magazine Header -->
+                    <div style="background: ${primaryColor}; color: white; padding: 60px 40px; text-align: center;">
+                        ${sections.photo && photoSettings ? `
+                            <div style="width: 150px; height: 150px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '20px' : '0'}; margin: 0 auto 30px; overflow: hidden; border: 4px solid rgba(255,255,255,0.3); box-shadow: 0 15px 35px rgba(0,0,0,0.3);">
+                                ${photoSettings.photoUrl ? 
+                                    `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                    `<div style="width: 100%; height: 100%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 60px; color: white; font-weight: bold; font-family: 'Playfair Display', serif;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'M'}</span>
+                                    </div>`
+                                }
+                            </div>
+                        ` : ''}
+                        <h1 style="margin: 0; font-size: 56px; font-weight: 700; letter-spacing: 2px; font-family: 'Playfair Display', serif;">${hero.name || 'Your Name'}</h1>
+                        <p style="margin: 15px 0 0 0; font-size: 24px; opacity: 0.9; font-family: 'Lora', serif; font-style: italic;">${hero.subtitle || 'Professional Title'}</p>
+                    </div>
+
+                    <!-- Magazine Content -->
+                    <div style="padding: 60px 40px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px;">
+                            <!-- Left Column -->
+                            <div style="display: flex; flex-direction: column; gap: 40px;">
+                                <!-- About Section -->
+                                ${sections.about && adjustedAbout.description ? `
+                                    <div>
+                                        <h2 style="margin: 0 0 30px 0; font-size: 32px; font-weight: 700; color: ${primaryColor}; font-family: 'Playfair Display', serif; border-bottom: 3px solid ${primaryColor}; padding-bottom: 10px;">
+                                            About
+                                        </h2>
+                                        <div style="line-height: 1.8; font-size: 18px; color: ${textColor}; font-family: 'Lora', serif;">${adjustedAbout.description}</div>
+                                    </div>
+                                ` : ''}
+
+                                <!-- Contact Info -->
+                                ${sections.contact ? `
+                                    <div>
+                                        <h2 style="margin: 0 0 30px 0; font-size: 32px; font-weight: 700; color: ${primaryColor}; font-family: 'Playfair Display', serif; border-bottom: 3px solid ${primaryColor}; padding-bottom: 10px;">
+                                            Contact
+                                        </h2>
+                                        <div style="font-size: 16px; line-height: 2; color: ${textColor}; font-family: 'Lora', serif;">
+                                            ${contact.location ? `<div style="margin-bottom: 15px;">📍 ${contact.location}</div>` : ''}
+                                            ${contact.phone ? `<div style="margin-bottom: 15px;">📞 ${contact.phone}</div>` : ''}
+                                            ${contact.email ? `<div style="margin-bottom: 15px;">📧 ${contact.email}</div>` : ''}
+                                            ${contact.linkedin ? `<div style="margin-bottom: 15px;">🔗 LinkedIn</div>` : ''}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <!-- Right Column -->
+                            <div style="display: flex; flex-direction: column; gap: 40px;">
+                                <!-- Experience Section -->
+                                ${sections.experience && adjustedExperience.length > 0 ? `
+                                    <div>
+                                        <h2 style="margin: 0 0 30px 0; font-size: 32px; font-weight: 700; color: ${primaryColor}; font-family: 'Playfair Display', serif; border-bottom: 3px solid ${primaryColor}; padding-bottom: 10px;">
+                                            Experience
+                                        </h2>
+                                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                                            ${adjustedExperience.map((exp, index) => `
+                                                <div style="border-left: 4px solid ${primaryColor}; padding-left: 30px; position: relative;">
+                                                    <div style="position: absolute; left: -8px; top: 0; width: 12px; height: 12px; background: ${primaryColor}; border-radius: 50%;"></div>
+                                                    <h3 style="margin: 0 0 10px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; font-family: 'Playfair Display', serif;">${exp.title}</h3>
+                                                    <p style="margin: 0 0 10px 0; font-size: 18px; color: ${secondaryColor}; font-family: 'Lora', serif; font-style: italic;">${exp.company}</p>
+                                                    <p style="margin: 0 0 15px 0; font-size: 14px; color: #9ca3af; font-family: 'Lora', serif;">${exp.date || exp.period}</p>
+                                                    <div style="line-height: 1.7; font-size: 16px; color: ${textColor}; font-family: 'Lora', serif;">${exp.description}</div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+
+                                <!-- Skills Section -->
+                                ${sections.skills && Object.keys(skills).length > 0 ? `
+                                    <div>
+                                        <h2 style="margin: 0 0 30px 0; font-size: 32px; font-weight: 700; color: ${primaryColor}; font-family: 'Playfair Display', serif; border-bottom: 3px solid ${primaryColor}; padding-bottom: 10px;">
+                                            Skills
+                                        </h2>
+                                        <div style="display: flex; flex-direction: column; gap: 25px;">
+                                            ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                                <div>
+                                                    <h3 style="margin: 0 0 15px 0; font-size: 20px; font-weight: 600; color: ${secondaryColor}; font-family: 'Playfair Display', serif;">${categoryName}</h3>
+                                                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                                        ${skillList.map(skill => `
+                                                            <span style="background: #f3f4f6; color: ${primaryColor}; padding: 8px 16px; border-radius: 0; font-size: 14px; font-weight: 500; font-family: 'Lora', serif; border: 1px solid #e5e7eb;">${skill.name || skill}</span>
+                                                        `).join('')}
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateDashboardDarkResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#00d4ff';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#ff6b6b';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#0f172a';
+        const textColor = document.getElementById('resume-text-color')?.value || '#ffffff';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'JetBrains Mono, monospace'; max-width: 1200px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; min-height: 100vh; padding: 40px 20px;">
+                <!-- The Dashboard Dark - Dark Data -->
+                <div style="display: grid; grid-template-columns: 300px 1fr; gap: 30px;">
+                    <!-- Left Sidebar - Dark Stats -->
+                    <div style="background: #1e293b; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); height: fit-content;">
+                        <!-- Profile Section -->
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            ${sections.photo && photoSettings ? `
+                                <div style="width: 120px; height: 120px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '15px' : '0'}; margin: 0 auto 20px; overflow: hidden; border: 3px solid ${primaryColor}; box-shadow: 0 0 20px ${primaryColor};">
+                                    ${photoSettings.photoUrl ? 
+                                        `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                        `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); display: flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 48px; color: ${bgColor}; font-weight: bold;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'D'}</span>
+                                        </div>`
+                                    }
+                                </div>
+                            ` : ''}
+                            <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: ${primaryColor};">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 8px 0 0 0; font-size: 16px; color: #94a3b8; font-weight: 500;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+
+                        <!-- Dark Stats Dashboard -->
+                        <div style="margin-bottom: 30px;">
+                            <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: ${primaryColor};">📊 Metrics</h3>
+                            <div style="display: grid; gap: 15px;">
+                                <div style="background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); color: ${bgColor}; padding: 15px; border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 700;">7+</div>
+                                    <div style="font-size: 12px; opacity: 0.9;">Years</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #10b981, #34d399); color: ${bgColor}; padding: 15px; border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 700;">200+</div>
+                                    <div style="font-size: 12px; opacity: 0.9;">Projects</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: ${bgColor}; padding: 15px; border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 700;">98%</div>
+                                    <div style="font-size: 12px; opacity: 0.9;">Success</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Info -->
+                        ${sections.contact ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">📞 Contact</h3>
+                                <div style="font-size: 14px; line-height: 1.6; color: #94a3b8;">
+                                    ${contact.location ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📍 ${contact.location}</div>` : ''}
+                                    ${contact.phone ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📞 ${contact.phone}</div>` : ''}
+                                    ${contact.email ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📧 ${contact.email}</div>` : ''}
+                                    ${contact.linkedin ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">🔗 LinkedIn</div>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Chart -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div>
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">⚡ Skills</h3>
+                                ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                    <div style="margin-bottom: 20px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                            <span style="font-size: 14px; font-weight: 500; color: #94a3b8;">${categoryName}</span>
+                                            <span style="font-size: 12px; color: #64748b;">${skillList.length} skills</span>
+                                        </div>
+                                        <div style="width: 100%; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
+                                            <div style="width: ${Math.min(skillList.length * 20, 100)}%; height: 100%; background: linear-gradient(90deg, ${primaryColor}, ${secondaryColor}); border-radius: 3px;"></div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="display: flex; flex-direction: column; gap: 30px;">
+                        <!-- Professional Summary -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div style="background: #1e293b; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    📋 Summary
+                                </h2>
+                                <div style="line-height: 1.7; font-size: 15px; color: ${textColor};">${adjustedAbout.description}</div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Experience Table -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div style="background: #1e293b; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    💼 Experience
+                                </h2>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                        <thead>
+                                            <tr style="background: ${primaryColor}; color: ${bgColor};">
+                                                <th style="padding: 15px; text-align: left; border-radius: 8px 0 0 8px;">Position</th>
+                                                <th style="padding: 15px; text-align: left;">Company</th>
+                                                <th style="padding: 15px; text-align: left;">Duration</th>
+                                                <th style="padding: 15px; text-align: left; border-radius: 0 8px 8px 0;">Achievements</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${adjustedExperience.map((exp, index) => `
+                                                <tr style="border-bottom: 1px solid #334155; ${index % 2 === 0 ? 'background: #334155;' : ''}">
+                                                    <td style="padding: 15px; font-weight: 600; color: ${primaryColor};">${exp.title}</td>
+                                                    <td style="padding: 15px; color: #94a3b8;">${exp.company}</td>
+                                                    <td style="padding: 15px; color: #94a3b8; font-size: 13px;">${exp.date || exp.period}</td>
+                                                    <td style="padding: 15px; color: ${textColor}; line-height: 1.5;">${exp.description}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Grid -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div style="background: #1e293b; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                    🎯 Skills
+                                </h2>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                    ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                        <div style="background: #334155; border-radius: 15px; padding: 20px; border-left: 4px solid ${primaryColor};">
+                                            <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">${categoryName}</h3>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                                ${skillList.map(skill => `
+                                                    <span style="background: ${primaryColor}; color: ${bgColor}; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">${skill.name || skill}</span>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateMinimalColorResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#6366f1';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#8b5cf6';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Inter, system-ui, sans-serif'; max-width: 1000px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; min-height: 100vh; padding: 60px 40px;">
+                <!-- The Minimal Color - Subtle Accents -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px;">
+                    <!-- Left Column -->
+                    <div style="display: flex; flex-direction: column; gap: 40px;">
+                        <!-- Header -->
+                        <div style="text-align: center; padding: 40px 0; border-bottom: 2px solid ${primaryColor};">
+                            ${sections.photo && photoSettings ? `
+                                <div style="width: 120px; height: 120px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '15px' : '0'}; margin: 0 auto 30px; overflow: hidden; border: 3px solid ${primaryColor};">
+                                    ${photoSettings.photoUrl ? 
+                                        `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                        `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); display: flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 48px; color: white; font-weight: bold;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'M'}</span>
+                                        </div>`
+                                    }
+                                </div>
+                            ` : ''}
+                            <h1 style="margin: 0; font-size: 36px; font-weight: 700; color: ${primaryColor};">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 10px 0 0 0; font-size: 18px; color: #6b7280; font-weight: 400;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+
+                        <!-- About Section -->
+                        ${sections.about && adjustedAbout.description ? `
+                            <div>
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; border-left: 4px solid ${primaryColor}; padding-left: 15px;">
+                                    About
+                                </h2>
+                                <div style="line-height: 1.7; font-size: 16px; color: ${textColor};">${adjustedAbout.description}</div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Contact Info -->
+                        ${sections.contact ? `
+                            <div>
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; border-left: 4px solid ${primaryColor}; padding-left: 15px;">
+                                    Contact
+                                </h2>
+                                <div style="font-size: 16px; line-height: 1.8; color: #6b7280;">
+                                    ${contact.location ? `<div style="margin-bottom: 12px;">📍 ${contact.location}</div>` : ''}
+                                    ${contact.phone ? `<div style="margin-bottom: 12px;">📞 ${contact.phone}</div>` : ''}
+                                    ${contact.email ? `<div style="margin-bottom: 12px;">📧 ${contact.email}</div>` : ''}
+                                    ${contact.linkedin ? `<div style="margin-bottom: 12px;">🔗 LinkedIn</div>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Right Column -->
+                    <div style="display: flex; flex-direction: column; gap: 40px;">
+                        <!-- Experience Section -->
+                        ${sections.experience && adjustedExperience.length > 0 ? `
+                            <div>
+                                <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; border-left: 4px solid ${primaryColor}; padding-left: 15px;">
+                                    Experience
+                                </h2>
+                                <div style="display: flex; flex-direction: column; gap: 30px;">
+                                    ${adjustedExperience.map((exp, index) => `
+                                        <div style="border-left: 3px solid ${secondaryColor}; padding-left: 25px; position: relative;">
+                                            <div style="position: absolute; left: -6px; top: 0; width: 10px; height: 10px; background: ${secondaryColor}; border-radius: 50%;"></div>
+                                            <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 600; color: ${primaryColor};">${exp.title}</h3>
+                                            <p style="margin: 0 0 8px 0; font-size: 16px; color: ${secondaryColor}; font-weight: 500;">${exp.company}</p>
+                                            <p style="margin: 0 0 15px 0; font-size: 14px; color: #9ca3af;">${exp.date || exp.period}</p>
+                                            <div style="line-height: 1.6; font-size: 15px; color: ${textColor};">${exp.description}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Section -->
+                        ${sections.skills && Object.keys(skills).length > 0 ? `
+                            <div>
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; border-left: 4px solid ${primaryColor}; padding-left: 15px;">
+                                    Skills
+                                </h2>
+                                <div style="display: flex; flex-direction: column; gap: 20px;">
+                                    ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                        <div>
+                                            <h3 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 600; color: ${secondaryColor};">${categoryName}</h3>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                                ${skillList.map(skill => `
+                                                    <span style="background: #f3f4f6; color: ${primaryColor}; padding: 6px 12px; border-radius: 15px; font-size: 13px; font-weight: 500; border: 1px solid #e5e7eb;">${skill.name || skill}</span>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateGeometricResume(data, sections, length = 'single') {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#ef4444';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#dc2626';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
+        
+        // Get photo settings
+        const photoSettings = this.getResumePhoto();
+        
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, length);
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Inter, system-ui, sans-serif'; max-width: 1200px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; min-height: 100vh; padding: 40px 20px;">
+                <!-- The Geometric - Angular Design -->
+                <div style="background: white; border-radius: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.1); overflow: hidden;">
+                    <!-- Geometric Header -->
+                    <div style="background: ${primaryColor}; color: white; padding: 60px 40px; position: relative; overflow: hidden;">
+                        <!-- Geometric Shapes -->
+                        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: ${secondaryColor}; transform: rotate(45deg);"></div>
+                        <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); transform: rotate(45deg);"></div>
+                        
+                        <div style="position: relative; z-index: 2; text-align: center;">
+                            ${sections.photo && photoSettings ? `
+                                <div style="width: 150px; height: 150px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '20px' : '0'}; margin: 0 auto 30px; overflow: hidden; border: 4px solid rgba(255,255,255,0.3); box-shadow: 0 15px 35px rgba(0,0,0,0.3);">
+                                    ${photoSettings.photoUrl ? 
+                                        `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                        `<div style="width: 100%; height: 100%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 60px; color: white; font-weight: bold;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'G'}</span>
+                                        </div>`
+                                    }
+                                </div>
+                            ` : ''}
+                            <h1 style="margin: 0; font-size: 48px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 15px 0 0 0; font-size: 20px; opacity: 0.9; font-weight: 500;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+                    </div>
+
+                    <!-- Geometric Content -->
+                    <div style="padding: 60px 40px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px;">
+                            <!-- Left Column -->
+                            <div style="display: flex; flex-direction: column; gap: 40px;">
+                                <!-- About Section -->
+                                ${sections.about && adjustedAbout.description ? `
+                                    <div style="border-left: 5px solid ${primaryColor}; padding-left: 25px;">
+                                        <h2 style="margin: 0 0 20px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; text-transform: uppercase; letter-spacing: 1px;">
+                                            About
+                                        </h2>
+                                        <div style="line-height: 1.7; font-size: 16px; color: ${textColor};">${adjustedAbout.description}</div>
+                                    </div>
+                                ` : ''}
+
+                                <!-- Contact Info -->
+                                ${sections.contact ? `
+                                    <div style="border-left: 5px solid ${secondaryColor}; padding-left: 25px;">
+                                        <h2 style="margin: 0 0 20px 0; font-size: 28px; font-weight: 700; color: ${secondaryColor}; text-transform: uppercase; letter-spacing: 1px;">
+                                            Contact
+                                        </h2>
+                                        <div style="font-size: 16px; line-height: 1.8; color: #6b7280;">
+                                            ${contact.location ? `<div style="margin-bottom: 12px;">📍 ${contact.location}</div>` : ''}
+                                            ${contact.phone ? `<div style="margin-bottom: 12px;">📞 ${contact.phone}</div>` : ''}
+                                            ${contact.email ? `<div style="margin-bottom: 12px;">📧 ${contact.email}</div>` : ''}
+                                            ${contact.linkedin ? `<div style="margin-bottom: 12px;">🔗 LinkedIn</div>` : ''}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <!-- Right Column -->
+                            <div style="display: flex; flex-direction: column; gap: 40px;">
+                                <!-- Experience Section -->
+                                ${sections.experience && adjustedExperience.length > 0 ? `
+                                    <div>
+                                        <h2 style="margin: 0 0 30px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; text-transform: uppercase; letter-spacing: 1px;">
+                                            Experience
+                                        </h2>
+                                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                                            ${adjustedExperience.map((exp, index) => `
+                                                <div style="position: relative; padding-left: 30px;">
+                                                    <div style="position: absolute; left: 0; top: 0; width: 15px; height: 15px; background: ${primaryColor}; transform: rotate(45deg);"></div>
+                                                    <h3 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 600; color: ${primaryColor}; text-transform: uppercase;">${exp.title}</h3>
+                                                    <p style="margin: 0 0 10px 0; font-size: 18px; color: ${secondaryColor}; font-weight: 500;">${exp.company}</p>
+                                                    <p style="margin: 0 0 15px 0; font-size: 14px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">${exp.date || exp.period}</p>
+                                                    <div style="line-height: 1.6; font-size: 16px; color: ${textColor};">${exp.description}</div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+
+                                <!-- Skills Section -->
+                                ${sections.skills && Object.keys(skills).length > 0 ? `
+                                    <div>
+                                        <h2 style="margin: 0 0 25px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; text-transform: uppercase; letter-spacing: 1px;">
+                                            Skills
+                                        </h2>
+                                        <div style="display: flex; flex-direction: column; gap: 25px;">
+                                            ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                                <div>
+                                                    <h3 style="margin: 0 0 15px 0; font-size: 20px; font-weight: 600; color: ${secondaryColor}; text-transform: uppercase; letter-spacing: 1px;">${categoryName}</h3>
+                                                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                                        ${skillList.map(skill => `
+                                                            <span style="background: ${primaryColor}; color: white; padding: 8px 16px; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">${skill.name || skill}</span>
+                                                        `).join('')}
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    // Distinctive template functions
+    generateCreativeResume(data, sections) {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || {};
+        const contact = data.contact || {};
+        
+        // Get customization settings
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#6366f1';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#8b5cf6';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
+
+        // Adjust data for length
+        const adjustedData = this.adjustDataForLength(data, 'single');
+        const adjustedExperience = adjustedData.experience || experience;
+        const adjustedAbout = adjustedData.about || about;
+
+        let html = `
+            <div style="font-family: 'Inter, Arial', sans-serif; max-width: 900px; margin: 0 auto; background: ${bgColor}; color: ${textColor};">
+                <!-- Creative Portfolio Layout -->
+                <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; padding: 40px; border-radius: 0 0 30px 30px; margin-bottom: 40px;">
+                    <div style="text-align: center;">
+                        <h1 style="margin: 0; font-size: 48px; font-weight: 800; letter-spacing: -1px;">${hero.name || 'Your Name'}</h1>
+                        <p style="margin: 15px 0 0 0; font-size: 20px; opacity: 0.9; font-weight: 300;">${hero.subtitle || 'Professional Title'}</p>
+                        ${sections.contact ? `
+                            <div style="margin-top: 25px; display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 14px;">
+                                ${contact.email ? `<div style="display: flex; align-items: center; gap: 8px;">📧 ${contact.email}</div>` : ''}
+                                ${contact.phone ? `<div style="display: flex; align-items: center; gap: 8px;">📞 ${contact.phone}</div>` : ''}
+                                ${contact.location ? `<div style="display: flex; align-items: center; gap: 8px;">📍 ${contact.location}</div>` : ''}
+                                ${contact.linkedin ? `<div style="display: flex; align-items: center; gap: 8px;">🔗 ${contact.linkedin}</div>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div style="padding: 0 40px 40px;">
+                    <!-- Professional Summary -->
+                    ${sections.about && adjustedAbout.description ? `
+                <div style="margin-bottom: 40px;">
+                            <h2 style="margin: 0 0 20px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; position: relative;">
+                                <span style="background: ${primaryColor}; color: white; padding: 8px 20px; border-radius: 20px; font-size: 16px; margin-right: 15px;">About</span>
+                                Professional Summary
+                            </h2>
+                            <p style="margin: 0; line-height: 1.8; font-size: 16px; color: #4b5563; background: #f8fafc; padding: 25px; border-radius: 15px; border-left: 5px solid ${primaryColor};">${adjustedAbout.description}</p>
+                    </div>
+                    ` : ''}
+
+                    <!-- Work Experience -->
+                    ${sections.experience && adjustedExperience.length > 0 ? `
+                        <div style="margin-bottom: 40px;">
+                            <h2 style="margin: 0 0 30px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; position: relative;">
+                                <span style="background: ${primaryColor}; color: white; padding: 8px 20px; border-radius: 20px; font-size: 16px; margin-right: 15px;">Work</span>
+                                Experience
+                            </h2>
+                            ${adjustedExperience.map((exp, index) => `
+                                <div style="margin-bottom: 30px; background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; position: relative; overflow: hidden;">
+                                    <div style="position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: linear-gradient(to bottom, ${primaryColor}, ${secondaryColor});"></div>
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                                        <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: ${primaryColor};">${exp.title}</h3>
+                                        <span style="color: ${secondaryColor}; font-size: 14px; font-weight: 600; background: #f3f4f6; padding: 6px 15px; border-radius: 20px;">${exp.date || exp.period}</span>
+                </div>
+                                    <div style="color: ${secondaryColor}; font-size: 18px; margin-bottom: 15px; font-weight: 600;">${exp.company}</div>
+                                    <p style="margin: 0; line-height: 1.7; font-size: 15px; color: #6b7280;">${exp.description}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    <!-- Skills Section with Percentage Bars -->
+                    ${sections.skills && Object.keys(skills).length > 0 ? `
+                <div style="margin-bottom: 40px;">
+                            <h2 style="margin: 0 0 30px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; position: relative;">
+                                <span style="background: ${primaryColor}; color: white; padding: 8px 20px; border-radius: 20px; font-size: 16px; margin-right: 15px;">Skills</span>
+                                & Expertise
+                            </h2>
+                            ${Object.entries(skills).map(([categoryName, skillList]) => `
+                                <div style="margin-bottom: 30px; background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                                    <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 700; color: ${primaryColor}; border-bottom: 2px solid ${secondaryColor}; padding-bottom: 10px;">${categoryName}</h3>
+                                    ${skillList.map(skill => `
+                    <div style="margin-bottom: 15px;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                                <span style="font-weight: 600; color: ${textColor}; font-size: 14px;">${skill.name || skill}</span>
+                                                <span style="font-weight: 600; color: ${secondaryColor}; font-size: 14px;">${skill.percentage || 85}%</span>
+                        </div>
+                                            <div style="width: 100%; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden;">
+                                                <div style="width: ${skill.percentage || 85}%; height: 100%; background: linear-gradient(90deg, ${primaryColor}, ${secondaryColor}); border-radius: 4px; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+                                    `).join('')}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateTechResume(data, sections) {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || [];
+        const contact = data.contact || {};
+
+        let html = `
+            <div style="font-family: 'Roboto Slab, Roboto, serif'; max-width: 900px; margin: 0 auto; background: white;">
+                <!-- The Engineer - Two Column with Timeline -->
+                <div style="display: flex; min-height: 100vh;">
+                    <!-- Left Sidebar -->
+                    <div style="width: 280px; background: #34495e; color: white; padding: 30px 25px;">
+                        <!-- Profile Picture -->
+                        <div style="width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 25px; overflow: hidden; border: 4px solid #e74c3c;">
+                            ${hero.image ? 
+                                `<img src="${hero.image}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                `<div style="width: 100%; height: 100%; background: #e74c3c; display: flex; align-items: center; justify-content: center; font-size: 48px; color: white; font-weight: bold;">
+                                    ${hero.name ? hero.name.charAt(0).toUpperCase() : 'E'}
+                                </div>`
+                            }
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        ${sections.contact ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #e74c3c; border-bottom: 2px solid #e74c3c; padding-bottom: 8px;">CONTACT</h3>
+                                ${contact.location ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center;"><span style="margin-right: 8px;">📍</span> ${contact.location}</div>` : ''}
+                                ${contact.phone ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center;"><span style="margin-right: 8px;">📞</span> ${contact.phone}</div>` : ''}
+                                ${contact.email ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center;"><span style="margin-right: 8px;">📧</span> ${contact.email}</div>` : ''}
+                                ${contact.linkedin ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center;"><span style="margin-right: 8px;">🔗</span> LinkedIn</div>` : ''}
+                                ${contact.github ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center;"><span style="margin-right: 8px;">💻</span> GitHub</div>` : ''}
+                                ${contact.portfolio ? `<div style="margin-bottom: 12px; font-size: 14px; display: flex; align-items: center;"><span style="margin-right: 8px;">🌐</span> Portfolio</div>` : ''}
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Section -->
+                        ${sections.skills && skills.length > 0 ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #e74c3c; border-bottom: 2px solid #e74c3c; padding-bottom: 8px;">SKILLS</h3>
+                                ${skills.map(category => `
+                                    <div style="margin-bottom: 20px;">
+                                        <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #ecf0f1; font-weight: 600;">${category.name}</h4>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                            ${category.skills.map(skill => `
+                                                <span style="background: #e74c3c; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px;">${skill}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        <!-- Certifications Section -->
+                        <div style="margin-bottom: 30px;">
+                            <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #e74c3c; border-bottom: 2px solid #e74c3c; padding-bottom: 8px;">CERTIFICATIONS</h3>
+                            <div style="font-size: 14px; line-height: 1.6;">
+                                <div style="margin-bottom: 8px;">🏆 AWS Certified Developer</div>
+                                <div style="margin-bottom: 8px;">📜 PMP Certification</div>
+                                <div style="margin-bottom: 8px;">🔒 CISSP Security</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="flex: 1; padding: 40px 30px;">
+                        <!-- Header -->
+                        <div style="margin-bottom: 30px;">
+                            <h1 style="margin: 0; color: #2c3e50; font-size: 36px; font-weight: 700; font-family: 'Roboto Slab', serif;">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 10px 0; color: #e74c3c; font-size: 20px; font-weight: 500;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+
+                        <!-- Professional Summary -->
+                        ${sections.about && about.description ? `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #2c3e50; font-size: 22px; margin-bottom: 15px; border-bottom: 2px solid #e74c3c; padding-bottom: 8px; font-family: 'Roboto Slab', serif;">PROFESSIONAL SUMMARY</h2>
+                                <p style="margin: 0; line-height: 1.6; color: #555; font-size: 14px; font-family: 'Roboto', sans-serif;">${about.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Work Experience with Timeline -->
+                        ${sections.experience && experience.length > 0 ? `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #2c3e50; font-size: 22px; margin-bottom: 15px; border-bottom: 2px solid #e74c3c; padding-bottom: 8px; font-family: 'Roboto Slab', serif;">PROFESSIONAL EXPERIENCE</h2>
+                                ${experience.map((exp, index) => `
+                                    <div style="margin-bottom: 25px; position: relative;">
+                                        <!-- Timeline Dot -->
+                                        <div style="position: absolute; left: -15px; top: 8px; width: 12px; height: 12px; background: #e74c3c; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px #e74c3c;"></div>
+                                        <!-- Timeline Line -->
+                                        ${index < experience.length - 1 ? `<div style="position: absolute; left: -9px; top: 20px; width: 2px; height: 40px; background: #e74c3c;"></div>` : ''}
+                                        
+                                        <div style="margin-left: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                                <h3 style="margin: 0; color: #2c3e50; font-size: 16px; font-weight: 600; font-family: 'Roboto Slab', serif;">${exp.title}</h3>
+                                                <span style="color: #e74c3c; font-size: 14px; font-weight: 500;">${exp.period}</span>
+                                            </div>
+                                            <div style="color: #666; font-size: 14px; margin-bottom: 10px; font-weight: 500; font-family: 'Roboto', sans-serif;">${exp.company}</div>
+                                            <p style="margin: 0; line-height: 1.6; color: #555; font-size: 13px; font-family: 'Roboto', sans-serif;">${exp.description}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        <!-- Education Section -->
+                        <div style="margin-bottom: 30px;">
+                            <h2 style="color: #2c3e50; font-size: 22px; margin-bottom: 15px; border-bottom: 2px solid #e74c3c; padding-bottom: 8px; font-family: 'Roboto Slab', serif;">EDUCATION</h2>
+                            <div style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <h3 style="margin: 0; color: #2c3e50; font-size: 16px; font-weight: 600; font-family: 'Roboto Slab', serif;">Bachelor's Degree in Computer Science</h3>
+                                    <span style="color: #e74c3c; font-size: 14px; font-weight: 500;">2020 - 2024</span>
+                                </div>
+                                <div style="color: #666; font-size: 14px; margin-bottom: 8px; font-weight: 500; font-family: 'Roboto', sans-serif;">University Name</div>
+                                <p style="margin: 0; line-height: 1.5; color: #555; font-size: 13px; font-family: 'Roboto', sans-serif;">Relevant coursework: Data Structures, Algorithms, Software Engineering, Database Systems</p>
+                            </div>
+                        </div>
+
+                        <!-- Projects Section -->
+                        <div style="margin-bottom: 30px;">
+                            <h2 style="color: #2c3e50; font-size: 22px; margin-bottom: 15px; border-bottom: 2px solid #e74c3c; padding-bottom: 8px; font-family: 'Roboto Slab', serif;">PROJECTS</h2>
+                            <div style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                                <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 16px; font-weight: 600; font-family: 'Roboto Slab', serif;">E-Commerce Platform</h3>
+                                <p style="margin: 0 0 8px 0; color: #666; font-size: 13px; font-family: 'Roboto', sans-serif;">React, Node.js, MongoDB, AWS</p>
+                                <p style="margin: 0; line-height: 1.5; color: #555; font-size: 13px; font-family: 'Roboto', sans-serif;">Developed a full-stack e-commerce platform with payment integration and admin dashboard.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateExecutiveResume(data, sections) {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || [];
+        const contact = data.contact || {};
+
+        let html = `
+            <div style="font-family: 'Oswald, Lato, sans-serif'; max-width: 900px; margin: 0 auto; background: white;">
+                <!-- The Innovator - Asymmetrical Design -->
+                <div style="position: relative; min-height: 100vh;">
+                    <!-- Vertical Accent Line -->
+                    <div style="position: absolute; left: 50px; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, #9b59b6, #3498db);"></div>
+                    
+                    <!-- Header Section -->
+                    <div style="padding: 40px 60px 30px 80px; background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%); color: white;">
+                        <div style="display: flex; align-items: center; gap: 30px;">
+                            <!-- Profile Picture -->
+                            <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; border: 4px solid rgba(255,255,255,0.3); flex-shrink: 0;">
+                                ${hero.image ? 
+                                    `<img src="${hero.image}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                    `<div style="width: 100%; height: 100%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 36px; color: white; font-weight: bold;">
+                                        ${hero.name ? hero.name.charAt(0).toUpperCase() : 'I'}
+                                    </div>`
+                                }
+                            </div>
+                            
+                            <div style="flex: 1;">
+                                <h1 style="margin: 0; font-size: 42px; font-weight: 700; font-family: 'Oswald', sans-serif;">${hero.name || 'Your Name'}</h1>
+                                <p style="margin: 10px 0; font-size: 20px; opacity: 0.9; font-family: 'Lato', sans-serif;">${hero.subtitle || 'Professional Title'}</p>
+                                ${sections.contact ? `
+                                    <div style="margin-top: 15px; font-size: 14px; opacity: 0.8;">
+                                        ${contact.location ? `<div style="margin-bottom: 5px;">📍 ${contact.location}</div>` : ''}
+                                        ${contact.phone ? `<div style="margin-bottom: 5px;">📞 ${contact.phone}</div>` : ''}
+                                        ${contact.email ? `<div style="margin-bottom: 5px;">📧 ${contact.email}</div>` : ''}
+                                        ${contact.linkedin ? `<div style="margin-bottom: 5px;">🔗 LinkedIn</div>` : ''}
+                                        ${contact.github ? `<div style="margin-bottom: 5px;">💻 GitHub</div>` : ''}
+                                        ${contact.portfolio ? `<div style="margin-bottom: 5px;">🌐 Portfolio</div>` : ''}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="padding: 40px 60px 40px 80px;">
+                        <!-- Professional Summary -->
+                        ${sections.about && about.description ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
+                                    <span style="background: white; padding-right: 15px;">PROFESSIONAL SUMMARY</span>
+                                    <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
+                                </h2>
+                                <p style="margin: 0; line-height: 1.7; color: #555; font-size: 15px; font-family: 'Lato', sans-serif;">${about.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Work Experience -->
+                        ${sections.experience && experience.length > 0 ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
+                                    <span style="background: white; padding-right: 15px;">PROFESSIONAL EXPERIENCE</span>
+                                    <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
+                                </h2>
+                                ${experience.map(exp => `
+                                    <div style="margin-bottom: 30px; padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 5px solid #9b59b6; position: relative;">
+                                        <div style="position: absolute; top: -10px; left: 20px; background: #9b59b6; color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; font-weight: bold; font-family: 'Oswald', sans-serif;">${exp.period}</div>
+                                        <div style="margin-top: 15px;">
+                                            <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 18px; font-weight: 600; font-family: 'Oswald', sans-serif;">${exp.title}</h3>
+                                            <div style="color: #9b59b6; font-size: 16px; margin-bottom: 12px; font-weight: 500; font-family: 'Lato', sans-serif;">${exp.company}</div>
+                                            <p style="margin: 0; line-height: 1.6; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">${exp.description}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills Section -->
+                        ${sections.skills && skills.length > 0 ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
+                                    <span style="background: white; padding-right: 15px;">SKILLS & EXPERTISE</span>
+                                    <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
+                                </h2>
+                                ${skills.map(category => `
+                                    <div style="margin-bottom: 25px;">
+                                        <h3 style="margin: 0 0 12px 0; color: #2c3e50; font-size: 16px; font-weight: 600; font-family: 'Oswald', sans-serif;">${category.name}</h3>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                            ${category.skills.map(skill => `
+                                                <span style="background: linear-gradient(135deg, #9b59b6, #3498db); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: 'Lato', sans-serif;">${skill}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        <!-- Education Section -->
+                        <div style="margin-bottom: 40px;">
+                            <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
+                                <span style="background: white; padding-right: 15px;">EDUCATION</span>
+                                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
+                            </h2>
+                            <div style="padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 5px solid #9b59b6; position: relative;">
+                                <div style="position: absolute; top: -10px; left: 20px; background: #9b59b6; color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; font-weight: bold; font-family: 'Oswald', sans-serif;">2020 - 2024</div>
+                                <div style="margin-top: 15px;">
+                                    <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 18px; font-weight: 600; font-family: 'Oswald', sans-serif;">Bachelor's Degree in Computer Science</h3>
+                                    <div style="color: #9b59b6; font-size: 16px; margin-bottom: 12px; font-weight: 500; font-family: 'Lato', sans-serif;">University Name</div>
+                                    <p style="margin: 0; line-height: 1.6; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">Relevant coursework: Data Structures, Algorithms, Software Engineering, Database Systems</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Projects Section -->
+                        <div style="margin-bottom: 40px;">
+                            <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
+                                <span style="background: white; padding-right: 15px;">PROJECTS</span>
+                                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
+                            </h2>
+                            <div style="padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 5px solid #9b59b6;">
+                                <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 18px; font-weight: 600; font-family: 'Oswald', sans-serif;">E-Commerce Platform</h3>
+                                <p style="margin: 0 0 8px 0; color: #9b59b6; font-size: 14px; font-family: 'Lato', sans-serif;">React, Node.js, MongoDB, AWS</p>
+                                <p style="margin: 0; line-height: 1.6; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">Developed a full-stack e-commerce platform with payment integration and admin dashboard.</p>
+                            </div>
+                        </div>
+
+                        <!-- Certifications Section -->
+                        <div style="margin-bottom: 40px;">
+                            <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
+                                <span style="background: white; padding-right: 15px;">CERTIFICATIONS & AWARDS</span>
+                                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
+                            </h2>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                                    <div style="font-size: 24px; margin-bottom: 8px;">🏆</div>
+                                    <h3 style="margin: 0 0 5px 0; color: #2c3e50; font-size: 14px; font-weight: 600; font-family: 'Oswald', sans-serif;">AWS Certified Developer</h3>
+                                    <p style="margin: 0; color: #9b59b6; font-size: 12px; font-family: 'Lato', sans-serif;">Amazon Web Services</p>
+                                </div>
+                                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                                    <div style="font-size: 24px; margin-bottom: 8px;">📜</div>
+                                    <h3 style="margin: 0 0 5px 0; color: #2c3e50; font-size: 14px; font-weight: 600; font-family: 'Oswald', sans-serif;">PMP Certification</h3>
+                                    <p style="margin: 0; color: #9b59b6; font-size: 12px; font-family: 'Lato', sans-serif;">Project Management Institute</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Languages Section -->
+                        <div>
+                            <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
+                                <span style="background: white; padding-right: 15px;">LANGUAGES</span>
+                                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
+                            </h2>
+                            <div style="display: flex; gap: 20px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; margin-bottom: 5px;">🇺🇸</div>
+                                    <p style="margin: 0; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">English (Native)</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; margin-bottom: 5px;">🇪🇸</div>
+                                    <p style="margin: 0; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">Spanish (Fluent)</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; margin-bottom: 5px;">🇫🇷</div>
+                                    <p style="margin: 0; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">French (Intermediate)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateDesignerResume(data, sections) {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || [];
+        const contact = data.contact || {};
+
+        let html = `
+            <div style="font-family: 'Arial', sans-serif; max-width: 800px; margin: 0 auto; background: white;">
+                <!-- Designer Layout with Color Blocks -->
+                <div style="display: flex; min-height: 100vh;">
+                    <!-- Left Color Block -->
+                    <div style="width: 200px; background: linear-gradient(45deg, #ff6b6b, #feca57); padding: 30px 20px; color: white;">
+                        <!-- Profile Picture -->
+                        <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 20px; overflow: hidden; border: 3px solid rgba(255,255,255,0.3);">
+                            ${hero.image ? 
+                                `<img src="${hero.image}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                `<div style="width: 100%; height: 100%; background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 36px; color: white; font-weight: bold;">
+                                    ${hero.name ? hero.name.charAt(0).toUpperCase() : 'D'}
+                                </div>`
+                            }
+                        </div>
+                        
+                        <!-- Contact Info -->
+                        ${sections.contact ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; text-align: center;">CONTACT</h3>
+                                ${contact.email ? `<div style="margin-bottom: 8px; font-size: 13px; text-align: center;">📧 ${contact.email}</div>` : ''}
+                                ${contact.phone ? `<div style="margin-bottom: 8px; font-size: 13px; text-align: center;">📞 ${contact.phone}</div>` : ''}
+                                ${contact.location ? `<div style="margin-bottom: 8px; font-size: 13px; text-align: center;">📍 ${contact.location}</div>` : ''}
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills -->
+                        ${sections.skills && skills.length > 0 ? `
+                            <div>
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; text-align: center;">SKILLS</h3>
+                                ${skills.map(category => `
+                                    <div style="margin-bottom: 15px;">
+                                        <h4 style="margin: 0 0 8px 0; font-size: 13px; text-align: center;">${category.name}</h4>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">
+                                            ${category.skills.map(skill => `
+                                                <span style="background: rgba(255,255,255,0.2); padding: 3px 6px; border-radius: 10px; font-size: 11px;">${skill}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="flex: 1; padding: 30px;">
+                        <!-- Header -->
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h1 style="margin: 0; color: #2c3e50; font-size: 36px; font-weight: 700;">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 10px 0; color: #ff6b6b; font-size: 20px; font-weight: 500;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+
+                        <!-- About Section -->
+                        ${sections.about && about.description ? `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #2c3e50; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #ff6b6b; padding-bottom: 5px;">ABOUT</h2>
+                                <p style="margin: 0; line-height: 1.6; color: #555;">${about.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Experience Section -->
+                        ${sections.experience && experience.length > 0 ? `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #2c3e50; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #ff6b6b; padding-bottom: 5px;">EXPERIENCE</h2>
+                                ${experience.map(exp => `
+                                    <div style="margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 15px; border-left: 4px solid #ff6b6b;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                            <h3 style="margin: 0; color: #2c3e50; font-size: 16px; font-weight: 600;">${exp.title}</h3>
+                                            <span style="color: #ff6b6b; font-size: 14px; font-weight: 500;">${exp.period}</span>
+                                        </div>
+                                        <div style="color: #666; font-size: 14px; margin-bottom: 10px; font-weight: 500;">${exp.company}</div>
+                                        <p style="margin: 0; line-height: 1.6; color: #555;">${exp.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateCorporateResume(data, sections) {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || [];
+        const contact = data.contact || {};
+
+        let html = `
+            <div style="font-family: 'Arial', sans-serif; max-width: 800px; margin: 0 auto; background: white; padding: 20px;">
+                <!-- Corporate Header -->
+                <div style="text-align: center; background: #f8f9fa; padding: 30px; margin-bottom: 30px; border: 1px solid #dee2e6;">
+                    <h1 style="margin: 0; color: #212529; font-size: 32px; font-weight: 600;">${hero.name || 'Your Name'}</h1>
+                    <p style="margin: 10px 0; color: #6c757d; font-size: 18px;">${hero.subtitle || 'Professional Title'}</p>
+                    ${sections.contact ? `
+                        <div style="margin-top: 20px; font-size: 14px; color: #495057;">
+                            ${contact.email ? `<div style="margin-bottom: 5px;">📧 ${contact.email}</div>` : ''}
+                            ${contact.phone ? `<div style="margin-bottom: 5px;">📞 ${contact.phone}</div>` : ''}
+                            ${contact.location ? `<div style="margin-bottom: 5px;">📍 ${contact.location}</div>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- About Section -->
+                ${sections.about && about.description ? `
+                    <div style="margin-bottom: 30px;">
+                        <h2 style="color: #212529; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #007bff; padding-bottom: 5px;">PROFESSIONAL SUMMARY</h2>
+                        <p style="margin: 0; line-height: 1.6; color: #495057;">${about.description}</p>
+                    </div>
+                ` : ''}
+
+                <!-- Experience Section -->
+                ${sections.experience && experience.length > 0 ? `
+                    <div style="margin-bottom: 30px;">
+                        <h2 style="color: #212529; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #007bff; padding-bottom: 5px;">PROFESSIONAL EXPERIENCE</h2>
+                        ${experience.map(exp => `
+                            <div style="margin-bottom: 25px; padding: 20px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <h3 style="margin: 0; color: #212529; font-size: 16px; font-weight: 600;">${exp.title}</h3>
+                                    <span style="color: #007bff; font-size: 14px; font-weight: 500;">${exp.period}</span>
+                                </div>
+                                <div style="color: #6c757d; font-size: 14px; margin-bottom: 10px; font-weight: 500;">${exp.company}</div>
+                                <p style="margin: 0; line-height: 1.6; color: #495057;">${exp.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <!-- Skills Section -->
+                ${sections.skills && skills.length > 0 ? `
+                    <div style="margin-bottom: 30px;">
+                        <h2 style="color: #212529; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #007bff; padding-bottom: 5px;">SKILLS & EXPERTISE</h2>
+                        ${skills.map(category => `
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 10px 0; color: #212529; font-size: 16px; font-weight: 600;">${category.name}</h3>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                    ${category.skills.map(skill => `
+                                        <span style="background: #007bff; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px;">${skill}</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateStartupResume(data, sections) {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || [];
+        const contact = data.contact || {};
+
+        let html = `
+            <div style="font-family: 'Arial', sans-serif; max-width: 800px; margin: 0 auto; background: white;">
+                <!-- Startup Layout -->
+                <div style="display: flex; min-height: 100vh;">
+                    <!-- Left Sidebar -->
+                    <div style="width: 250px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px;">
+                        <!-- Profile Picture -->
+                        <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; overflow: hidden; border: 3px solid rgba(255,255,255,0.3);">
+                            ${hero.image ? 
+                                `<img src="${hero.image}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                `<div style="width: 100%; height: 100%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; font-weight: bold;">
+                                    ${hero.name ? hero.name.charAt(0).toUpperCase() : 'S'}
+                                </div>`
+                            }
+                        </div>
+                        
+                        <!-- Contact Info -->
+                        ${sections.contact ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; text-align: center;">CONTACT</h3>
+                                ${contact.email ? `<div style="margin-bottom: 8px; font-size: 13px; text-align: center;">📧 ${contact.email}</div>` : ''}
+                                ${contact.phone ? `<div style="margin-bottom: 8px; font-size: 13px; text-align: center;">📞 ${contact.phone}</div>` : ''}
+                                ${contact.location ? `<div style="margin-bottom: 8px; font-size: 13px; text-align: center;">📍 ${contact.location}</div>` : ''}
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills -->
+                        ${sections.skills && skills.length > 0 ? `
+                            <div>
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; text-align: center;">SKILLS</h3>
+                                ${skills.map(category => `
+                                    <div style="margin-bottom: 15px;">
+                                        <h4 style="margin: 0 0 8px 0; font-size: 13px; text-align: center;">${category.name}</h4>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">
+                                            ${category.skills.map(skill => `
+                                                <span style="background: rgba(255,255,255,0.2); padding: 3px 6px; border-radius: 10px; font-size: 11px;">${skill}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="flex: 1; padding: 30px;">
+                        <!-- Header -->
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h1 style="margin: 0; color: #333; font-size: 32px; font-weight: 700;">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 10px 0; color: #667eea; font-size: 18px; font-weight: 500;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+
+                        <!-- About Section -->
+                        ${sections.about && about.description ? `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 5px;">ABOUT</h2>
+                                <p style="margin: 0; line-height: 1.6; color: #555;">${about.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Experience Section -->
+                        ${sections.experience && experience.length > 0 ? `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 5px;">EXPERIENCE</h2>
+                                ${experience.map(exp => `
+                                    <div style="margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #667eea;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                            <h3 style="margin: 0; color: #333; font-size: 16px; font-weight: 600;">${exp.title}</h3>
+                                            <span style="color: #667eea; font-size: 14px; font-weight: 500;">${exp.period}</span>
+                                        </div>
+                                        <div style="color: #666; font-size: 14px; margin-bottom: 10px; font-weight: 500;">${exp.company}</div>
+                                        <p style="margin: 0; line-height: 1.6; color: #555;">${exp.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateAcademicResume(data, sections) {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || [];
+        const contact = data.contact || {};
+
+        let html = `
+            <div style="font-family: 'Times New Roman', serif; max-width: 800px; margin: 0 auto; background: white; padding: 20px;">
+                <!-- Academic Header -->
+                <div style="text-align: center; border-bottom: 2px solid #2c3e50; padding-bottom: 20px; margin-bottom: 30px;">
+                    <h1 style="margin: 0; color: #2c3e50; font-size: 28px; font-weight: bold;">${hero.name || 'Your Name'}</h1>
+                    <p style="margin: 10px 0; color: #7f8c8d; font-size: 16px;">${hero.subtitle || 'Professional Title'}</p>
+                    ${sections.contact ? `
+                        <div style="margin-top: 15px; font-size: 14px; color: #34495e;">
+                            ${contact.email ? `<div>📧 ${contact.email}</div>` : ''}
+                            ${contact.phone ? `<div>📞 ${contact.phone}</div>` : ''}
+                            ${contact.location ? `<div>📍 ${contact.location}</div>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- About Section -->
+                ${sections.about && about.description ? `
+                    <div style="margin-bottom: 30px;">
+                        <h2 style="color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px;">RESEARCH INTERESTS</h2>
+                        <p style="margin: 0; line-height: 1.6; color: #2c3e50;">${about.description}</p>
+                    </div>
+                ` : ''}
+
+                <!-- Experience Section -->
+                ${sections.experience && experience.length > 0 ? `
+                    <div style="margin-bottom: 30px;">
+                        <h2 style="color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px;">ACADEMIC & PROFESSIONAL EXPERIENCE</h2>
+                        ${experience.map(exp => `
+                            <div style="margin-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                    <h3 style="margin: 0; color: #2c3e50; font-size: 16px; font-weight: bold;">${exp.title}</h3>
+                                    <span style="color: #7f8c8d; font-size: 14px;">${exp.period}</span>
+                                </div>
+                                <div style="color: #7f8c8d; font-size: 14px; margin-bottom: 8px; font-style: italic;">${exp.company}</div>
+                                <p style="margin: 0; line-height: 1.5; color: #2c3e50;">${exp.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <!-- Skills Section -->
+                ${sections.skills && skills.length > 0 ? `
+                    <div style="margin-bottom: 30px;">
+                        <h2 style="color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px;">TECHNICAL SKILLS & EXPERTISE</h2>
+                        ${skills.map(category => `
+                            <div style="margin-bottom: 15px;">
+                                <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 14px; font-weight: bold;">${category.name}</h3>
+                                <p style="margin: 0; color: #2c3e50; font-size: 13px;">${category.skills.join(', ')}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        return html;
+    }
+
+    generateFreelanceResume(data, sections) {
+        const hero = data.hero || {};
+        const about = data.about || {};
+        const experience = data.experience || [];
+        const skills = data.skills || [];
+        const contact = data.contact || {};
+
+        let html = `
+            <div style="font-family: 'Arial', sans-serif; max-width: 800px; margin: 0 auto; background: white;">
+                <!-- Freelance Layout -->
+                <div style="display: flex; min-height: 100vh;">
+                    <!-- Left Sidebar -->
+                    <div style="width: 250px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px;">
+                        <!-- Profile Picture -->
+                        <div style="width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold;">
+                            ${hero.name ? hero.name.charAt(0).toUpperCase() : 'F'}
+                        </div>
+                        
+                        <!-- Contact Info -->
+                        ${sections.contact ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; text-align: center;">CONTACT</h3>
+                                ${contact.email ? `<div style="margin-bottom: 8px; font-size: 13px; text-align: center;">📧 ${contact.email}</div>` : ''}
+                                ${contact.phone ? `<div style="margin-bottom: 8px; font-size: 13px; text-align: center;">📞 ${contact.phone}</div>` : ''}
+                                ${contact.location ? `<div style="margin-bottom: 8px; font-size: 13px; text-align: center;">📍 ${contact.location}</div>` : ''}
+                            </div>
+                        ` : ''}
+
+                        <!-- Skills -->
+                        ${sections.skills && skills.length > 0 ? `
+                            <div>
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; text-align: center;">SKILLS</h3>
+                                ${skills.map(category => `
+                                    <div style="margin-bottom: 15px;">
+                                        <h4 style="margin: 0 0 8px 0; font-size: 13px; text-align: center;">${category.name}</h4>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">
+                                            ${category.skills.map(skill => `
+                                                <span style="background: rgba(255,255,255,0.2); padding: 3px 6px; border-radius: 10px; font-size: 11px;">${skill}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="flex: 1; padding: 30px;">
+                        <!-- Header -->
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h1 style="margin: 0; color: #333; font-size: 32px; font-weight: 700;">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 10px 0; color: #667eea; font-size: 18px; font-weight: 500;">${hero.subtitle || 'Professional Title'}</p>
+                        </div>
+
+                        <!-- About Section -->
+                        ${sections.about && about.description ? `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 5px;">ABOUT</h2>
+                                <p style="margin: 0; line-height: 1.6; color: #555;">${about.description}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- Experience Section -->
+                        ${sections.experience && experience.length > 0 ? `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 5px;">EXPERIENCE</h2>
+                                ${experience.map(exp => `
+                                    <div style="margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #667eea;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                            <h3 style="margin: 0; color: #333; font-size: 16px; font-weight: 600;">${exp.title}</h3>
+                                            <span style="color: #667eea; font-size: 14px; font-weight: 500;">${exp.period}</span>
+                                        </div>
+                                        <div style="color: #666; font-size: 14px; margin-bottom: 10px; font-weight: 500;">${exp.company}</div>
+                                        <p style="margin: 0; line-height: 1.6; color: #555;">${exp.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    async generateResume() {
+        try {
+            const template = document.getElementById('resume-template')?.value || 'classic';
+            const sections = this.getResumeSections();
+            const resumeLength = document.getElementById('resume-length')?.value || 'single';
+            const pageSize = document.getElementById('resume-page-size')?.value || 'A4';
+            const orientation = document.getElementById('resume-orientation')?.value || 'portrait';
+            const fontSize = document.getElementById('resume-font-size')?.value || 'medium';
+
+            // Generate resume HTML with length consideration
+            const resumeHtml = this.generateResumeHtml(template, sections, resumeLength);
+            
+            // Create a temporary container for the resume
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = resumeHtml;
+            document.body.appendChild(tempContainer);
+
+            // Use html2pdf.js to generate PDF
+            const opt = {
+                margin: 10,
+                filename: `${this.websiteData?.hero?.name || 'resume'}_${template}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: pageSize.toLowerCase(), 
+                    orientation: orientation 
+                }
+            };
+
+            // Load html2pdf library if not already loaded
+            if (typeof html2pdf === 'undefined') {
+                await this.loadHtml2PdfLibrary();
+            }
+
+            // Generate PDF
+            await html2pdf().set(opt).from(tempContainer).save();
+
+            // Clean up
+            document.body.removeChild(tempContainer);
+
+            this.showMessage('Resume generated and downloaded successfully!', 'success');
+        } catch (error) {
+            console.error('Error generating resume:', error);
+            this.showMessage('Error generating resume. Please try again.', 'error');
+        }
+    }
+
+    async loadHtml2PdfLibrary() {
+        return new Promise((resolve, reject) => {
+            if (typeof html2pdf !== 'undefined') {
+                resolve();
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
     }
 }
 
