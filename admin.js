@@ -376,6 +376,8 @@ class AdminPanel {
         this.currentSection = 'hero';
         this.websiteData = {};
         this.supabase = null;
+        this.savedTemplateContent = null; // Store saved template content
+        this.loadSavedTemplateContent(); // Load saved template content
         this.init().catch(error => {
             console.error('Admin panel initialization failed:', error);
         });
@@ -5513,7 +5515,7 @@ My philosophy centers on creating seamless experiences that transform internatio
         const linkItem = document.createElement('div');
         linkItem.className = 'footer-link-item';
         linkItem.innerHTML = `
-            <button type="button" class="remove-footer-link" onclick="adminPanel.removeFooterLink(${linkIndex})">
+            <button type="button" class="remove-footer-link" data-index="${linkIndex}">
                 <i class="fas fa-trash"></i>
             </button>
             <h5>Footer Link ${linkIndex + 1}</h5>
@@ -5545,7 +5547,7 @@ My philosophy centers on creating seamless experiences that transform internatio
         
         footerLinksList.appendChild(linkItem);
         
-        // Add event listeners
+        // Add event listeners for form inputs
         linkItem.querySelectorAll('input, select').forEach(input => {
             input.addEventListener('input', () => {
                 this.collectFooterData();
@@ -5556,14 +5558,47 @@ My philosophy centers on creating seamless experiences that transform internatio
                 this.updateFooterPreview();
             });
         });
+        
+        // Add event listener for delete button
+        const deleteButton = linkItem.querySelector('.remove-footer-link');
+        if (deleteButton) {
+            deleteButton.addEventListener('click', () => {
+                this.removeFooterLink(linkIndex);
+            });
+        }
     }
     
     removeFooterLink(index) {
+        console.log('Removing footer link at index:', index);
         const footerLinksList = document.getElementById('footer-links-list');
-        if (footerLinksList && footerLinksList.children[index]) {
-            footerLinksList.children[index].remove();
+        
+        if (!footerLinksList) {
+            console.error('Footer links list not found');
+            this.showMessage('Footer links container not found', 'error');
+            return;
+        }
+        
+        if (index < 0 || index >= footerLinksList.children.length) {
+            console.error('Invalid index:', index, 'Total children:', footerLinksList.children.length);
+            this.showMessage('Invalid link index', 'error');
+            return;
+        }
+        
+        // Remove the link item
+        const linkItem = footerLinksList.children[index];
+        if (linkItem) {
+            linkItem.remove();
+            console.log('Link item removed from DOM');
+            
+            // Update the data structure
             this.collectFooterData();
             this.updateFooterPreview();
+            
+            // Show confirmation
+            this.showMessage('Footer link removed successfully!', 'success');
+        } else {
+            console.error('Link item not found at index:', index);
+            this.showMessage('Link not found or already removed', 'error');
         }
     }
     
@@ -5587,6 +5622,17 @@ My philosophy centers on creating seamless experiences that transform internatio
                     linkItem.querySelector('.footer-link-type').value = link.type || 'page';
                     linkItem.querySelector('.footer-link-target').value = link.url || '#';
                     linkItem.querySelector('.footer-link-new-tab').checked = link.newTab || false;
+                    
+                    // Update the delete button to use the correct index
+                    const deleteButton = linkItem.querySelector('.remove-footer-link');
+                    if (deleteButton) {
+                        // Remove existing event listeners
+                        deleteButton.replaceWith(deleteButton.cloneNode(true));
+                        const newDeleteButton = linkItem.querySelector('.remove-footer-link');
+                        newDeleteButton.addEventListener('click', () => {
+                            this.removeFooterLink(index);
+                        });
+                    }
                 }
             });
         } else {
@@ -5617,6 +5663,17 @@ My philosophy centers on creating seamless experiences that transform internatio
                 linkItem.querySelector('.footer-link-type').value = link.type;
                 linkItem.querySelector('.footer-link-target').value = link.url;
                 linkItem.querySelector('.footer-link-new-tab').checked = link.newTab;
+                
+                // Update the delete button to use the correct index
+                const deleteButton = linkItem.querySelector('.remove-footer-link');
+                if (deleteButton) {
+                    // Remove existing event listeners
+                    deleteButton.replaceWith(deleteButton.cloneNode(true));
+                    const newDeleteButton = linkItem.querySelector('.remove-footer-link');
+                    newDeleteButton.addEventListener('click', () => {
+                        this.removeFooterLink(index);
+                    });
+                }
             }
         });
         
@@ -5632,26 +5689,8 @@ My philosophy centers on creating seamless experiences that transform internatio
         // Clear existing links
         footerLinksList.innerHTML = '';
         
-        // Default links that should always be present
-        const defaultLinks = [
-            { text: 'Disclaimer', url: '/disclaimer.html', type: 'page', newTab: false },
-            { text: 'Terms', url: '/terms.html', type: 'page', newTab: false }
-        ];
-        
-        // Combine default and custom links, avoiding duplicates
-        const allLinks = [...defaultLinks];
-        
-        // Add custom links that aren't duplicates
-        if (customLinks && customLinks.length > 0) {
-            customLinks.forEach(customLink => {
-                const isDuplicate = defaultLinks.some(defaultLink => 
-                    defaultLink.text === customLink.text || defaultLink.url === customLink.url
-                );
-                if (!isDuplicate) {
-                    allLinks.push(customLink);
-                }
-            });
-        }
+        // Use only the custom links provided, no hardcoded defaults
+        const allLinks = customLinks || [];
         
         console.log('All links to load:', allLinks);
         
@@ -5673,6 +5712,17 @@ My philosophy centers on creating seamless experiences that transform internatio
                 if (typeInput) typeInput.value = link.type || 'page';
                 if (targetInput) targetInput.value = link.url;
                 if (newTabInput) newTabInput.checked = link.newTab || false;
+                
+                // Update the delete button to use the correct index
+                const deleteButton = linkItem.querySelector('.remove-footer-link');
+                if (deleteButton) {
+                    // Remove existing event listeners
+                    deleteButton.replaceWith(deleteButton.cloneNode(true));
+                    const newDeleteButton = linkItem.querySelector('.remove-footer-link');
+                    newDeleteButton.addEventListener('click', () => {
+                        this.removeFooterLink(index);
+                    });
+                }
             }
         });
         
@@ -8009,12 +8059,154 @@ Your website is ready to go live! 🌐`;
         }
     }
 
+    // Load saved template content from localStorage
+    loadSavedTemplateContent() {
+        try {
+            const savedContent = localStorage.getItem('savedTemplateContent');
+            if (savedContent) {
+                this.savedTemplateContent = savedContent;
+                console.log('Loaded saved template content:', savedContent.length, 'characters');
+            }
+        } catch (error) {
+            console.error('Error loading saved template content:', error);
+        }
+    }
+
+    // Legal Modal Functions
+    openLegalModal() {
+        console.log('Opening legal modal...');
+        const legalModal = document.getElementById('legal-modal');
+        if (legalModal) {
+            legalModal.classList.remove('hidden');
+            legalModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            console.log('Legal modal opened successfully');
+        } else {
+            console.error('Legal modal element not found');
+            this.showMessage('Legal modal not found', 'error');
+        }
+    }
+
+    closeLegalModal() {
+        console.log('Closing legal modal...');
+        const legalModal = document.getElementById('legal-modal');
+        if (legalModal) {
+            legalModal.classList.add('hidden');
+            legalModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            console.log('Legal modal closed successfully');
+        }
+    }
+
+    // Add Legal link to footer
+    addLegalFooterLink() {
+        const legalLink = {
+            text: 'Legal',
+            url: '#',
+            type: 'anchor',
+            newTab: false
+        };
+        
+        // Add to website data
+        if (!this.websiteData.footer) {
+            this.websiteData.footer = {};
+        }
+        if (!this.websiteData.footer.links) {
+            this.websiteData.footer.links = [];
+        }
+        
+        // Check if Legal link already exists
+        const existingLegal = this.websiteData.footer.links.find(link => link.text === 'Legal');
+        if (existingLegal) {
+            this.showMessage('Legal link already exists in footer', 'warning');
+            return;
+        }
+        
+        // Add Legal link
+        this.websiteData.footer.links.push(legalLink);
+        
+        // Reload footer links in admin panel
+        this.loadFooterLinks();
+        
+        // Save to database
+        this.saveChanges();
+        
+        // Update preview
+        this.updateFooterPreview();
+        
+        this.showMessage('Legal link added to footer successfully!', 'success');
+    }
+
+    // Remove Legal link from footer
+    removeLegalFooterLink() {
+        if (!this.websiteData.footer || !this.websiteData.footer.links) {
+            this.showMessage('No footer links found', 'error');
+            return;
+        }
+        
+        // Find and remove Legal link
+        const legalIndex = this.websiteData.footer.links.findIndex(link => link.text === 'Legal');
+        if (legalIndex === -1) {
+            this.showMessage('Legal link not found in footer', 'error');
+            return;
+        }
+        
+        // Remove Legal link
+        this.websiteData.footer.links.splice(legalIndex, 1);
+        
+        // Reload footer links in admin panel
+        this.loadFooterLinks();
+        
+        // Save to database
+        this.saveChanges();
+        
+        // Update preview
+        this.updateFooterPreview();
+        
+        this.showMessage('Legal link removed from footer successfully!', 'success');
+    }
+
+    // Save the current edited template
+    saveTemplate() {
+        const editor = document.getElementById('resume-editor-content');
+        if (!editor) {
+            this.showMessage('No editor found', 'error');
+            return;
+        }
+
+        const editedContent = editor.innerHTML;
+        if (!editedContent || editedContent.trim() === '') {
+            this.showMessage('No content to save', 'error');
+            return;
+        }
+
+        // Store the edited content
+        this.savedTemplateContent = editedContent;
+        localStorage.setItem('savedTemplateContent', editedContent);
+        
+        this.showMessage('Template saved successfully!', 'success');
+        console.log('Template saved:', editedContent.length, 'characters');
+    }
+
+    // Download the saved/edited template
     downloadResume() {
         const editor = document.getElementById('resume-editor-content');
-        if (!editor) return;
+        if (!editor) {
+            this.showMessage('No editor found', 'error');
+            return;
+        }
 
-        // Get the edited content
-        const editedContent = editor.innerHTML;
+        // Get the edited content (prefer saved content if available)
+        const editedContent = this.savedTemplateContent || editor.innerHTML;
+        
+        if (!editedContent || editedContent.trim() === '') {
+            this.showMessage('No content to download', 'error');
+            return;
+        }
+
+        // Get page settings
+        const pageSize = document.getElementById('resume-page-size')?.value || 'A4';
+        const orientation = document.getElementById('resume-orientation')?.value || 'portrait';
         
         // Create a new window with the edited content for PDF generation
         const printWindow = window.open('', '_blank');
@@ -8024,15 +8216,53 @@ Your website is ready to go live! 🌐`;
             <head>
                 <title>Resume</title>
                 <style>
-                    body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; }
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+                    
+                    body { 
+                        margin: 0; 
+                        padding: 0; 
+                        font-family: 'Inter', sans-serif;
+                        width: 100%;
+                        height: 100%;
+                        overflow: hidden;
+                    }
+                    
+                    .resume-container {
+                        width: 100%;
+                        height: 100%;
+                        padding: 20px;
+                        background: white;
+                        overflow: auto;
+                    }
+                    
                     @media print {
-                        body { margin: 0; }
-                        @page { margin: 0.5in; }
+                        body { 
+                            margin: 0; 
+                            padding: 0;
+                            width: 100%;
+                            height: 100%;
+                        }
+                        
+                        .resume-container {
+                            padding: 0;
+                            margin: 0;
+                        }
+                        
+                        @page { 
+                            margin: 0.5in;
+                            size: ${pageSize.toLowerCase()} ${orientation};
+                        }
                     }
                 </style>
             </head>
             <body>
-                ${editedContent}
+                <div class="resume-container">
+                    ${editedContent}
+                </div>
                 <script>
                     window.onload = function() {
                         window.print();
@@ -8045,22 +8275,48 @@ Your website is ready to go live! 🌐`;
         printWindow.document.close();
     }
 
-    loadResumeContent() {
+    async loadResumeContent() {
         const editor = document.getElementById('resume-editor-content');
-        if (!editor) return;
+        if (!editor) {
+            console.error('Resume editor element not found');
+            return;
+        }
 
         // Generate current resume content
         const template = document.getElementById('resume-template')?.value || 'architect';
         const sections = this.getResumeSections();
         const length = document.getElementById('resume-length')?.value || 'single';
         
-        const resumeHtml = this.generateResumeHtml(template, sections, length);
+        console.log('Loading resume content with:', {
+            template,
+            sections,
+            length,
+            editor: editor ? 'found' : 'not found'
+        });
         
-        // Load the full HTML directly into the editor for WYSIWYG editing
-        editor.innerHTML = resumeHtml;
-        
-        // Focus the editor
-        editor.focus();
+        try {
+            // First, let's test with a simple template to see if the issue is with data collection
+            console.log('Testing with simple template first...');
+            const testHtml = '<div style="padding: 20px; background: #f0f0f0; border: 2px solid #333;"><h1>Test Template</h1><p>This is a test to see if templates are working.</p></div>';
+            editor.innerHTML = testHtml;
+            console.log('Test template loaded successfully');
+            
+            // Now try the real template
+            console.log('Now trying real template...');
+            const resumeHtml = await this.generateResumeHtml(template, sections, length);
+            console.log('Generated resume HTML length:', resumeHtml.length);
+            
+            // Load the full HTML directly into the editor for WYSIWYG editing
+            editor.innerHTML = resumeHtml;
+            
+            // Focus the editor
+            editor.focus();
+            
+            console.log('Resume content loaded successfully');
+        } catch (error) {
+            console.error('Error loading resume content:', error);
+            editor.innerHTML = '<p>Error loading resume content. Please try again.</p>';
+        }
     }
 
     getEditedResumeContent() {
@@ -8069,7 +8325,7 @@ Your website is ready to go live! 🌐`;
     }
 
     getResumeSections() {
-        return {
+        const sections = {
             about: document.getElementById('resume-include-about')?.checked || false,
             education: document.getElementById('resume-include-education')?.checked || false,
             experience: document.getElementById('resume-include-experience')?.checked || false,
@@ -8077,16 +8333,76 @@ Your website is ready to go live! 🌐`;
             contact: document.getElementById('resume-include-contact')?.checked || false,
             photo: document.getElementById('resume-include-photo')?.checked || false
         };
+        
+        console.log('Resume sections:', sections);
+        return sections;
     }
 
-    generateResumeHtml(template, sections, length = 'single') {
-        const data = this.websiteData;
-        if (!data) return '<p>No data available</p>';
+    async generateResumeHtml(template, sections, length = 'single') {
+        try {
+            console.log('Generating resume for template:', template);
+            
+            // Create test data if no real data is available
+            let data = this.websiteData;
+            if (!data || Object.keys(data).length === 0) {
+                console.log('No website data available, using test data');
+                data = {
+                    hero: {
+                        name: 'John Doe',
+                        subtitle: 'Software Engineer',
+                        description: 'Experienced software engineer with expertise in web development.'
+                    },
+                    about: {
+                        description: 'Passionate software engineer with 5+ years of experience in full-stack development.',
+                        statistics: [
+                            { number: '5', label: 'Years Experience' },
+                            { number: '50', label: 'Projects Completed' },
+                            { number: '95', label: 'Client Satisfaction %' }
+                        ]
+                    },
+                    experience: [
+                        {
+                            title: 'Senior Software Engineer',
+                            company: 'Tech Corp',
+                            date: '2020 - Present',
+                            description: 'Led development of multiple web applications using React and Node.js.'
+                        }
+                    ],
+                    skills: {
+                        'Programming Languages': ['JavaScript', 'Python', 'Java'],
+                        'Frameworks': ['React', 'Node.js', 'Express'],
+                        'Tools': ['Git', 'Docker', 'AWS']
+                    },
+                    contact: {
+                        email: 'john.doe@email.com',
+                        phone: '+1 234 567 8900',
+                        location: 'San Francisco, CA',
+                        linkedin: 'linkedin.com/in/johndoe'
+                    }
+                };
+                this.websiteData = data;
+            }
+            
+            // Always collect fresh data from the current form state
+            await this.collectFormData();
+            
+            // Also ensure we have the latest statistics data
+            this.collectStatisticsData();
+            
+            // Update data with collected form data
+            data = this.websiteData;
+            if (!data) {
+                console.error('No website data available after collection');
+                return '<p>No data available</p>';
+            }
 
-        // Adjust data based on length
-        const adjustedData = this.adjustDataForLength(data, length);
+            console.log('Website data collected:', data);
 
-        switch (template) {
+            // Adjust data based on length
+            const adjustedData = this.adjustDataForLength(data, length);
+
+            console.log('Template switch for:', template);
+            switch (template) {
             case 'architect':
                 return this.generateArchitectResume(adjustedData, sections, length);
             case 'analyst':
@@ -8130,6 +8446,10 @@ Your website is ready to go live! 🌐`;
             default:
                 return this.generateAnalystResume(adjustedData, sections, length);
         }
+        } catch (error) {
+            console.error('Error generating resume HTML:', error);
+            return '<p>Error generating resume. Please try again.</p>';
+        }
     }
 
     adjustDataForLength(data, length) {
@@ -8165,9 +8485,11 @@ Your website is ready to go live! 🌐`;
                 adjustedData.about.description = `<strong>${adjustedData.about.description}</strong><br><br>
                 
                 <strong>Professional Highlights:</strong><br>
-                • <em>7+ years</em> of combined experience in financial analysis and education consulting<br>
-                • <em>200+ students</em> successfully guided through complex visa applications<br>
-                • <em>98% success rate</em> in visa application processing<br>
+                ${(adjustedData.about?.statistics || [
+                    { number: '7', label: 'Years Total Experience' },
+                    { number: '200', label: 'Students Guided' },
+                    { number: '98', label: 'Success Rate %' }
+                ]).map(stat => `• <em>${stat.number}${stat.label.includes('%') ? '' : '+'} ${stat.label.toLowerCase()}</em><br>`).join('')}
                 • <em>Expertise</em> in Australian immigration pathways and regulatory compliance<br><br>
                 
                 <strong>Core Competencies:</strong><br>
@@ -8215,7 +8537,7 @@ Your website is ready to go live! 🌐`;
                             exp.description = `<strong>${exp.description}</strong><br><br>
                             
                             <strong>Application Processing:</strong><br>
-                            • Processed over <em>150 visa applications annually</em> with a <em>98% success rate</em><br>
+                            • Processed over <em>150 visa applications annually</em> with a <em>${(adjustedData.about?.statistics || []).find(s => s.label.includes('Success'))?.number || '98'}% success rate</em><br>
                             • Conducted comprehensive interviews with applicants to assess eligibility<br>
                             • Gathered and verified required documentation for complex cases<br><br>
                             
@@ -8384,25 +8706,19 @@ Your website is ready to go live! 🌐`;
                         ` : ''}
 
                         <!-- Education -->
-                        ${sections.education ? `
+                        ${sections.education && data.education && data.education.length > 0 ? `
                             <div style="margin-bottom: 35px;">
                                 <h2 style="margin: 0 0 25px 0; font-size: 28px; font-weight: 700; color: ${primaryColor}; border-bottom: 3px solid ${secondaryColor}; padding-bottom: 10px; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;">🎓 Education</h2>
-                                <div style="margin-bottom: 25px; padding-left: 20px; border-left: 3px solid ${secondaryColor};">
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                        <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: ${primaryColor}; font-family: 'Poppins', sans-serif;">Master of Business Administration</h3>
-                                        <span style="color: #718096; font-size: 14px; font-weight: 500; background: #f7fafc; padding: 4px 12px; border-radius: 15px; font-family: 'Open Sans', sans-serif;">2018 - 2020</span>
+                                ${data.education.map(edu => `
+                                    <div style="margin-bottom: 25px; padding-left: 20px; border-left: 3px solid ${secondaryColor};">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                            <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: ${primaryColor}; font-family: 'Poppins', sans-serif;">${edu.degree || 'Degree'}</h3>
+                                            <span style="color: #718096; font-size: 14px; font-weight: 500; background: #f7fafc; padding: 4px 12px; border-radius: 15px; font-family: 'Open Sans', sans-serif;">${edu.period || edu.date || 'Period'}</span>
+                                        </div>
+                                        <div style="color: ${secondaryColor}; font-size: 18px; margin-bottom: 12px; font-weight: 600; font-family: 'Poppins', sans-serif;">${edu.institution || 'Institution'}</div>
+                                        <div style="line-height: 1.6; font-size: 15px; color: #1f2937; font-family: 'Open Sans', sans-serif; font-weight: 400;">${edu.description || edu.major || 'Description'}</div>
                                     </div>
-                                    <div style="color: ${secondaryColor}; font-size: 18px; margin-bottom: 12px; font-weight: 600; font-family: 'Poppins', sans-serif;">University of Melbourne</div>
-                                    <div style="line-height: 1.6; font-size: 15px; color: #1f2937; font-family: 'Open Sans', sans-serif; font-weight: 400;">Specialized in International Business and Strategic Management</div>
-                                </div>
-                                <div style="margin-bottom: 25px; padding-left: 20px; border-left: 3px solid ${secondaryColor};">
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                        <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: ${primaryColor}; font-family: 'Poppins', sans-serif;">Bachelor of Commerce</h3>
-                                        <span style="color: #718096; font-size: 14px; font-weight: 500; background: #f7fafc; padding: 4px 12px; border-radius: 15px; font-family: 'Open Sans', sans-serif;">2014 - 2018</span>
-                                    </div>
-                                    <div style="color: ${secondaryColor}; font-size: 18px; margin-bottom: 12px; font-weight: 600; font-family: 'Poppins', sans-serif;">Monash University</div>
-                                    <div style="line-height: 1.6; font-size: 15px; color: #1f2937; font-family: 'Open Sans', sans-serif; font-weight: 400;">Major in Finance and Economics</div>
-                                </div>
+                                `).join('')}
                             </div>
                         ` : ''}
 
@@ -9328,18 +9644,18 @@ Your website is ready to go live! 🌐`;
         return html;
     }
 
-    generateHybridResume(data, sections, length = 'single') {
+        generateHybridResume(data, sections, length = 'single') {
         const hero = data.hero || {};
         const about = data.about || {};
         const experience = data.experience || [];
         const skills = data.skills || {};
         const contact = data.contact || {};
         
-        // Get customization settings
-        const primaryColor = document.getElementById('resume-primary-color')?.value || '#2c3e50';
-        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#3498db';
+        // Get customization settings with better contrast defaults
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#1e40af';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#3b82f6';
         const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
-        const textColor = document.getElementById('resume-text-color')?.value || '#333333';
+        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
         
         // Adjust data for length
         const adjustedData = this.adjustDataForLength(data, length);
@@ -9347,14 +9663,14 @@ Your website is ready to go live! 🌐`;
         const adjustedAbout = adjustedData.about || about;
 
         let html = `
-            <div style="font-family: 'Playfair Display, Raleway, serif'; max-width: 900px; margin: 0 auto; background: ${bgColor}; color: ${textColor};">
+            <div style="font-family: 'Playfair Display, Raleway, serif'; max-width: 900px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; min-height: 100vh; padding: 20px;">
                 <!-- The Hybrid - Single Column Header + Two Column Layout -->
                 <!-- Header Section -->
-                <div style="text-align: center; padding: 50px 40px; background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; border-radius: 0 0 30px 30px; margin-bottom: 40px;">
-                    <h1 style="margin: 0; font-size: 48px; font-weight: 700; letter-spacing: 1px; font-family: 'Playfair Display', serif;">${hero.name || 'Your Name'}</h1>
-                    <p style="margin: 15px 0 0 0; font-size: 22px; opacity: 0.9; font-weight: 300; font-family: 'Raleway', sans-serif;">${hero.subtitle || 'Professional Title'}</p>
+                <div style="text-align: center; padding: 50px 40px; background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; border-radius: 20px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                    <h1 style="margin: 0; font-size: 48px; font-weight: 700; letter-spacing: 1px; font-family: 'Playfair Display', serif; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">${hero.name || 'Your Name'}</h1>
+                    <p style="margin: 15px 0 0 0; font-size: 22px; opacity: 0.95; font-weight: 400; font-family: 'Raleway', sans-serif;">${hero.subtitle || 'Professional Title'}</p>
                     ${sections.contact ? `
-                        <div style="margin-top: 25px; display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 15px; font-family: 'Raleway', sans-serif;">
+                        <div style="margin-top: 25px; display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; font-size: 15px; font-family: 'Raleway', sans-serif; opacity: 0.9;">
                             ${contact.location ? `<div style="display: flex; align-items: center; gap: 8px;">📍 ${contact.location}</div>` : ''}
                             ${contact.phone ? `<div style="display: flex; align-items: center; gap: 8px;">📞 ${contact.phone}</div>` : ''}
                             ${contact.email ? `<div style="display: flex; align-items: center; gap: 8px;">📧 ${contact.email}</div>` : ''}
@@ -9364,25 +9680,29 @@ Your website is ready to go live! 🌐`;
                 </div>
 
                 <!-- Two Column Layout -->
-                <div style="display: flex; padding: 0 40px 40px;">
+                <div style="display: flex; gap: 40px; padding: 0 20px;">
                     <!-- Left Column -->
-                    <div style="width: 300px; padding-right: 30px;">
+                    <div style="width: 300px; flex-shrink: 0;">
                         <!-- Professional Summary -->
                         ${sections.about && adjustedAbout.description ? `
-                            <div style="margin-bottom: 40px;">
+                            <div style="margin-bottom: 40px; padding: 25px; background: #f8fafc; border-radius: 15px; border-left: 4px solid ${primaryColor};">
                                 <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Playfair Display', serif;">PROFESSIONAL SUMMARY</h2>
-                                <p style="margin: 0; line-height: 1.8; font-size: 15px; color: ${textColor}; font-family: 'Raleway', sans-serif;">${adjustedAbout.description}</p>
+                                <p style="margin: 0; line-height: 1.8; font-size: 15px; color: #374151; font-family: 'Raleway', sans-serif;">${adjustedAbout.description}</p>
                             </div>
                         ` : ''}
 
                         <!-- Skills Section -->
                         ${sections.skills && Object.keys(skills).length > 0 ? `
-                            <div>
+                            <div style="padding: 25px; background: #f8fafc; border-radius: 15px; border-left: 4px solid ${secondaryColor};">
                                 <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Playfair Display', serif;">SKILLS & EXPERTISE</h2>
                                 ${Object.entries(skills).map(([categoryName, skillList]) => `
-                    <div style="margin-bottom: 25px;">
-                                        <h3 style="margin: 0 0 12px 0; color: ${primaryColor}; font-size: 16px; font-weight: 600; font-family: 'Playfair Display', serif;">${categoryName}</h3>
-                                        <p style="margin: 0; color: ${textColor}; font-size: 14px; line-height: 1.6; font-family: 'Raleway', sans-serif;">${skillList.map(skill => skill.name || skill).join(' • ')}</p>
+                                    <div style="margin-bottom: 25px;">
+                                        <h3 style="margin: 0 0 12px 0; color: ${secondaryColor}; font-size: 16px; font-weight: 600; font-family: 'Playfair Display', serif;">${categoryName}</h3>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                            ${skillList.map(skill => `
+                                                <span style="background: ${secondaryColor}; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: 'Raleway', sans-serif;">${skill.name || skill}</span>
+                                            `).join('')}
+                                        </div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -9394,15 +9714,17 @@ Your website is ready to go live! 🌐`;
                         <!-- Work Experience -->
                         ${sections.experience && adjustedExperience.length > 0 ? `
                             <div>
-                                <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Playfair Display', serif;">PROFESSIONAL EXPERIENCE</h2>
+                                <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; font-family: 'Playfair Display', serif; border-bottom: 3px solid ${secondaryColor}; padding-bottom: 10px;">PROFESSIONAL EXPERIENCE</h2>
                                 ${adjustedExperience.map(exp => `
-                                    <div style="margin-bottom: 35px; padding-left: 20px; border-left: 3px solid ${secondaryColor};">
-                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                            <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: ${primaryColor}; font-family: 'Playfair Display', serif;">${exp.title}</h3>
-                                            <span style="color: #718096; font-size: 14px; font-weight: 500; background: #f7fafc; padding: 4px 12px; border-radius: 15px; font-family: 'Raleway', sans-serif;">${exp.date || exp.period}</span>
+                                    <div style="margin-bottom: 35px; padding: 25px; background: #f8fafc; border-radius: 15px; border-left: 4px solid ${primaryColor}; position: relative;">
+                                        <div style="position: absolute; top: 20px; right: 20px;">
+                                            <span style="color: ${primaryColor}; font-size: 13px; font-weight: 600; background: white; padding: 6px 12px; border-radius: 15px; font-family: 'Raleway', sans-serif; border: 1px solid ${primaryColor};">${exp.date || exp.period}</span>
                                         </div>
-                                        <div style="color: ${secondaryColor}; font-size: 16px; margin-bottom: 12px; font-weight: 600; font-family: 'Playfair Display', serif;">${exp.company}</div>
-                                        <p style="margin: 0; line-height: 1.7; font-size: 14px; color: ${textColor}; font-family: 'Raleway', sans-serif;">${exp.description}</p>
+                                        <div style="margin-bottom: 12px;">
+                                            <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 600; color: ${primaryColor}; font-family: 'Playfair Display', serif;">${exp.title}</h3>
+                                            <div style="color: ${secondaryColor}; font-size: 16px; font-weight: 600; font-family: 'Playfair Display', serif;">${exp.company}</div>
+                                        </div>
+                                        <p style="margin: 0; line-height: 1.7; font-size: 14px; color: #374151; font-family: 'Raleway', sans-serif;">${exp.description}</p>
                                     </div>
                                 `).join('')}
                             </div>
@@ -9436,8 +9758,9 @@ Your website is ready to go live! 🌐`;
         const adjustedExperience = adjustedData.experience || experience;
         const adjustedAbout = adjustedData.about || about;
 
-        // Get real subtitle from website data
+        // Get real data from website data
         const websiteData = this.websiteData;
+        const realName = hero.name || (websiteData && websiteData.hero && websiteData.hero.name) || 'Your Name';
         const realSubtitle = hero.subtitle || hero.title || (websiteData && websiteData.hero && websiteData.hero.subtitle) || (websiteData && websiteData.hero && websiteData.hero.title) || 'Professional Title';
 
         let html = `
@@ -9457,26 +9780,24 @@ Your website is ready to go live! 🌐`;
                         <div style="margin-bottom: 40px;">
                             <h3 style="margin: 0 0 25px 0; font-size: 18px; font-weight: 600; color: rgba(255,255,255,0.9); text-align: center;">📊 Key Metrics</h3>
                             <div style="display: grid; gap: 12px;">
-                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
-                                    <div style="font-size: 22px; font-weight: 700;">7+</div>
-                                    <div style="font-size: 11px; opacity: 0.9;">Years Experience</div>
-                                </div>
-                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
-                                    <div style="font-size: 22px; font-weight: 700;">200+</div>
-                                    <div style="font-size: 11px; opacity: 0.9;">Students Guided</div>
-                                </div>
-                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
-                                    <div style="font-size: 22px; font-weight: 700;">98%</div>
-                                    <div style="font-size: 11px; opacity: 0.9;">Success Rate</div>
-                                </div>
+                                ${(data.about?.statistics || [
+                                    { number: '7', label: 'Years Total Experience' },
+                                    { number: '200', label: 'Students Guided' },
+                                    { number: '98', label: 'Success Rate %' }
+                                ]).map(stat => `
+                                    <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
+                                        <div style="font-size: 22px; font-weight: 700;">${stat.number}${stat.label.includes('%') ? '' : '+'}</div>
+                                        <div style="font-size: 11px; opacity: 0.9;">${stat.label}</div>
+                                    </div>
+                                `).join('')}
                             </div>
                         </div>
 
                         <!-- Contact Info -->
                         ${sections.contact ? `
                             <div style="margin-bottom: 30px;">
-                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">📞 Contact</h3>
-                                <div style="font-size: 14px; line-height: 1.6; color: #374151;">
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.95);">📞 Contact</h3>
+                                <div style="font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.9);">
                                     ${contact.location ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📍 ${contact.location}</div>` : ''}
                                     ${contact.phone ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📞 ${contact.phone}</div>` : ''}
                                     ${contact.email ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📧 ${contact.email}</div>` : ''}
@@ -9488,8 +9809,8 @@ Your website is ready to go live! 🌐`;
                         <!-- About Summary for Left Column -->
                         ${sections.about && adjustedAbout.description ? `
                             <div style="margin-bottom: 30px;">
-                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">📋 About</h3>
-                                <div style="font-size: 14px; line-height: 1.6; color: #374151;">
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.95);">📋 About</h3>
+                                <div style="font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.9);">
                                     ${this.truncateText(adjustedAbout.description, 200)}
                                 </div>
                             </div>
@@ -9498,16 +9819,16 @@ Your website is ready to go live! 🌐`;
                         <!-- Skills Chart -->
                         ${sections.skills && Object.keys(skills).length > 0 ? `
                             <div>
-                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">⚡ Skills Overview</h3>
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.95);">⚡ Skills Overview</h3>
                                 ${Object.entries(skills).map(([categoryName, skillList]) => `
                                     <div style="margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                            <span style="font-size: 14px; font-weight: 500; color: #374151;">${categoryName}</span>
-                                            <span style="font-size: 12px; color: #6b7280;">${skillList.length} skills</span>
-                        </div>
-                                        <div style="width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
-                                            <div style="width: ${Math.min(skillList.length * 20, 100)}%; height: 100%; background: linear-gradient(90deg, ${primaryColor}, ${secondaryColor}); border-radius: 3px;"></div>
-                    </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                            <span style="font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.9);">${categoryName}</span>
+                                            <span style="font-size: 12px; color: rgba(255,255,255,0.7);">${skillList.length} skills</span>
+                                        </div>
+                                        <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden;">
+                                            <div style="width: ${Math.min(skillList.length * 20, 100)}%; height: 100%; background: rgba(255,255,255,0.8); border-radius: 3px;"></div>
+                                        </div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -9592,11 +9913,11 @@ Your website is ready to go live! 🌐`;
         const skills = data.skills || {};
         const contact = data.contact || {};
         
-        // Get customization settings
-        const primaryColor = document.getElementById('resume-primary-color')?.value || '#6366f1';
-        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#8b5cf6';
-        const bgColor = document.getElementById('resume-bg-color')?.value || '#f8fafc';
-        const textColor = document.getElementById('resume-text-color')?.value || '#1f2937';
+        // Get customization settings with better defaults for contrast
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#1e40af';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#3b82f6';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#0f172a';
+        const textColor = document.getElementById('resume-text-color')?.value || '#ffffff';
         
         // Get photo settings
         const photoSettings = this.getResumePhoto();
@@ -9614,13 +9935,13 @@ Your website is ready to go live! 🌐`;
         const realEmail = this.getRealData(contact, 'email');
 
         let html = `
-            <div style="font-family: 'Inter, system-ui, sans-serif'; max-width: 1200px; margin: 0 auto; background: linear-gradient(135deg, ${bgColor} 0%, #e0e7ff 100%); color: ${textColor}; min-height: 100vh; padding: 40px 20px;">
-                <!-- The Glassmorphism - Modern Glass Effect -->
-                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.2); padding: 40px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);">
+            <div style="font-family: 'Inter, system-ui, sans-serif'; max-width: 1200px; margin: 0 auto; background: linear-gradient(135deg, ${bgColor} 0%, #1e293b 100%); color: ${textColor}; min-height: 100vh; padding: 40px 20px;">
+                <!-- The Glassmorphism - Modern Glass Effect with Proper Contrast -->
+                <div style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.15); padding: 40px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);">
                     <!-- Header with Glass Effect -->
-                    <div style="text-align: center; margin-bottom: 50px; padding: 40px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.3);">
+                    <div style="text-align: center; margin-bottom: 50px; padding: 40px; background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(15px); border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.2);">
                         ${sections.photo && photoSettings ? `
-                            <div style="width: 150px; height: 150px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '20px' : '0'}; margin: 0 auto 30px; overflow: hidden; border: 3px solid rgba(255, 255, 255, 0.4); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px);">
+                            <div style="width: 150px; height: 150px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '20px' : '0'}; margin: 0 auto 30px; overflow: hidden; border: 4px solid rgba(255, 255, 255, 0.3); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px);">
                                 ${photoSettings.photoUrl ? 
                                     `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
                                     `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); display: flex; align-items: center; justify-content: center;">
@@ -9629,8 +9950,8 @@ Your website is ready to go live! 🌐`;
                                 }
                             </div>
                         ` : ''}
-                        <h1 style="margin: 0; font-size: 48px; font-weight: 700; background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${realName}</h1>
-                        <p style="margin: 15px 0 0 0; font-size: 20px; color: rgba(255, 255, 255, 0.9); font-weight: 500;">${realSubtitle}</p>
+                        <h1 style="margin: 0; font-size: 48px; font-weight: 700; color: #ffffff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);">${realName}</h1>
+                        <p style="margin: 15px 0 0 0; font-size: 20px; color: #e2e8f0; font-weight: 500;">${realSubtitle}</p>
                     </div>
 
                     <!-- Content Grid -->
@@ -9639,21 +9960,21 @@ Your website is ready to go live! 🌐`;
                         <div style="display: flex; flex-direction: column; gap: 30px;">
                             <!-- About Section -->
                             ${sections.about && adjustedAbout.description ? `
-                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2);">
-                                    <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.15);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: #ffffff; display: flex; align-items: center; gap: 10px;">
                                         ✨ About Me
                                     </h2>
-                                    <div style="line-height: 1.8; font-size: 16px; color: rgba(255, 255, 255, 0.9);">${adjustedAbout.description}</div>
+                                    <div style="line-height: 1.8; font-size: 16px; color: #e2e8f0;">${adjustedAbout.description}</div>
                                 </div>
                             ` : ''}
 
                             <!-- Contact Info -->
                             ${sections.contact ? `
-                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2);">
-                                    <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.15);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: #ffffff; display: flex; align-items: center; gap: 10px;">
                                         📞 Contact
                                     </h2>
-                                    <div style="font-size: 15px; line-height: 1.8; color: rgba(255, 255, 255, 0.95);">
+                                    <div style="font-size: 15px; line-height: 1.8; color: #e2e8f0;">
                                         ${realLocation ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📍 ${realLocation}</div>` : ''}
                                         ${realPhone ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📞 ${realPhone}</div>` : ''}
                                         ${realEmail ? `<div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">📧 ${realEmail}</div>` : ''}
@@ -9664,17 +9985,17 @@ Your website is ready to go live! 🌐`;
 
                             <!-- Skills Glass Cards -->
                             ${sections.skills && Object.keys(skills).length > 0 ? `
-                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2);">
-                                    <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.15);">
+                                    <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 600; color: #ffffff; display: flex; align-items: center; gap: 10px;">
                                         🎯 Skills
                                     </h2>
                                     <div style="display: flex; flex-direction: column; gap: 20px;">
                                         ${Object.entries(skills).map(([categoryName, skillList]) => `
-                                            <div style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
-                                                <h3 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 600; color: ${secondaryColor};">${categoryName}</h3>
+                                            <div style="background: rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                                <h3 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 600; color: #3b82f6;">${categoryName}</h3>
                                                 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                                                     ${skillList.map(skill => `
-                                                        <span style="background: rgba(255, 255, 255, 0.2); color: ${primaryColor}; padding: 8px 16px; border-radius: 25px; font-size: 13px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3);">${skill.name || skill}</span>
+                                                        <span style="background: rgba(59, 130, 246, 0.2); color: #ffffff; padding: 8px 16px; border-radius: 25px; font-size: 13px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(59, 130, 246, 0.3);">${skill.name || skill}</span>
                                                     `).join('')}
                                                 </div>
                                             </div>
@@ -9688,22 +10009,22 @@ Your website is ready to go live! 🌐`;
                         <div style="display: flex; flex-direction: column; gap: 30px;">
                             <!-- Experience Timeline -->
                             ${sections.experience && adjustedExperience.length > 0 ? `
-                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2);">
-                                    <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 600; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                                <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.15);">
+                                    <h2 style="margin: 0 0 30px 0; font-size: 24px; font-weight: 600; color: #ffffff; display: flex; align-items: center; gap: 10px;">
                                         💼 Experience
                                     </h2>
                                     <div style="position: relative;">
                                         ${adjustedExperience.map((exp, index) => `
                                             <div style="position: relative; margin-bottom: 30px; padding-left: 30px;">
-                                                <div style="position: absolute; left: 0; top: 0; width: 12px; height: 12px; background: ${primaryColor}; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.3);"></div>
+                                                <div style="position: absolute; left: 0; top: 0; width: 12px; height: 12px; background: ${primaryColor}; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.3); box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);"></div>
                                                 ${index < adjustedExperience.length - 1 ? `<div style="position: absolute; left: 5px; top: 12px; width: 2px; height: 40px; background: linear-gradient(to bottom, ${primaryColor}, transparent);"></div>` : ''}
-                                                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                                <div style="background: rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
                                                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                                                        <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: ${secondaryColor};">${exp.title}</h3>
-                                                        <span style="font-size: 13px; color: rgba(255, 255, 255, 0.7); background: rgba(255, 255, 255, 0.1); padding: 4px 12px; border-radius: 12px;">${exp.date || exp.period}</span>
+                                                        <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #3b82f6;">${exp.title}</h3>
+                                                        <span style="font-size: 13px; color: #cbd5e1; background: rgba(255, 255, 255, 0.1); padding: 4px 12px; border-radius: 12px;">${exp.date || exp.period}</span>
                                                     </div>
-                                                    <p style="margin: 0 0 10px 0; font-size: 15px; color: rgba(255, 255, 255, 0.8); font-weight: 500;">${exp.company}</p>
-                                                    <div style="line-height: 1.6; font-size: 14px; color: rgba(255, 255, 255, 0.9);">${exp.description}</div>
+                                                    <p style="margin: 0 0 10px 0; font-size: 15px; color: #e2e8f0; font-weight: 500;">${exp.company}</p>
+                                                    <div style="line-height: 1.6; font-size: 14px; color: #cbd5e1;">${exp.description}</div>
                                                 </div>
                                             </div>
                                         `).join('')}
@@ -10153,18 +10474,16 @@ Your website is ready to go live! 🌐`;
                             
                             <!-- Stats Row -->
                             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 28px; font-weight: 700;">7+</div>
-                                    <div style="font-size: 12px; opacity: 0.8;">Years</div>
-                                </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 28px; font-weight: 700;">200+</div>
-                                    <div style="font-size: 12px; opacity: 0.8;">Projects</div>
-                                </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 28px; font-weight: 700;">98%</div>
-                                    <div style="font-size: 12px; opacity: 0.8;">Success</div>
-                                </div>
+                                ${(data.about?.statistics || [
+                                    { number: '7', label: 'Years Total Experience' },
+                                    { number: '200', label: 'Students Guided' },
+                                    { number: '98', label: 'Success Rate %' }
+                                ]).map(stat => `
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 28px; font-weight: 700;">${stat.number}${stat.label.includes('%') ? '' : '+'}</div>
+                                        <div style="font-size: 12px; opacity: 0.8;">${stat.label.split(' ').slice(0, 2).join(' ')}</div>
+                                    </div>
+                                `).join('')}
                             </div>
                         </div>
 
@@ -10386,11 +10705,11 @@ Your website is ready to go live! 🌐`;
         const skills = data.skills || {};
         const contact = data.contact || {};
         
-        // Get customization settings
-        const primaryColor = document.getElementById('resume-primary-color')?.value || '#00d4ff';
-        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#ff6b6b';
-        const bgColor = document.getElementById('resume-bg-color')?.value || '#0f172a';
-        const textColor = document.getElementById('resume-text-color')?.value || '#ffffff';
+        // Get customization settings with WHITE & YELLOW gradient theme
+        const primaryColor = document.getElementById('resume-primary-color')?.value || '#ffd700';
+        const secondaryColor = document.getElementById('resume-secondary-color')?.value || '#ffed4e';
+        const bgColor = document.getElementById('resume-bg-color')?.value || '#ffffff';
+        const textColor = document.getElementById('resume-text-color')?.value || '#000000';
         
         // Get photo settings
         const photoSettings = this.getResumePhoto();
@@ -10401,71 +10720,77 @@ Your website is ready to go live! 🌐`;
         const adjustedAbout = adjustedData.about || about;
 
         let html = `
-            <div style="font-family: 'JetBrains Mono, monospace'; max-width: 1200px; margin: 0 auto; background: ${bgColor}; color: ${textColor}; min-height: 100vh; padding: 40px 20px;">
-                <!-- The Dashboard Dark - Dark Data -->
+            <div style="font-family: 'Inter, system-ui, sans-serif'; width: 100%; max-width: 100%; margin: 0; padding: 0; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #ffffff 100%); color: #000000; min-height: 100vh; box-sizing: border-box;">
+                <!-- The Dashboard White & Yellow - ELEGANT GRADIENT -->
+                <div style="padding: 20px; max-width: 100%; box-sizing: border-box;">
                 <div style="display: grid; grid-template-columns: 300px 1fr; gap: 30px;">
-                    <!-- Left Sidebar - Dark Stats -->
-                    <div style="background: #1e293b; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); height: fit-content;">
+                    <!-- Left Sidebar - WHITE & YELLOW GRADIENT -->
+                    <div style="background: linear-gradient(135deg, #ffffff 0%, #fff8dc 50%, #ffffff 100%); border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2); height: fit-content; border: 3px solid #ffd700;">
                         <!-- Profile Section -->
                         <div style="text-align: center; margin-bottom: 30px;">
                             ${sections.photo && photoSettings ? `
-                                <div style="width: 120px; height: 120px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '15px' : '0'}; margin: 0 auto 20px; overflow: hidden; border: 3px solid ${primaryColor}; box-shadow: 0 0 20px ${primaryColor};">
+                                <div style="width: 120px; height: 120px; border-radius: ${photoSettings.photoStyle === 'circle' ? '50%' : photoSettings.photoStyle === 'rounded' ? '15px' : '0'}; margin: 0 auto 20px; overflow: hidden; border: 3px solid #ffd700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);">
                                     ${photoSettings.photoUrl ? 
                                         `<img src="${photoSettings.photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">` :
-                                        `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); display: flex; align-items: center; justify-content: center;">
-                                            <span style="font-size: 48px; color: ${bgColor}; font-weight: bold;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'D'}</span>
+                                        `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, #ffd700, #ffed4e); display: flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 48px; color: #000000; font-weight: bold;">${hero.name ? hero.name.charAt(0).toUpperCase() : 'D'}</span>
                                         </div>`
                                     }
                                 </div>
                             ` : ''}
-                            <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: ${primaryColor};">${hero.name || 'Your Name'}</h1>
-                            <p style="margin: 8px 0 0 0; font-size: 16px; color: #94a3b8; font-weight: 500;">${hero.subtitle || 'Professional Title'}</p>
+                            <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #000000; text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);">${hero.name || 'Your Name'}</h1>
+                            <p style="margin: 8px 0 0 0; font-size: 16px; color: #666666; font-weight: 600;">${hero.subtitle || 'Professional Title'}</p>
                         </div>
 
-                        <!-- Dark Stats Dashboard -->
+                        <!-- Stats Dashboard - YELLOW GRADIENT CARDS -->
                         <div style="margin-bottom: 30px;">
-                            <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: ${primaryColor};">📊 Metrics</h3>
+                            <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #000000; text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);">📊 Metrics</h3>
                             <div style="display: grid; gap: 15px;">
-                                <div style="background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor}); color: ${bgColor}; padding: 15px; border-radius: 12px; text-align: center;">
-                                    <div style="font-size: 24px; font-weight: 700;">7+</div>
-                                    <div style="font-size: 12px; opacity: 0.9;">Years</div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #10b981, #34d399); color: ${bgColor}; padding: 15px; border-radius: 12px; text-align: center;">
-                                    <div style="font-size: 24px; font-weight: 700;">200+</div>
-                                    <div style="font-size: 12px; opacity: 0.9;">Projects</div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: ${bgColor}; padding: 15px; border-radius: 12px; text-align: center;">
-                                    <div style="font-size: 24px; font-weight: 700;">98%</div>
-                                    <div style="font-size: 12px; opacity: 0.9;">Success</div>
-                                </div>
+                                ${(data.about?.statistics || [
+                                    { number: '7', label: 'Years Total Experience' },
+                                    { number: '200', label: 'Students Guided' },
+                                    { number: '98', label: 'Success Rate %' }
+                                ]).map((stat, index) => {
+                                    const gradients = [
+                                        'linear-gradient(135deg, #ffd700, #ffed4e)',
+                                        'linear-gradient(135deg, #fff8dc, #ffd700)',
+                                        'linear-gradient(135deg, #ffed4e, #ffd700)'
+                                    ];
+                                    return `
+                                        <div style="background: ${gradients[index % gradients.length]}; color: #000000; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); border: 2px solid #ffd700;">
+                                            <div style="font-size: 24px; font-weight: 700; color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">${stat.number}${stat.label.includes('%') ? '' : '+'}</div>
+                                            <div style="font-size: 12px; font-weight: 700; color: #000000;">${stat.label.split(' ').slice(0, 2).join(' ')}</div>
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
 
-                        <!-- Contact Info -->
+                        <!-- Contact Info - WHITE CARDS -->
                         ${sections.contact ? `
                             <div style="margin-bottom: 30px;">
-                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">📞 Contact</h3>
-                                <div style="font-size: 14px; line-height: 1.6; color: #94a3b8;">
-                                    ${contact.location ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📍 ${contact.location}</div>` : ''}
-                                    ${contact.phone ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📞 ${contact.phone}</div>` : ''}
-                                    ${contact.email ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">📧 ${contact.email}</div>` : ''}
-                                    ${contact.linkedin ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">🔗 LinkedIn</div>` : ''}
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #000000; text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);">📞 Contact</h3>
+                                <div style="font-size: 14px; line-height: 1.6; color: #000000;">
+                                    ${contact.location ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; padding: 12px; background: #ffffff; border-radius: 8px; border: 2px solid #ffd700; color: #000000; font-weight: 600; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);">📍 ${contact.location}</div>` : ''}
+                                    ${contact.phone ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; padding: 12px; background: #ffffff; border-radius: 8px; border: 2px solid #ffd700; color: #000000; font-weight: 600; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);">📞 ${contact.phone}</div>` : ''}
+                                    ${contact.email ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; padding: 12px; background: #ffffff; border-radius: 8px; border: 2px solid #ffd700; color: #000000; font-weight: 600; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);">📧 ${contact.email}</div>` : ''}
+                                    ${contact.linkedin ? `<div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; padding: 12px; background: #ffffff; border-radius: 8px; border: 2px solid #ffd700; color: #000000; font-weight: 600; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);">🔗 LinkedIn</div>` : ''}
                                 </div>
                             </div>
                         ` : ''}
 
-                        <!-- Skills Chart -->
+                        <!-- Skills Chart - YELLOW PROGRESS -->
                         ${sections.skills && Object.keys(skills).length > 0 ? `
                             <div>
-                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">⚡ Skills</h3>
+                                <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #000000; text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);">⚡ Skills</h3>
                                 ${Object.entries(skills).map(([categoryName, skillList]) => `
                                     <div style="margin-bottom: 20px;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                            <span style="font-size: 14px; font-weight: 500; color: #94a3b8;">${categoryName}</span>
-                                            <span style="font-size: 12px; color: #64748b;">${skillList.length} skills</span>
+                                            <span style="font-size: 14px; font-weight: 600; color: #000000;">${categoryName}</span>
+                                            <span style="font-size: 12px; color: #000000; background: #ffd700; padding: 6px 10px; border-radius: 10px; border: 2px solid #ffed4e; font-weight: 600; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);">${skillList.length} skills</span>
                                         </div>
-                                        <div style="width: 100%; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
-                                            <div style="width: ${Math.min(skillList.length * 20, 100)}%; height: 100%; background: linear-gradient(90deg, ${primaryColor}, ${secondaryColor}); border-radius: 3px;"></div>
+                                        <div style="width: 100%; height: 10px; background: #f0f0f0; border-radius: 5px; overflow: hidden; border: 2px solid #ffd700;">
+                                            <div style="width: ${Math.min(skillList.length * 20, 100)}%; height: 100%; background: linear-gradient(90deg, #ffd700, #ffed4e); border-radius: 5px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);"></div>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -10473,41 +10798,41 @@ Your website is ready to go live! 🌐`;
                         ` : ''}
                     </div>
 
-                    <!-- Main Content -->
+                    <!-- Main Content - WHITE & YELLOW GRADIENT -->
                     <div style="display: flex; flex-direction: column; gap: 30px;">
                         <!-- Professional Summary -->
                         ${sections.about && adjustedAbout.description ? `
-                            <div style="background: #1e293b; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                            <div style="background: linear-gradient(135deg, #ffffff 0%, #fff8dc 50%, #ffffff 100%); border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2); border: 3px solid #ffd700;">
+                                <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: #000000; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);">
                                     📋 Summary
                                 </h2>
-                                <div style="line-height: 1.7; font-size: 15px; color: ${textColor};">${adjustedAbout.description}</div>
+                                <div style="line-height: 1.7; font-size: 15px; color: #000000; background: #ffffff; padding: 20px; border-radius: 12px; border: 2px solid #ffd700; font-weight: 500; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);">${adjustedAbout.description}</div>
                             </div>
                         ` : ''}
 
                         <!-- Experience Table -->
                         ${sections.experience && adjustedExperience.length > 0 ? `
-                            <div style="background: #1e293b; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                            <div style="background: linear-gradient(135deg, #ffffff 0%, #fff8dc 50%, #ffffff 100%); border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2); border: 3px solid #ffd700;">
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: #000000; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);">
                                     💼 Experience
                                 </h2>
                                 <div style="overflow-x: auto;">
                                     <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                                         <thead>
-                                            <tr style="background: ${primaryColor}; color: ${bgColor};">
-                                                <th style="padding: 15px; text-align: left; border-radius: 8px 0 0 8px;">Position</th>
-                                                <th style="padding: 15px; text-align: left;">Company</th>
-                                                <th style="padding: 15px; text-align: left;">Duration</th>
-                                                <th style="padding: 15px; text-align: left; border-radius: 0 8px 8px 0;">Achievements</th>
+                                            <tr style="background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000000;">
+                                                <th style="padding: 15px; text-align: left; border-radius: 8px 0 0 8px; font-weight: 700; font-size: 16px; color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">Position</th>
+                                                <th style="padding: 15px; text-align: left; font-weight: 700; font-size: 16px; color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">Company</th>
+                                                <th style="padding: 15px; text-align: left; font-weight: 700; font-size: 16px; color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">Duration</th>
+                                                <th style="padding: 15px; text-align: left; border-radius: 0 8px 8px 0; font-weight: 700; font-size: 16px; color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">Achievements</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             ${adjustedExperience.map((exp, index) => `
-                                                <tr style="border-bottom: 1px solid #334155; ${index % 2 === 0 ? 'background: #334155;' : ''}">
-                                                    <td style="padding: 15px; font-weight: 600; color: ${primaryColor};">${exp.title}</td>
-                                                    <td style="padding: 15px; color: #94a3b8;">${exp.company}</td>
-                                                    <td style="padding: 15px; color: #94a3b8; font-size: 13px;">${exp.date || exp.period}</td>
-                                                    <td style="padding: 15px; color: ${textColor}; line-height: 1.5;">${exp.description}</td>
+                                                <tr style="border-bottom: 2px solid #ffd700; ${index % 2 === 0 ? 'background: #ffffff;' : 'background: #fff8dc;'}">
+                                                    <td style="padding: 15px; font-weight: 700; color: #000000; text-shadow: 0 1px 2px rgba(255, 215, 0, 0.3); font-size: 15px;">${exp.title}</td>
+                                                    <td style="padding: 15px; color: #000000; font-weight: 600; font-size: 15px;">${exp.company}</td>
+                                                    <td style="padding: 15px; color: #000000; font-size: 13px; background: #ffd700; border-radius: 6px; border: 2px solid #ffed4e; font-weight: 600; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);">${exp.date || exp.period}</td>
+                                                    <td style="padding: 15px; color: #000000; line-height: 1.6; font-weight: 500;">${exp.description}</td>
                                                 </tr>
                                             `).join('')}
                                         </tbody>
@@ -10518,17 +10843,17 @@ Your website is ready to go live! 🌐`;
 
                         <!-- Skills Grid -->
                         ${sections.skills && Object.keys(skills).length > 0 ? `
-                            <div style="background: #1e293b; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: ${primaryColor}; display: flex; align-items: center; gap: 10px;">
+                            <div style="background: linear-gradient(135deg, #ffffff 0%, #fff8dc 50%, #ffffff 100%); border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2); border: 3px solid #ffd700;">
+                                <h2 style="margin: 0 0 25px 0; font-size: 24px; font-weight: 700; color: #000000; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);">
                                     🎯 Skills
                                 </h2>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
                                     ${Object.entries(skills).map(([categoryName, skillList]) => `
-                                        <div style="background: #334155; border-radius: 15px; padding: 20px; border-left: 4px solid ${primaryColor};">
-                                            <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: ${primaryColor};">${categoryName}</h3>
+                                        <div style="background: #ffffff; border-radius: 15px; padding: 20px; border-left: 4px solid #ffd700; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); border: 2px solid #ffd700;">
+                                            <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #000000; text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);">${categoryName}</h3>
                                             <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                                                 ${skillList.map(skill => `
-                                                    <span style="background: ${primaryColor}; color: ${bgColor}; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">${skill.name || skill}</span>
+                                                    <span style="background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000000; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3); border: 2px solid #ffed4e; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">${skill.name || skill}</span>
                                                 `).join('')}
                                             </div>
                                         </div>
@@ -10537,6 +10862,7 @@ Your website is ready to go live! 🌐`;
                             </div>
                         ` : ''}
                     </div>
+                </div>
                 </div>
             </div>
         `;
@@ -10951,14 +11277,16 @@ Your website is ready to go live! 🌐`;
                         ` : ''}
 
                         <!-- Certifications Section -->
-                        <div style="margin-bottom: 30px;">
-                            <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #e74c3c; border-bottom: 2px solid #e74c3c; padding-bottom: 8px;">CERTIFICATIONS</h3>
-                            <div style="font-size: 14px; line-height: 1.6;">
-                                <div style="margin-bottom: 8px;">🏆 AWS Certified Developer</div>
-                                <div style="margin-bottom: 8px;">📜 PMP Certification</div>
-                                <div style="margin-bottom: 8px;">🔒 CISSP Security</div>
+                        ${sections.certifications && data.certifications && data.certifications.length > 0 ? `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #e74c3c; border-bottom: 2px solid #e74c3c; padding-bottom: 8px;">CERTIFICATIONS</h3>
+                                <div style="font-size: 14px; line-height: 1.6;">
+                                    ${data.certifications.map(cert => `
+                                        <div style="margin-bottom: 8px;">${cert.icon || '🏆'} ${cert.name || 'Certification'}</div>
+                                    `).join('')}
+                                </div>
                             </div>
-                        </div>
+                        ` : ''}
                     </div>
 
                     <!-- Main Content -->
@@ -11002,27 +11330,35 @@ Your website is ready to go live! 🌐`;
                         ` : ''}
 
                         <!-- Education Section -->
-                        <div style="margin-bottom: 30px;">
-                            <h2 style="color: #2c3e50; font-size: 22px; margin-bottom: 15px; border-bottom: 2px solid #e74c3c; padding-bottom: 8px; font-family: 'Roboto Slab', serif;">EDUCATION</h2>
-                            <div style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <h3 style="margin: 0; color: #2c3e50; font-size: 16px; font-weight: 600; font-family: 'Roboto Slab', serif;">Bachelor's Degree in Computer Science</h3>
-                                    <span style="color: #e74c3c; font-size: 14px; font-weight: 500;">2020 - 2024</span>
-                                </div>
-                                <div style="color: #666; font-size: 14px; margin-bottom: 8px; font-weight: 500; font-family: 'Roboto', sans-serif;">University Name</div>
-                                <p style="margin: 0; line-height: 1.5; color: #555; font-size: 13px; font-family: 'Roboto', sans-serif;">Relevant coursework: Data Structures, Algorithms, Software Engineering, Database Systems</p>
+                        ${sections.education && data.education && data.education.length > 0 ? `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #2c3e50; font-size: 22px; margin-bottom: 15px; border-bottom: 2px solid #e74c3c; padding-bottom: 8px; font-family: 'Roboto Slab', serif;">EDUCATION</h2>
+                                ${data.education.map(edu => `
+                                    <div style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                            <h3 style="margin: 0; color: #2c3e50; font-size: 16px; font-weight: 600; font-family: 'Roboto Slab', serif;">${edu.degree || 'Degree'}</h3>
+                                            <span style="color: #e74c3c; font-size: 14px; font-weight: 500;">${edu.period || edu.date || 'Period'}</span>
+                                        </div>
+                                        <div style="color: #666; font-size: 14px; margin-bottom: 8px; font-weight: 500; font-family: 'Roboto', sans-serif;">${edu.institution || 'Institution'}</div>
+                                        <p style="margin: 0; line-height: 1.5; color: #555; font-size: 13px; font-family: 'Roboto', sans-serif;">${edu.description || edu.major || 'Description'}</p>
+                                    </div>
+                                `).join('')}
                             </div>
-                        </div>
+                        ` : ''}
 
                         <!-- Projects Section -->
-                        <div style="margin-bottom: 30px;">
-                            <h2 style="color: #2c3e50; font-size: 22px; margin-bottom: 15px; border-bottom: 2px solid #e74c3c; padding-bottom: 8px; font-family: 'Roboto Slab', serif;">PROJECTS</h2>
-                            <div style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
-                                <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 16px; font-weight: 600; font-family: 'Roboto Slab', serif;">E-Commerce Platform</h3>
-                                <p style="margin: 0 0 8px 0; color: #666; font-size: 13px; font-family: 'Roboto', sans-serif;">React, Node.js, MongoDB, AWS</p>
-                                <p style="margin: 0; line-height: 1.5; color: #555; font-size: 13px; font-family: 'Roboto', sans-serif;">Developed a full-stack e-commerce platform with payment integration and admin dashboard.</p>
+                        ${sections.projects && data.projects && data.projects.length > 0 ? `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #2c3e50; font-size: 22px; margin-bottom: 15px; border-bottom: 2px solid #e74c3c; padding-bottom: 8px; font-family: 'Roboto Slab', serif;">PROJECTS</h2>
+                                ${data.projects.map(project => `
+                                    <div style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                                        <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 16px; font-weight: 600; font-family: 'Roboto Slab', serif;">${project.name || 'Project Name'}</h3>
+                                        <p style="margin: 0 0 8px 0; color: #666; font-size: 13px; font-family: 'Roboto', sans-serif;">${project.technologies || 'Technologies'}</p>
+                                        <p style="margin: 0; line-height: 1.5; color: #555; font-size: 13px; font-family: 'Roboto', sans-serif;">${project.description || 'Project description'}</p>
+                                    </div>
+                                `).join('')}
                             </div>
-                        </div>
+                        ` : ''}
                     </div>
                 </div>
             </div>
@@ -11129,75 +11465,78 @@ Your website is ready to go live! 🌐`;
                         ` : ''}
 
                         <!-- Education Section -->
-                        <div style="margin-bottom: 40px;">
-                            <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
-                                <span style="background: white; padding-right: 15px;">EDUCATION</span>
-                                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
-                            </h2>
-                            <div style="padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 5px solid #9b59b6; position: relative;">
-                                <div style="position: absolute; top: -10px; left: 20px; background: #9b59b6; color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; font-weight: bold; font-family: 'Oswald', sans-serif;">2020 - 2024</div>
-                                <div style="margin-top: 15px;">
-                                    <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 18px; font-weight: 600; font-family: 'Oswald', sans-serif;">Bachelor's Degree in Computer Science</h3>
-                                    <div style="color: #9b59b6; font-size: 16px; margin-bottom: 12px; font-weight: 500; font-family: 'Lato', sans-serif;">University Name</div>
-                                    <p style="margin: 0; line-height: 1.6; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">Relevant coursework: Data Structures, Algorithms, Software Engineering, Database Systems</p>
-                                </div>
+                        ${sections.education && data.education && data.education.length > 0 ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
+                                    <span style="background: white; padding-right: 15px;">EDUCATION</span>
+                                    <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
+                                </h2>
+                                ${data.education.map(edu => `
+                                    <div style="padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 5px solid #9b59b6; position: relative; margin-bottom: 20px;">
+                                        <div style="position: absolute; top: -10px; left: 20px; background: #9b59b6; color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; font-weight: bold; font-family: 'Oswald', sans-serif;">${edu.period || edu.date || 'Period'}</div>
+                                        <div style="margin-top: 15px;">
+                                            <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 18px; font-weight: 600; font-family: 'Oswald', sans-serif;">${edu.degree || 'Degree'}</h3>
+                                            <div style="color: #9b59b6; font-size: 16px; margin-bottom: 12px; font-weight: 500; font-family: 'Lato', sans-serif;">${edu.institution || 'Institution'}</div>
+                                            <p style="margin: 0; line-height: 1.6; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">${edu.description || edu.major || 'Description'}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
                             </div>
-                        </div>
+                        ` : ''}
 
                         <!-- Projects Section -->
-                        <div style="margin-bottom: 40px;">
-                            <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
-                                <span style="background: white; padding-right: 15px;">PROJECTS</span>
-                                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
-                            </h2>
-                            <div style="padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 5px solid #9b59b6;">
-                                <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 18px; font-weight: 600; font-family: 'Oswald', sans-serif;">E-Commerce Platform</h3>
-                                <p style="margin: 0 0 8px 0; color: #9b59b6; font-size: 14px; font-family: 'Lato', sans-serif;">React, Node.js, MongoDB, AWS</p>
-                                <p style="margin: 0; line-height: 1.6; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">Developed a full-stack e-commerce platform with payment integration and admin dashboard.</p>
+                        ${sections.projects && data.projects && data.projects.length > 0 ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
+                                    <span style="background: white; padding-right: 15px;">PROJECTS</span>
+                                    <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
+                                </h2>
+                                ${data.projects.map(project => `
+                                    <div style="padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 5px solid #9b59b6; margin-bottom: 20px;">
+                                        <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 18px; font-weight: 600; font-family: 'Oswald', sans-serif;">${project.name || 'Project Name'}</h3>
+                                        <p style="margin: 0 0 8px 0; color: #9b59b6; font-size: 14px; font-family: 'Lato', sans-serif;">${project.technologies || 'Technologies'}</p>
+                                        <p style="margin: 0; line-height: 1.6; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">${project.description || 'Project description'}</p>
+                                    </div>
+                                `).join('')}
                             </div>
-                        </div>
+                        ` : ''}
 
                         <!-- Certifications Section -->
-                        <div style="margin-bottom: 40px;">
-                            <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
-                                <span style="background: white; padding-right: 15px;">CERTIFICATIONS & AWARDS</span>
-                                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
-                            </h2>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
-                                    <div style="font-size: 24px; margin-bottom: 8px;">🏆</div>
-                                    <h3 style="margin: 0 0 5px 0; color: #2c3e50; font-size: 14px; font-weight: 600; font-family: 'Oswald', sans-serif;">AWS Certified Developer</h3>
-                                    <p style="margin: 0; color: #9b59b6; font-size: 12px; font-family: 'Lato', sans-serif;">Amazon Web Services</p>
-                                </div>
-                                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
-                                    <div style="font-size: 24px; margin-bottom: 8px;">📜</div>
-                                    <h3 style="margin: 0 0 5px 0; color: #2c3e50; font-size: 14px; font-weight: 600; font-family: 'Oswald', sans-serif;">PMP Certification</h3>
-                                    <p style="margin: 0; color: #9b59b6; font-size: 12px; font-family: 'Lato', sans-serif;">Project Management Institute</p>
+                        ${sections.certifications && data.certifications && data.certifications.length > 0 ? `
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
+                                    <span style="background: white; padding-right: 15px;">CERTIFICATIONS & AWARDS</span>
+                                    <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
+                                </h2>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                    ${data.certifications.map(cert => `
+                                        <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                                            <div style="font-size: 24px; margin-bottom: 8px;">${cert.icon || '🏆'}</div>
+                                            <h3 style="margin: 0 0 5px 0; color: #2c3e50; font-size: 14px; font-weight: 600; font-family: 'Oswald', sans-serif;">${cert.name || 'Certification'}</h3>
+                                            <p style="margin: 0; color: #9b59b6; font-size: 12px; font-family: 'Lato', sans-serif;">${cert.issuer || 'Issuer'}</p>
+                                        </div>
+                                    `).join('')}
                                 </div>
                             </div>
-                        </div>
+                        ` : ''}
 
                         <!-- Languages Section -->
-                        <div>
-                            <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
-                                <span style="background: white; padding-right: 15px;">LANGUAGES</span>
-                                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
-                            </h2>
-                            <div style="display: flex; gap: 20px;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 24px; margin-bottom: 5px;">🇺🇸</div>
-                                    <p style="margin: 0; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">English (Native)</p>
-                                </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 24px; margin-bottom: 5px;">🇪🇸</div>
-                                    <p style="margin: 0; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">Spanish (Fluent)</p>
-                                </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 24px; margin-bottom: 5px;">🇫🇷</div>
-                                    <p style="margin: 0; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">French (Intermediate)</p>
+                        ${sections.languages && data.languages && data.languages.length > 0 ? `
+                            <div>
+                                <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; font-family: 'Oswald', sans-serif; font-weight: 600; position: relative;">
+                                    <span style="background: white; padding-right: 15px;">LANGUAGES</span>
+                                    <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #9b59b6; z-index: -1;"></div>
+                                </h2>
+                                <div style="display: flex; gap: 20px;">
+                                    ${data.languages.map(lang => `
+                                        <div style="text-align: center;">
+                                            <div style="font-size: 24px; margin-bottom: 5px;">${lang.flag || '🌐'}</div>
+                                            <p style="margin: 0; color: #555; font-size: 14px; font-family: 'Lato', sans-serif;">${lang.name} (${lang.level})</p>
+                                        </div>
+                                    `).join('')}
                                 </div>
                             </div>
-                        </div>
+                        ` : ''}
                     </div>
                 </div>
             </div>
@@ -11610,6 +11949,8 @@ Your website is ready to go live! 🌐`;
 
     async generateResume() {
         try {
+            console.log('Starting resume generation...');
+            
             const template = document.getElementById('resume-template')?.value || 'classic';
             const sections = this.getResumeSections();
             const resumeLength = document.getElementById('resume-length')?.value || 'single';
@@ -11617,43 +11958,150 @@ Your website is ready to go live! 🌐`;
             const orientation = document.getElementById('resume-orientation')?.value || 'portrait';
             const fontSize = document.getElementById('resume-font-size')?.value || 'medium';
 
+            console.log('Resume settings:', { template, sections, resumeLength, pageSize, orientation, fontSize });
+
             // Generate resume HTML with length consideration
-            const resumeHtml = this.generateResumeHtml(template, sections, resumeLength);
+            console.log('Generating resume HTML...');
+            const resumeHtml = await this.generateResumeHtml(template, sections, resumeLength);
+            console.log('Resume HTML generated, length:', resumeHtml.length);
             
-            // Create a temporary container for the resume
+            // Create a temporary container for the resume with proper sizing
             const tempContainer = document.createElement('div');
+            tempContainer.style.cssText = `
+                position: fixed;
+                top: -9999px;
+                left: -9999px;
+                width: ${pageSize === 'A4' ? '210mm' : pageSize === 'letter' ? '216mm' : '210mm'};
+                height: ${pageSize === 'A4' ? '297mm' : pageSize === 'letter' ? '279mm' : '297mm'};
+                margin: 0;
+                padding: 0;
+                background: white;
+                overflow: hidden;
+                box-sizing: border-box;
+            `;
             tempContainer.innerHTML = resumeHtml;
             document.body.appendChild(tempContainer);
+            console.log('Temporary container created and added to DOM');
 
-            // Use html2pdf.js to generate PDF
+            // Calculate proper margins based on page size
+            const margins = this.getPageMargins(pageSize, orientation);
+            console.log('Page margins calculated:', margins);
+            
+            // Validate margins
+            if (typeof margins !== 'number' || margins < 0 || margins > 50) {
+                console.warn('Invalid margins, using default:', margins);
+                margins = 15; // Default margin
+            }
+            
+            // Load html2pdf library if not already loaded
+            console.log('Checking html2pdf library...');
+            if (typeof html2pdf === 'undefined') {
+                console.log('Loading html2pdf library...');
+                await this.loadHtml2PdfLibrary();
+                console.log('html2pdf library loaded successfully');
+            } else {
+                console.log('html2pdf library already available');
+            }
+
+            // Use html2pdf.js to generate PDF with optimized settings for colors/gradients
             const opt = {
-                margin: 10,
+                margin: margins,
                 filename: `${this.websiteData?.hero?.name || 'resume'}_${template}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    logging: true,
+                    removeContainer: false,
+                    foreignObjectRendering: true
+                },
                 jsPDF: { 
                     unit: 'mm', 
                     format: pageSize.toLowerCase(), 
-                    orientation: orientation 
+                    orientation: orientation,
+                    compress: true
                 }
             };
 
-            // Load html2pdf library if not already loaded
-            if (typeof html2pdf === 'undefined') {
-                await this.loadHtml2PdfLibrary();
-            }
+            console.log('PDF options configured:', opt);
+            console.log('Starting PDF generation...');
 
-            // Generate PDF
-            await html2pdf().set(opt).from(tempContainer).save();
+            // Generate PDF with better error handling
+            try {
+                const pdf = html2pdf().set(opt).from(tempContainer);
+                await pdf.save();
+                console.log('PDF generation completed successfully');
+            } catch (pdfError) {
+                console.error('PDF generation failed:', pdfError);
+                console.error('PDF error details:', {
+                    message: pdfError.message,
+                    stack: pdfError.stack,
+                    margins: margins,
+                    pageSize: pageSize,
+                    orientation: orientation
+                });
+                throw new Error(`PDF generation failed: ${pdfError.message}`);
+            }
 
             // Clean up
             document.body.removeChild(tempContainer);
+            console.log('Temporary container cleaned up');
 
             this.showMessage('Resume generated and downloaded successfully!', 'success');
         } catch (error) {
             console.error('Error generating resume:', error);
-            this.showMessage('Error generating resume. Please try again.', 'error');
+            console.error('Error stack:', error.stack);
+            this.showMessage(`Error generating resume: ${error.message}`, 'error');
         }
+    }
+
+    getPageMargins(pageSize, orientation) {
+        // Return margins as a number (html2pdf expects a number or array)
+        let margin = 15; // Default margin in mm
+
+        // Adjust margins for different page sizes
+        if (pageSize === 'A4') {
+            margin = 20;
+        } else if (pageSize === 'letter') {
+            margin = 18;
+        }
+
+        // Adjust for landscape orientation
+        if (orientation === 'landscape') {
+            margin = 15;
+        }
+
+        return margin;
+    }
+
+    // Standardize template container for proper sizing and margins
+    getStandardTemplateContainer(innerContent, bgColor = '#ffffff', textColor = '#000000') {
+        return `
+            <div style="
+                font-family: 'Inter, system-ui, sans-serif'; 
+                width: 100%; 
+                max-width: 100%; 
+                margin: 0; 
+                padding: 0; 
+                background: ${bgColor}; 
+                color: ${textColor}; 
+                min-height: 100vh; 
+                box-sizing: border-box;
+                overflow: hidden;
+            ">
+                <div style="
+                    padding: 20px; 
+                    max-width: 100%; 
+                    box-sizing: border-box;
+                    height: 100%;
+                    overflow: auto;
+                ">
+                    ${innerContent}
+                </div>
+            </div>
+        `;
     }
 
     async loadHtml2PdfLibrary() {

@@ -769,6 +769,7 @@ My philosophy centers on creating seamless experiences that transform internatio
                                     
                                     <!-- Action Buttons -->
                                     <button type="button" onclick="adminPanel.loadResumeContent()" style="padding: 8px 12px; border: 1px solid #d1d5db; background: #3b82f6; color: white; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">Load Content</button>
+                                    <button type="button" onclick="adminPanel.saveTemplate()" style="padding: 8px 12px; border: 1px solid #d1d5db; background: #f59e0b; color: white; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">Save Template</button>
                                     <button type="button" onclick="adminPanel.clearEditor()" style="padding: 8px 12px; border: 1px solid #d1d5db; background: #ef4444; color: white; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">Clear</button>
                                     <button type="button" onclick="adminPanel.downloadResume()" style="padding: 8px 12px; border: 1px solid #d1d5db; background: #10b981; color: white; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">Download PDF</button>
                                 </div>
@@ -1211,6 +1212,28 @@ My philosophy centers on creating seamless experiences that transform internatio
                                 <div class="form-group">
                                     <label>Copyright Text</label>
                                     <input type="text" id="footer-copyright" value="© 2025 Soumita Chatterjee. All Rights Reserved." class="form-input">
+                                </div>
+                            </div>
+                            
+                            <!-- Legal Modal Access -->
+                            <div class="form-section">
+                                <h3>Legal Information</h3>
+                                <div class="form-group">
+                                    <button type="button" onclick="adminPanel.openLegalModal()" class="btn-primary">
+                                        <i class="fas fa-gavel"></i> Open Legal Modal
+                                    </button>
+                                    <small>Click to view and edit legal information (Privacy Policy, Terms, Disclaimer)</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <h4>Legal Link in Footer</h4>
+                                    <button type="button" onclick="adminPanel.addLegalFooterLink()" class="btn-secondary">
+                                        <i class="fas fa-plus"></i> Add Legal Link to Footer
+                                    </button>
+                                    <button type="button" onclick="adminPanel.removeLegalFooterLink()" class="btn-danger">
+                                        <i class="fas fa-minus"></i> Remove Legal Link from Footer
+                                    </button>
+                                    <small>Control whether the Legal link appears in the footer</small>
                                 </div>
                             </div>
                             
@@ -2367,6 +2390,31 @@ My philosophy centers on creating seamless experiences that transform internatio
             }
         });
     </script>
+    <!-- Legal Modal -->
+    <div id="legal-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Legal Information</h2>
+                <button class="modal-close" onclick="adminPanel.closeLegalModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="legal-content">
+                    <h3>Privacy Policy</h3>
+                    <p>This website respects your privacy and is committed to protecting your personal information. We collect only the information you voluntarily provide and use it solely for the purpose of providing our services.</p>
+                    
+                    <h3>Terms of Service</h3>
+                    <p>By using this website, you agree to these terms of service. The content provided is for informational purposes only and should not be considered as professional advice.</p>
+                    
+                    <h3>Disclaimer</h3>
+                    <p>The information on this website is provided "as is" without any warranties. We make no representations about the accuracy, completeness, or reliability of any information on this site.</p>
+                    
+                    <h3>Contact Information</h3>
+                    <p>For any legal inquiries, please contact us through the contact form provided on this website.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Save Button -->
     <div id="floating-save-btn" class="floating-save-btn">
         <button type="button" class="btn-primary" id="save-all-changes">

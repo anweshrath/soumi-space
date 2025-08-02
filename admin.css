@@ -967,6 +967,33 @@ body::before {
     z-index: 1000;
 }
 
+/* Legal Modal Specific Styles */
+#legal-modal {
+    display: none;
+}
+
+#legal-modal:not(.hidden) {
+    display: flex !important;
+}
+
+.legal-content {
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.legal-content h3 {
+    color: #333;
+    margin: 20px 0 10px 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.legal-content p {
+    color: #666;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
 .modal-content {
     background: var(--bg-white);
     border-radius: var(--border-radius);
@@ -2848,17 +2875,78 @@ body.dark-mode #dark-mode-toggle:hover {
     box-shadow: 0 8px 25px rgba(106, 90, 205, 0.4);
 }
 
-/* Premium Text Colors for Dark Mode */
+/* Premium Text Colors for Dark Mode - PURE WHITE TEXT */
 body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
-    color: #ffd700;
+    color: #ffffff !important;
+    text-shadow: 0 0 5px #ffffff;
 }
 
 body.dark-mode label {
-    color: #ffffff;
+    color: #ffffff !important;
+    text-shadow: 0 0 3px #ffffff;
 }
 
 body.dark-mode .form-group label {
-    color: #ffd700;
+    color: #ffffff !important;
+    text-shadow: 0 0 3px #ffffff;
+}
+
+/* Force ALL text to be pure white in dark mode */
+body.dark-mode * {
+    color: #ffffff !important;
+}
+
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+    color: #ffffff !important;
+    background: #000000 !important;
+    border: 2px solid #333333 !important;
+}
+
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+    color: #ffffff !important;
+    background: #111111 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 0 10px #ffffff !important;
+}
+
+/* Make all skill tags and contact info pure white */
+body.dark-mode .skill-item,
+body.dark-mode .contact-detail-item,
+body.dark-mode .experience-item,
+body.dark-mode .testimonial-item {
+    color: #ffffff !important;
+    background: #000000 !important;
+    border: 2px solid #333333 !important;
+}
+
+body.dark-mode .skill-item span,
+body.dark-mode .contact-detail-item span,
+body.dark-mode .experience-item span,
+body.dark-mode .testimonial-item span {
+    color: #ffffff !important;
+    text-shadow: 0 0 3px #ffffff;
+}
+
+/* Make all form inputs pure white text */
+body.dark-mode .form-group input,
+body.dark-mode .form-group textarea,
+body.dark-mode .form-group select {
+    color: #ffffff !important;
+    background: #000000 !important;
+    border: 2px solid #333333 !important;
+}
+
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group textarea:focus,
+body.dark-mode .form-group select:focus {
+    color: #ffffff !important;
+    background: #111111 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 0 10px #ffffff !important;
 }
 
 /* Premium Message Styling for Dark Mode */
