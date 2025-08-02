@@ -67,10 +67,25 @@ class WebsiteLoader {
             console.log('Available sections:', Object.keys(this.content));
             
             // Check if we have the expected sections
-            const expectedSections = ['hero', 'about', 'experience', 'skills', 'testimonials', 'contact', 'settings', 'linkedin'];
+            const expectedSections = ['hero', 'about', 'experience', 'skills', 'testimonials', 'contact', 'settings', 'linkedin', 'navigation', 'footer'];
             expectedSections.forEach(section => {
                 if (this.content[section]) {
                     console.log(`${section} section found:`, this.content[section]);
+                    
+                    // Special debug for footer section
+                    if (section === 'footer') {
+                        console.log('Footer section details:', this.content.footer);
+                        if (this.content.footer.linkedin || this.content.footer.facebook || this.content.footer.twitter || this.content.footer.instagram) {
+                            console.log('Social media found in footer:', {
+                                linkedin: this.content.footer.linkedin,
+                                facebook: this.content.footer.facebook,
+                                twitter: this.content.footer.twitter,
+                                instagram: this.content.footer.instagram
+                            });
+                        } else {
+                            console.log('No social media found in footer');
+                        }
+                    }
                 } else {
                     console.log(`${section} section NOT found`);
                 }
@@ -222,13 +237,19 @@ My philosophy centers on creating seamless experiences that transform internatio
         console.log('About to update LinkedIn section...');
         this.updateLinkedInSection();
         
+        // Update navigation
+        this.updateNavigation();
+        
         // Update contact form
         this.updateContactForm();
         
         // Update settings
         this.updateSettings();
         
-
+        // Update footer if footer data exists
+        if (this.content.footer) {
+            this.updateFooter();
+        }
         
         console.log('Website update complete');
     }
@@ -292,6 +313,113 @@ My philosophy centers on creating seamless experiences that transform internatio
             const paragraphs = about.text.split('\n\n');
             textEl.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
         }
+        
+        // Update highlights if they exist
+        if (about.highlights && about.highlights.length > 0) {
+            const highlightsContainer = document.querySelector('.about-highlights');
+            if (highlightsContainer) {
+                highlightsContainer.innerHTML = '';
+                about.highlights.forEach((highlight, index) => {
+                    const highlightItem = document.createElement('div');
+                    highlightItem.className = 'about-highlight-item';
+                    
+                    // Choose icon based on index or content
+                    const icons = ['globe', 'briefcase', 'check-circle', 'award', 'star'];
+                    const icon = icons[index % icons.length];
+                    
+                    highlightItem.innerHTML = `
+                        <i data-feather="${icon}"></i>
+                        <span>${highlight}</span>
+                    `;
+                    highlightsContainer.appendChild(highlightItem);
+                });
+                
+                // Reinitialize Feather icons
+                if (typeof feather !== 'undefined') {
+                    feather.replace();
+                }
+            }
+        }
+        
+        // Update statistics if they exist
+        if (about.statistics && about.statistics.length > 0) {
+            const statsGrid = document.querySelector('.stats-grid');
+            if (statsGrid) {
+                console.log('Updating statistics with:', about.statistics);
+                statsGrid.innerHTML = '';
+                about.statistics.forEach((stat, index) => {
+                    const statCard = document.createElement('div');
+                    statCard.className = 'stat-card card gradient-border';
+                    statCard.setAttribute('data-animation', 'fade-in-up');
+                    statCard.innerHTML = `
+                        <div class="stat-number" data-count-to="${stat.number}">0</div>
+                        <div class="stat-label">${stat.label}</div>
+                    `;
+                    statsGrid.appendChild(statCard);
+                });
+                
+                // Trigger count-up animations
+                setTimeout(() => {
+                    this.triggerStatisticsAnimations();
+                }, 100);
+            }
+        } else {
+            // If no statistics data, ensure default statistics are shown
+            const statsGrid = document.querySelector('.stats-grid');
+            if (statsGrid && statsGrid.children.length === 0) {
+                console.log('No statistics data found, showing defaults');
+                // Restore default statistics if none exist
+                const defaultStats = [
+                    { number: '7', label: 'Years Total Experience' },
+                    { number: '200', label: 'Students Guided' },
+                    { number: '50', label: 'Partner Institutions' },
+                    { number: '98', label: 'Success Rate %' }
+                ];
+                
+                defaultStats.forEach((stat, index) => {
+                    const statCard = document.createElement('div');
+                    statCard.className = 'stat-card card gradient-border';
+                    statCard.setAttribute('data-animation', 'fade-in-up');
+                    statCard.innerHTML = `
+                        <div class="stat-number" data-count-to="${stat.number}">0</div>
+                        <div class="stat-label">${stat.label}</div>
+                    `;
+                    statsGrid.appendChild(statCard);
+                });
+                
+                // Trigger count-up animations
+                setTimeout(() => {
+                    this.triggerStatisticsAnimations();
+                }, 100);
+            }
+        }
+        
+        // Always ensure statistics are visible
+        setTimeout(() => {
+            const statsGrid = document.querySelector('.stats-grid');
+            if (statsGrid && statsGrid.children.length === 0) {
+                console.log('Statistics grid is empty, forcing default statistics');
+                const defaultStats = [
+                    { number: '7', label: 'Years Total Experience' },
+                    { number: '200', label: 'Students Guided' },
+                    { number: '50', label: 'Partner Institutions' },
+                    { number: '98', label: 'Success Rate %' }
+                ];
+                
+                defaultStats.forEach((stat, index) => {
+                    const statCard = document.createElement('div');
+                    statCard.className = 'stat-card card gradient-border';
+                    statCard.setAttribute('data-animation', 'fade-in-up');
+                    statCard.innerHTML = `
+                        <div class="stat-number" data-count-to="${stat.number}">0</div>
+                        <div class="stat-label">${stat.label}</div>
+                    `;
+                    statsGrid.appendChild(statCard);
+                });
+                
+                this.triggerStatisticsAnimations();
+            }
+        }, 500);
     }
 
     updateExperienceSection() {
@@ -609,16 +737,90 @@ My philosophy centers on creating seamless experiences that transform internatio
         if (emailEl) emailEl.href = `mailto:${contact.email}`;
         if (linkedinEl) linkedinEl.href = contact.linkedin;
         if (locationEl) locationEl.textContent = contact.location;
+        
+        // Update contact form
+        this.updateContactForm();
+    }
+    
+    updateNavigation() {
+        // Check for navigation data in the correct location
+        const navigation = this.content.navigation;
+        console.log('Navigation data found:', navigation);
+        if (!navigation) {
+            console.log('No navigation data found');
+            return;
+        }
+        const navbar = document.getElementById('navbar');
+        const logoElement = navbar?.querySelector('.logo');
+        
+        if (!navbar || !logoElement) return;
+        
+        // Handle logo visibility
+        if (navigation.showLogo === false) {
+            logoElement.style.display = 'none';
+        } else {
+            logoElement.style.display = 'block';
+            
+            // Update logo if provided
+            if (navigation.logo) {
+                const logoImg = logoElement.querySelector('img');
+                if (logoImg) {
+                    logoImg.src = navigation.logo;
+                }
+            }
+        }
+        
+        // Handle sticky navigation
+        if (navigation.sticky === false) {
+            navbar.classList.remove('sticky');
+        } else {
+            navbar.classList.add('sticky');
+        }
+        
+        // Update navigation colors based on theme
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const textColor = isDarkMode ? (navigation.textColor || '#ffffff') : (navigation.textColorLight || '#333333');
+        const bgColor = isDarkMode ? (navigation.bgColor || '#1a1a1a') : (navigation.bgColorLight || '#ffffff');
+        const hoverColor = isDarkMode ? (navigation.hoverColor || '#ffd700') : (navigation.hoverColorLight || '#6a5acd');
+        
+        // Apply colors to navigation
+        navbar.style.setProperty('--nav-text-color', textColor);
+        navbar.style.setProperty('--nav-bg-color', bgColor);
+        navbar.style.setProperty('--nav-hover-color', hoverColor);
+        
+        // Update navigation links
+        if (navigation.links && navigation.links.length > 0) {
+            const navMenu = document.getElementById('nav-menu');
+            if (navMenu) {
+                navMenu.innerHTML = '';
+                navigation.links.forEach(link => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = link.target;
+                    a.textContent = link.text;
+                    if (link.newTab) {
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                    }
+                    li.appendChild(a);
+                    navMenu.appendChild(li);
+                });
+            }
+        }
     }
     
     updateContactForm() {
-        if (!this.content.form_config) return;
-        
-        const formConfig = this.content.form_config;
         const formContainer = document.getElementById('contact-form');
         
         if (!formContainer) return;
         
+        if (!this.content.form_config) {
+            // Render default form if no config
+            this.renderDefaultForm();
+            return;
+        }
+        
+        const formConfig = this.content.form_config;
         console.log('Updating contact form with config:', formConfig);
         
         switch (formConfig.type) {
@@ -1007,11 +1209,426 @@ My philosophy centers on creating seamless experiences that transform internatio
         if (settings.accentColor) {
             document.documentElement.style.setProperty('--color-accent', settings.accentColor);
         }
+        
+        // Update footer if footer data exists
+        if (this.content.footer) {
+            this.updateFooter();
+        }
+        
+        // Update contact form if contact data exists
+        if (this.content.contact) {
+            this.updateContactForm();
+        }
     }
 
+    updateFooter() {
+        console.log('Updating footer with content:', this.content.footer);
+        
+        // Update footer logo
+        const footerLogo = document.querySelector('.footer-left img');
+        if (footerLogo) {
+            if (this.content.footer && this.content.footer.logo) {
+                footerLogo.src = this.content.footer.logo;
+            } else {
+                // Use default logo if none set in database
+                footerLogo.src = 'https://anwe.sh/work/sclogo1.png';
+            }
+            
+            // Handle SVG files properly
+            if (this.content.footer && this.content.footer.logo && this.content.footer.logo.includes('svg')) {
+                footerLogo.style.filter = 'none';
+            }
+            
+            // Auto-resize large images
+            footerLogo.onload = function() {
+                const maxHeight = 30;
+                const maxWidth = 120;
+                
+                if (this.naturalHeight > maxHeight || this.naturalWidth > maxWidth) {
+                    const aspectRatio = this.naturalWidth / this.naturalHeight;
+                    
+                    if (aspectRatio > 1) {
+                        // Wider image
+                        this.style.width = maxWidth + 'px';
+                        this.style.height = 'auto';
+                    } else {
+                        // Taller image
+                        this.style.height = maxHeight + 'px';
+                        this.style.width = 'auto';
+                    }
+                }
+                
+                this.style.objectFit = 'contain';
+                this.style.maxHeight = maxHeight + 'px';
+                this.style.maxWidth = maxWidth + 'px';
+            };
+        }
+        
+        // Update footer description (text, not link)
+        const footerDescription = document.querySelector('.footer-left span');
+        if (footerDescription && this.content.footer && this.content.footer.description) {
+            footerDescription.textContent = this.content.footer.description;
+        }
+        
+        // Update footer links - USE DATABASE LINKS OR DEFAULT LINKS
+        const footerLegal = document.querySelector('.footer-legal');
+        if (footerLegal) {
+            // Clear existing links
+            footerLegal.innerHTML = '';
+            
+            // Add links from the database OR use default links
+            if (this.content.footer && this.content.footer.links && this.content.footer.links.length > 0) {
+                console.log('Adding footer links from database:', this.content.footer.links);
+                this.content.footer.links.forEach(link => {
+                    const linkElement = document.createElement('a');
+                    linkElement.href = link.url;
+                    linkElement.textContent = link.text;
+                    linkElement.target = link.newTab ? '_blank' : '_self';
+                    if (link.newTab) {
+                        linkElement.rel = 'noopener noreferrer';
+                    }
+                    footerLegal.appendChild(linkElement);
+                });
+            }
+            
+            // Always add the Legal link (even if database links exist)
+            const legalLink = document.createElement('a');
+            legalLink.href = '#';
+            legalLink.textContent = 'Legal';
+            legalLink.onclick = (e) => {
+                e.preventDefault();
+                if (typeof window.openLegalModal === 'function') {
+                    window.openLegalModal();
+                } else {
+                    console.log('openLegalModal function not found');
+                }
+            };
+            footerLegal.appendChild(legalLink);
+        }
+        
+        // Update copyright
+        const footerCenter = document.querySelector('.footer-center p');
+        if (footerCenter && this.content.footer && this.content.footer.copyright) {
+            footerCenter.textContent = this.content.footer.copyright;
+        }
+        
 
+        
+        console.log('Footer updated successfully');
+    }
+    
+    updateContactForm() {
+        console.log('Updating contact form with content:', this.content.contact);
+        
+        const contactForm = document.getElementById('contact-form');
+        const contactDetails = document.getElementById('contact-details');
+        const contactSection = document.getElementById('contact');
+        
+        if (!contactForm || !contactDetails) {
+            console.log('Contact form or details containers not found');
+            return;
+        }
+        
+        const contact = this.content.contact;
+        
+        // Update contact section header
+        if (contactSection && contact.title && contact.subtitle) {
+            const sectionHeader = contactSection.querySelector('.section-header');
+            if (sectionHeader) {
+                const titleElement = sectionHeader.querySelector('.section-title');
+                const descriptionElement = sectionHeader.querySelector('.section-description');
+                
+                if (titleElement) {
+                    titleElement.innerHTML = contact.title.replace('Connect', '<span class="gradient-text">Connect</span>');
+                }
+                if (descriptionElement) {
+                    descriptionElement.textContent = contact.subtitle;
+                }
+            }
+        }
+        
+        // Update contact form based on type
+        switch (contact.formType) {
+            case 'simple':
+                contactForm.innerHTML = this.generateSimpleContactForm(contact.simpleForm);
+                break;
+            case 'autoresponder':
+                contactForm.innerHTML = this.generateAutoresponderContactForm(contact.autoresponderForm);
+                break;
+            case 'email':
+                contactForm.innerHTML = this.generateEmailContactForm(contact.emailForm);
+                break;
+            case 'google':
+                contactForm.innerHTML = this.generateGoogleContactForm(contact.googleForm);
+                break;
+            default:
+                contactForm.innerHTML = this.generateDefaultContactForm();
+        }
+        
+        // Update contact details
+        contactDetails.innerHTML = this.generateContactDetails(contact);
+        
+        console.log('Contact form updated successfully');
+    }
+    
+    generateSimpleContactForm(simpleForm) {
+        return `
+            <form class="contact-form" id="simple-contact-form">
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Your Email" required>
+                </div>
+                <div class="form-group">
+                    <textarea name="message" placeholder="Your Message" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Send Message</button>
+            </form>
+        `;
+    }
+    
+    generateAutoresponderContactForm(autoresponderForm) {
+        const formCode = autoresponderForm.code || '';
+        const formMatch = formCode.match(/<form[^>]*>[\s\S]*?<\/form>/i);
+        
+        if (formMatch) {
+            return formMatch[0];
+        }
+        
+        return `
+            <form class="contact-form" id="autoresponder-contact-form">
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Your Email" required>
+                </div>
+                <button type="submit" class="btn-primary">Submit</button>
+            </form>
+        `;
+    }
+    
+    generateEmailContactForm(emailForm) {
+        return `
+            <form class="contact-form" id="email-contact-form">
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Your Email" required>
+                </div>
+                <div class="form-group">
+                    <textarea name="message" placeholder="Your Message" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Send Email</button>
+            </form>
+            <script>
+                document.getElementById('email-contact-form').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const name = formData.get('name');
+                    const email = formData.get('email');
+                    const message = formData.get('message');
+                    const recipient = '${emailForm.recipient || ''}';
+                    
+                    if (!recipient) {
+                        alert('Please configure recipient email in admin panel');
+                        return;
+                    }
+                    
+                    // Create mailto link with form data
+                    const mailtoLink = \`mailto:\${recipient}?subject=Contact Form Submission from \${name}&body=Name: \${name}%0D%0AEmail: \${email}%0D%0A%0D%0AMessage:%0D%0A\${message}\`;
+                    
+                    // Open email client
+                    window.open(mailtoLink, '_blank');
+                    
+                    // Show success message
+                    alert('Email client opened! Please send the email manually.');
+                    
+                    // Reset form
+                    this.reset();
+                });
+            </script>
+        `;
+    }
+    
+    generateGoogleContactForm(googleForm) {
+        const formUrl = googleForm.url || '';
+        if (formUrl) {
+            return `
+                <iframe src="${formUrl}" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0">
+                    Loading...
+                </iframe>
+            `;
+        }
+        
+        return '<p>Please configure a valid Google Form URL in the admin panel.</p>';
+    }
+    
+    generateDefaultContactForm() {
+        return `
+            <form class="contact-form" id="default-contact-form">
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Your Email" required>
+                </div>
+                <div class="form-group">
+                    <textarea name="message" placeholder="Your Message" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Send Message</button>
+            </form>
+        `;
+    }
+    
+    generateContactDetails(contact) {
+        let detailsHtml = '';
+        
+        // Email
+        if (contact.email) {
+            detailsHtml += `
+                <div class="contact-detail-item" data-type="email">
+                    <div class="contact-detail-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-detail-text">
+                        <span>Email</span>
+                        <a href="mailto:${contact.email}" class="contact-email">${contact.email}</a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Phone
+        if (contact.phone) {
+            detailsHtml += `
+                <div class="contact-detail-item" data-type="phone">
+                    <div class="contact-detail-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="contact-detail-text">
+                        <span>Phone</span>
+                        <a href="tel:${contact.phone}" class="contact-phone">${contact.phone}</a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Location
+        if (contact.location) {
+            detailsHtml += `
+                <div class="contact-detail-item" data-type="location">
+                    <div class="contact-detail-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="contact-detail-text">
+                        <span>Location</span>
+                        <span class="contact-location">${contact.location}</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Social media links
+        if (contact.linkedin) {
+            detailsHtml += `
+                <div class="contact-detail-item" data-type="linkedin">
+                    <div class="contact-detail-icon">
+                        <i class="fab fa-linkedin"></i>
+                    </div>
+                    <div class="contact-detail-text">
+                        <span>LinkedIn</span>
+                        <a href="${contact.linkedin}" target="_blank" rel="noopener noreferrer" class="contact-linkedin">Connect Professionally</a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (contact.facebook) {
+            detailsHtml += `
+                <div class="contact-detail-item" data-type="facebook">
+                    <div class="contact-detail-icon">
+                        <i class="fab fa-facebook"></i>
+                    </div>
+                    <div class="contact-detail-text">
+                        <span>Facebook</span>
+                        <a href="${contact.facebook}" target="_blank" rel="noopener noreferrer" class="contact-facebook">Follow Us</a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (contact.twitter) {
+            detailsHtml += `
+                <div class="contact-detail-item" data-type="twitter">
+                    <div class="contact-detail-icon">
+                        <i class="fab fa-twitter"></i>
+                    </div>
+                    <div class="contact-detail-text">
+                        <span>X (Twitter)</span>
+                        <a href="${contact.twitter}" target="_blank" rel="noopener noreferrer" class="contact-twitter">Follow Us</a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (contact.instagram) {
+            detailsHtml += `
+                <div class="contact-detail-item" data-type="instagram">
+                    <div class="contact-detail-icon">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                    <div class="contact-detail-text">
+                        <span>Instagram</span>
+                        <a href="${contact.instagram}" target="_blank" rel="noopener noreferrer" class="contact-instagram">Follow Us</a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Custom links
+        if (contact.customLinks && contact.customLinks.length > 0) {
+            contact.customLinks.forEach(link => {
+                detailsHtml += `
+                    <div class="contact-detail-item" data-type="custom">
+                        <div class="contact-detail-icon">
+                            ${link.logo ? `<img src="${link.logo}" alt="${link.text}" style="width: 20px; height: 20px;">` : '<i class="fas fa-link"></i>'}
+                        </div>
+                        <div class="contact-detail-text">
+                            <span>${link.text}</span>
+                            <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="contact-custom-link">Visit</a>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        return detailsHtml;
+    }
 
-
+    triggerStatisticsAnimations() {
+        console.log('Triggering statistics animations...');
+        
+        // Find all stat cards
+        const statCards = document.querySelectorAll('.stat-card');
+        
+        statCards.forEach((card, index) => {
+            // Add stagger delay for animation
+            setTimeout(() => {
+                // Make the card visible
+                card.classList.add('is-visible');
+                
+                // Trigger count-up animation for the stat number
+                const statNumber = card.querySelector('.stat-number[data-count-to]');
+                if (statNumber) {
+                    this.animateCountUp(statNumber);
+                }
+            }, index * 200); // Stagger each card by 200ms
+        });
+    }
 }
 
 // Initialize website loader when DOM is ready
@@ -1040,18 +1657,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.refreshWebsiteContent = () => websiteLoader.refreshContent();
         window.websiteLoader = websiteLoader; // Make it globally accessible for admin panel
         
+        // Listen for localStorage changes from admin panel
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'websiteData') {
+                console.log('Storage updated, refreshing website...');
+                try {
+                    const newData = JSON.parse(e.newValue);
+                    websiteLoader.content = newData;
+                    websiteLoader.updateWebsite();
+                } catch (error) {
+                    console.error('Error parsing updated website data:', error);
+                }
+            }
+        });
+        
         // Theme change handler
         window.addEventListener('message', function(event) {
             if (event.data.type === 'CHANGE_THEME') {
                 changeTheme(event.data.theme);
             }
             
-            // Handle preview updates from admin panel
-            if (event.data.type === 'UPDATE_WEBSITE') {
-                console.log('Received preview update:', event.data.data);
-                websiteLoader.content = event.data.data;
-                websiteLoader.updateWebsite();
+                    // Handle preview updates from admin panel
+        if (event.data.type === 'UPDATE_WEBSITE') {
+            console.log('Received preview update:', event.data.data);
+            websiteLoader.content = event.data.data;
+            websiteLoader.updateWebsite();
+        }
+        
+        // Handle localStorage updates from admin panel
+        if (event.data.type === 'STORAGE_UPDATED') {
+            console.log('Received localStorage update');
+            const storedData = localStorage.getItem('websiteData');
+            if (storedData) {
+                try {
+                    const parsedData = JSON.parse(storedData);
+                    websiteLoader.content = parsedData;
+                    websiteLoader.updateWebsite();
+                } catch (error) {
+                    console.error('Error parsing stored website data:', error);
+                }
             }
+        }
         });
 
         function changeTheme(themeName) {

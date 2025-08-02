@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Soumita Chatterjee – Australia Immigration Specialist</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Georgia:wght@400;600;700&family=Poppins:wght@400;600;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/feather-icons"></script>
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -49,6 +49,11 @@
             --transition-speed-slow: 0.8s;
             --section-padding-y: 6.5rem;
             --max-width: 1280px;
+            
+            /* Navigation CSS Variables */
+            --nav-text-color: #333333;
+            --nav-bg-color: #ffffff;
+            --nav-hover-color: #6a5acd;
         }
 
         /* Dark Mode Base */
@@ -58,6 +63,11 @@
             --color-border: #4a5568;
             --shadow-color: 250, 80%, 75%;
             --shadow-hover: 0 8px 16px rgba(0,0,0,0.3), 0 15px 40px hsla(var(--shadow-color), 0.3);
+            
+            /* Navigation Dark Mode Overrides */
+            --nav-bg-color: rgba(0, 0, 0, 0.95);
+            --nav-text-color: #ffffff;
+            --nav-hover-color: var(--color-primary);
         }
 
         /* Dark Mode Theme Overrides */
@@ -78,6 +88,22 @@
             --color-medium-light-bg: #2d2d2d;
             --color-white: #1f1f1f;
         }
+        
+        /* Fix elegant theme dark mode button colors */
+        body.dark-mode.theme-elegant .btn-primary {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+            color: #1a1a1a;
+        }
+        
+        body.dark-mode.theme-elegant .btn-secondary {
+            color: #e2e8f0;
+            border-color: #e2e8f0;
+        }
+        
+        body.dark-mode.theme-elegant .btn-secondary:hover {
+            background: #e2e8f0;
+            color: #1a1a1a;
+        }
 
         body.dark-mode.theme-creative {
             --color-primary: #ff6b6b;
@@ -97,6 +123,22 @@
             --color-white: #000000;
             background-image: none;
             background-color: #000000;
+        }
+        
+        /* Fix minimal theme dark mode button colors */
+        body.dark-mode.theme-minimal .btn-primary {
+            background: linear-gradient(135deg, #ffffff, #e2e8f0);
+            color: #000000;
+        }
+        
+        body.dark-mode.theme-minimal .btn-secondary {
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+        
+        body.dark-mode.theme-minimal .btn-secondary:hover {
+            background: #ffffff;
+            color: #000000;
         }
 
         body.dark-mode.theme-corporate {
@@ -362,8 +404,7 @@
         body.dark-mode .nav {
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            background: rgba(0, 0, 0, 0.8);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         body.dark-mode .hero {
@@ -517,44 +558,17 @@
             color: #ffffff;
         }
 
-        body.dark-mode .nav-links a {
-            color: #e2e8f0;
-        }
-
+        /* Navigation hover effects for dark mode */
         body.dark-mode .nav-links a:hover {
-            color: var(--color-primary);
-        }
-
-        body.dark-mode .nav.scrolled .nav-links a {
-            color: #e2e8f0;
+            text-shadow: 0 0 10px rgba(106, 90, 205, 0.5);
         }
 
         body.dark-mode .nav.scrolled .nav-links a:hover {
-            color: var(--color-accent);
-        }
-
-        body.dark-mode .theme-toggle {
-            color: var(--color-primary);
-        }
-
-        body.dark-mode .nav.scrolled .theme-toggle {
-            color: #e2e8f0;
+            text-shadow: 0 0 10px rgba(255, 167, 38, 0.5);
         }
 
         body.dark-mode .theme-toggle:hover {
             color: var(--color-accent);
-        }
-
-        body.dark-mode .hamburger-line {
-            background-color: var(--color-primary);
-        }
-
-        body.dark-mode .nav.scrolled .hamburger-line {
-            background-color: #e2e8f0;
-        }
-
-        body.dark-mode .nav-toggle.is-active .hamburger-line {
-            background-color: #ffffff;
         }
 
         /* Dark Mode Scrollbar */
@@ -817,11 +831,50 @@
         .btn-primary:hover::before { left: 100%; }
         .btn-secondary { background: transparent; color: var(--color-primary); border: 2px solid var(--color-primary); }
         .btn-secondary:hover { background: var(--color-primary); color: #fff; transform: translateY(-4px); box-shadow: var(--shadow-hover); }
-        body.dark-mode .btn-primary, body.dark-mode .btn-secondary:hover { color: #12151c; }
+        /* Dark mode button fixes */
+        body.dark-mode .btn-primary { 
+            color: #ffffff; 
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        }
+        body.dark-mode .btn-secondary { 
+            color: var(--color-primary); 
+            border-color: var(--color-primary);
+        }
+        body.dark-mode .btn-secondary:hover { 
+            color: #ffffff; 
+            background: var(--color-primary);
+        }
         
-        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(249, 251, 253, 0.8); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid var(--color-border); transition: all var(--transition-speed-normal) cubic-bezier(0.25, 0.46, 0.45, 0.94); padding: 0.9rem 0; }
-        body.dark-mode .nav { background: rgba(26, 32, 44, 0.8); }
-        .nav.scrolled { background: rgba(18, 21, 28, 0.85); padding: 0.6rem 0; box-shadow: var(--shadow-md); border-bottom-color: transparent; }
+        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: var(--nav-bg-color); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid var(--color-border); transition: all var(--transition-speed-normal) cubic-bezier(0.25, 0.46, 0.45, 0.94); padding: 0.9rem 0; }
+        
+        /* Light theme navbar - light background with dark text */
+        .nav {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Dark theme navbar - dark background with light text */
+        body.dark-mode .nav {
+            background: rgba(0, 0, 0, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .nav.scrolled { 
+            padding: 0.6rem 0; 
+            box-shadow: var(--shadow-md); 
+            border-bottom-color: transparent; 
+        }
+        
+        /* Light theme scrolled navbar */
+        .nav.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Dark theme scrolled navbar */
+        body.dark-mode .nav.scrolled {
+            background: rgba(0, 0, 0, 0.98);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
         .nav-container { max-width: var(--max-width); margin: 0 auto; padding: 0 2.5rem; display: flex; justify-content: space-between; align-items: center; }
         .logo { text-decoration: none; display: block; position: relative; height: 50px; }
         .logo img { height: 100%; width: auto; display: block; transition: opacity var(--transition-speed-normal) ease; }
@@ -829,12 +882,34 @@
         .nav.scrolled .logo .logo-default { opacity: 0; }
         .nav.scrolled .logo .logo-scrolled { opacity: 1; }
         .nav-links { display: flex; list-style: none; gap: 2.8rem; }
-        .nav-links a { text-decoration: none; color: var(--color-gray-text); font-weight: 500; font-size: 1rem; transition: all var(--transition-speed-normal) ease; position: relative; padding: 0.5rem 0; }
-        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -6px; left: 0; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); transition: width var(--transition-speed-normal) ease-out; }
-        .nav-links a:hover { color: var(--color-primary); }
+        .nav-links a { 
+            text-decoration: none; 
+            color: #333333; 
+            font-weight: 500; 
+            font-size: 1rem; 
+            transition: all var(--transition-speed-normal) ease; 
+            position: relative; 
+            padding: 0.5rem 0; 
+        }
+        
+        /* Dark theme navbar links */
+        body.dark-mode .nav-links a {
+            color: #ffffff;
+        }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -6px; left: 0; background: linear-gradient(135deg, var(--nav-hover-color), var(--color-accent)); transition: width var(--transition-speed-normal) ease-out; }
+        .nav-links a:hover { color: var(--nav-hover-color); }
         .nav-links a:hover::after { width: 100%; }
-        .nav.scrolled .nav-links a { color: rgba(255, 255, 255, 0.85); }
-        .nav.scrolled .nav-links a:hover { color: var(--color-accent); }
+        .nav.scrolled .nav-links a { 
+            color: #333333; 
+        }
+        .nav.scrolled .nav-links a:hover { 
+            color: var(--nav-hover-color); 
+        }
+        
+        /* Dark theme scrolled navbar links */
+        body.dark-mode .nav.scrolled .nav-links a {
+            color: #ffffff;
+        }
         .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
         .theme-toggle { background: none; border: none; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; position: relative; color: var(--color-primary); }
         .nav.scrolled .theme-toggle { color: rgba(255,255,255,0.85); }
@@ -845,9 +920,37 @@
         body.dark-mode .theme-icon-moon { opacity: 1; transform: rotate(0); }
 
         .nav-toggle { display: none; width: 40px; height: 40px; z-index: 1001; background: none; border: none; position: relative; }
-        .hamburger-line { display: block; position: absolute; width: 24px; height: 2px; background-color: var(--color-primary); border-radius: 2px; left: 8px; transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease; }
-        .nav.scrolled .hamburger-line { background-color: rgba(255,255,255,0.85); }
-        .nav-toggle.is-active .hamburger-line { background-color: #f0f4f8; }
+        .hamburger-line { 
+            display: block; 
+            position: absolute; 
+            width: 24px; 
+            height: 2px; 
+            background-color: #333333; 
+            border-radius: 2px; 
+            left: 8px; 
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease; 
+        }
+        
+        /* Dark theme hamburger lines */
+        body.dark-mode .hamburger-line {
+            background-color: #ffffff;
+        }
+        
+        .nav.scrolled .hamburger-line { 
+            background-color: #333333; 
+        }
+        
+        body.dark-mode .nav.scrolled .hamburger-line { 
+            background-color: #ffffff; 
+        }
+        
+        .nav-toggle.is-active .hamburger-line { 
+            background-color: #333333; 
+        }
+        
+        body.dark-mode .nav-toggle.is-active .hamburger-line { 
+            background-color: #ffffff; 
+        }
         .hamburger-line:nth-child(1) { top: 12px; }
         .hamburger-line:nth-child(2) { top: 19px; }
         .hamburger-line:nth-child(3) { top: 26px; }
@@ -1006,28 +1109,216 @@
 
         .acknowledgment { max-width: var(--max-width); margin: 0 auto; padding: 0 2.5rem; text-align: center; }
         .acknowledgment .card { padding: 2.5rem; background-color: var(--color-medium-light-bg); border: 1px solid var(--color-border); }
+        body.dark-mode .acknowledgment .card { background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); }
         .acknowledgment h3 { font-size: 1.5rem; margin-bottom: 1rem; }
         .acknowledgment p { max-width: 650px; margin: 0 auto; color: var(--color-gray-text); font-size: 1rem; line-height: 1.6; }
         .acknowledgment a { color: var(--color-primary); font-weight: 600; text-decoration: none; }
         .acknowledgment a:hover { text-decoration: underline; }
 
         .contact-wrapper { background-color: var(--color-white); border-radius: var(--border-radius-card); box-shadow: var(--shadow-lg); padding: 4rem; display: grid; grid-template-columns: 1.2fr 1fr; gap: 4rem; align-items: center; position: relative; overflow: hidden; }
+        
+        .light-mode .contact-wrapper {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
         .form-group { margin-bottom: 1.5rem; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
         .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.95rem; }
+        body.dark-mode .form-label { color: #ffffff; }
         .form-input, .form-textarea, .form-select { width: 100%; padding: 1rem; border: 1px solid var(--color-border); border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; font-family: 'Inter', sans-serif; background-color: var(--color-light-bg); color: var(--color-dark); }
+        body.dark-mode .form-input, body.dark-mode .form-textarea, body.dark-mode .form-select { background-color: rgba(255, 255, 255, 0.05); color: #ffffff; border-color: rgba(255, 255, 255, 0.2); }
         .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--color-primary); background-color: var(--color-white); box-shadow: 0 0 0 4px hsla(var(--shadow-color), 0.2); }
-        body.dark-mode .form-input:focus, body.dark-mode .form-textarea:focus, body.dark-mode .form-select:focus { background-color: var(--color-light-bg); }
+        body.dark-mode .form-input:focus, body.dark-mode .form-textarea:focus, body.dark-mode .form-select:focus { background-color: rgba(255, 255, 255, 0.1); }
         .form-textarea { min-height: 120px; resize: vertical; }
         .btn-submit { width: 100%; padding: 1.2rem; border-radius: 10px; font-weight: 600; background: var(--color-primary); color: #fff; border: none; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; }
-        body.dark-mode .btn-submit { color: #12151c; }
+        body.dark-mode .btn-submit { color: #ffffff; }
         .btn-submit:hover { background: #5e509e; }
-        .contact-details-group { display: flex; flex-direction: column; gap: 2rem; }
-        .contact-detail-item { display: flex; align-items: center; gap: 1.5rem; }
-        .contact-detail-icon { width: 45px; height: 45px; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.4rem; flex-shrink: 0; }
-        .contact-detail-text span { display: block; }
-        .contact-detail-text a { color: var(--color-primary); text-decoration: none; font-weight: 500; }
-        .contact-detail-text a:hover { text-decoration: underline; }
+        .contact-details-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 2rem; 
+        }
+        
+        .contact-detail-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 1.5rem; 
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .light-mode .contact-detail-item {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .contact-detail-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+        
+        .contact-detail-item:hover::before {
+            opacity: 0.1;
+        }
+        
+        .contact-detail-item:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            border-color: var(--color-primary);
+        }
+        
+        .contact-detail-icon { 
+            width: 56px; 
+            height: 56px; 
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); 
+            border-radius: 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-size: 20px; 
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(106, 90, 205, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .contact-detail-item:hover .contact-detail-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(106, 90, 205, 0.4);
+        }
+        
+        .contact-detail-icon i {
+            transition: transform 0.3s ease;
+        }
+        
+        .contact-detail-item:hover .contact-detail-icon i {
+            transform: scale(1.2);
+        }
+        
+        .contact-detail-text { 
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .contact-detail-text span:first-child { 
+            display: block; 
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 4px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .light-mode .contact-detail-text span:first-child {
+            color: rgba(0,0,0,0.7);
+        }
+        
+        .contact-detail-text a, 
+        .contact-detail-text span:last-child { 
+            color: var(--color-primary); 
+            text-decoration: none; 
+            font-weight: 500; 
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: block;
+        }
+        
+        .light-mode .contact-detail-text a,
+        .light-mode .contact-detail-text span:last-child {
+            color: #333;
+        }
+        
+        .contact-detail-text a:hover { 
+            color: var(--color-secondary);
+            transform: translateX(5px);
+        }
+        
+        /* Social Media Specific Styles */
+        .contact-detail-item[data-type="email"] .contact-detail-icon {
+            background: linear-gradient(135deg, #ea4335, #d93025);
+        }
+        
+        .contact-detail-item[data-type="linkedin"] .contact-detail-icon {
+            background: linear-gradient(135deg, #0077b5, #005885);
+        }
+        
+        .contact-detail-item[data-type="facebook"] .contact-detail-icon {
+            background: linear-gradient(135deg, #1877f2, #0d6efd);
+        }
+        
+        .contact-detail-item[data-type="twitter"] .contact-detail-icon {
+            background: linear-gradient(135deg, #1da1f2, #0d8bd9);
+        }
+        
+        .contact-detail-item[data-type="instagram"] .contact-detail-icon {
+            background: linear-gradient(135deg, #e4405f, #c13584);
+        }
+        
+        .contact-detail-item[data-type="location"] .contact-detail-icon {
+            background: linear-gradient(135deg, #34d399, #10b981);
+        }
+        
+        .contact-detail-item[data-type="phone"] .contact-detail-icon {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .contact-detail-item {
+                padding: 16px;
+                gap: 12px;
+            }
+            
+            .contact-detail-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .contact-detail-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+            
+            .contact-detail-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 16px;
+                border-radius: 12px;
+            }
+            
+            .contact-detail-text span:first-child {
+                font-size: 12px;
+            }
+            
+            .contact-detail-text a,
+            .contact-detail-text span:last-child {
+                font-size: 14px;
+            }
+        }
 
         .footer { background: #12151c; color: rgba(255, 255, 255, 0.7); padding: 2rem 2.5rem; font-size: 0.9rem; margin-top: var(--section-padding-y); position: relative; }
         .footer::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, #8a78f0, #ffb84d, #8a78f0); }
@@ -1072,46 +1363,101 @@
     .section { padding-left: 1.5rem; padding-right: 1.5rem; }
     .nav-container { padding: 0 1.5rem; }
 
-    /* --- FINAL MOBILE MENU STYLES --- */
+    /* --- ELEGANT MOBILE SIDEBAR MENU --- */
     .nav-links {
         position: fixed;
         top: 0;
         right: 0;
-        width: 280px;
-        height: 100%;
-        background-color: var(--color-white); /* Solid White in light mode */
-        box-shadow: -5px 0px 25px rgba(0,0,0,0.1);
+        width: 260px;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: -8px 0px 32px rgba(0,0,0,0.15);
         flex-direction: column;
         justify-content: flex-start;
-        align-items: flex-start;
-        gap: 1.25rem;
-        padding-top: 100px;
-        padding-left: 2.5rem;
-        padding-right: 2.5rem;
+        align-items: stretch;
+        gap: 0;
+        padding: 0;
         transform: translateX(100%);
         opacity: 0;
         pointer-events: none;
-        transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-left: 1px solid rgba(0,0,0,0.1);
+        z-index: 999;
     }
+    
     body.dark-mode .nav-links {
-        background-color: #12151c !important; /* Solid Black in dark mode */
-        box-shadow: -5px 0px 25px rgba(0,0,0,0.2);
+        background: rgba(18, 21, 28, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: -8px 0px 32px rgba(0,0,0,0.3);
+        border-left: 1px solid rgba(255,255,255,0.1);
     }
+    
     .nav-links.is-active {
         transform: translateX(0);
         opacity: 1;
         pointer-events: all;
     }
-    .nav-links a {
-        font-size: 1.2rem; /* Smaller font size */
-        font-weight: 500;
-        color: var(--color-dark); /* Correct contrasting font color */
+    
+    .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
     }
+    
+    body.dark-mode .nav-links li {
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .nav-links a {
+        display: block;
+        width: 100%;
+        padding: 1.2rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--nav-text-color);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+    
+    body.dark-mode .nav-links a {
+        color: #ffffff;
+    }
+    
     .nav-links a:hover {
+        background: rgba(106, 90, 205, 0.1);
+        color: var(--nav-hover-color);
+        border-left-color: var(--nav-hover-color);
+    }
+    
+    body.dark-mode .nav-links a:hover {
+        background: rgba(106, 90, 205, 0.2);
         color: var(--color-primary);
     }
+    
     .nav-toggle {
         display: flex;
+    }
+    
+    /* Mobile menu overlay */
+    .nav-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.3);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        z-index: 998;
+    }
+    
+    .nav-overlay.is-active {
+        opacity: 1;
+        pointer-events: all;
     }
     /* --- End Mobile Menu --- */
 
@@ -1132,6 +1478,115 @@
             .contact-wrapper { padding: 2rem 1.5rem; }
             .hero-content h1 { font-size: 3.2rem; }
         }
+
+        body.dark-mode::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
+        }
+
+        /* Enhanced Contact Form Styles */
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 100%;
+        }
+        
+        .contact-form .form-group {
+            margin-bottom: 0;
+            position: relative;
+        }
+        
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+            backdrop-filter: blur(5px);
+        }
+        
+        .light-mode .contact-form input,
+        .light-mode .contact-form textarea {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 4px rgba(106, 90, 205, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .light-mode .contact-form input:focus,
+        .light-mode .contact-form textarea:focus {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 4px rgba(106, 90, 205, 0.15);
+        }
+        
+        .contact-form input::placeholder,
+        .contact-form textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+            transition: color 0.3s ease;
+        }
+        
+        .light-mode .contact-form input::placeholder,
+        .light-mode .contact-form textarea::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .contact-form input:focus::placeholder,
+        .contact-form textarea:focus::placeholder {
+            color: var(--color-primary);
+        }
+        
+        .contact-form button {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(106, 90, 205, 0.3);
+        }
+        
+        .contact-form button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .contact-form button:hover::before {
+            left: 100%;
+        }
+        
+        .contact-form button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(106, 90, 205, 0.4);
+        }
+        
+        .contact-form button:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
     </style>
 </head>
 <body>
@@ -1156,6 +1611,7 @@
 
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
+    <div class="nav-overlay" id="nav-overlay"></div>
 
     <header>
         <nav class="nav" id="navbar">
@@ -1245,8 +1701,19 @@
         <section id="contact" class="section">
              <div class="section-header" data-animation="fade-in-up"><div class="section-subtitle">Start Your Journey</div><h2 class="section-title">Let's <span class="gradient-text">Connect</span></h2><div class="section-divider"></div><p class="section-description">Ready to transform your educational aspirations into reality? Reach out today for a personalized consultation.</p></div>
              <div class="contact-wrapper" data-animation="scale-in">
-                 <div class="aurora-bg"></div><div class="contact-form-container"><h3 style="font-size: 2rem; margin-bottom: 2rem;">Send a Message</h3><form id="contact-form"><div class="form-row"><div class="form-group"><label for="firstName" class="form-label">First Name</label><input type="text" id="firstName" name="firstName" class="form-input" required></div><div class="form-group"><label for="lastName" class="form-label">Last Name</label><input type="text" id="lastName" name="lastName" class="form-input" required></div></div><div class="form-group"><label for="email" class="form-label">Email Address</label><input type="email" id="email" name="email" class="form-input" required></div><div class="form-group"><label for="message" class="form-label">Message</label><textarea id="message" name="message" class="form-textarea" placeholder="Share your goals and how I can assist you..." required></textarea></div><button type="submit" class="btn-submit magnetic">Submit Request <i data-feather="send"></i></button></form></div>
-                 <div class="contact-details-group"><h3 style="font-size: 2rem; margin-bottom: 1rem;">Contact Details</h3><div class="contact-detail-item"><div class="contact-detail-icon"><i data-feather="mail"></i></div><div class="contact-detail-text"><span>Email</span><a href="mailto:soumi.integrity@gmail.com" class="contact-email">hello@soumita.space</a></div></div><div class="contact-detail-item"><div class="contact-detail-icon"><i data-feather="linkedin"></i></div><div class="contact-detail-text"><span>LinkedIn</span><a href="https://www.linkedin.com/in/soumita-chatterjee" target="_blank" rel="noopener noreferrer" class="contact-linkedin">Connect Professionally</a></div></div><div class="contact-detail-item"><div class="contact-detail-icon"><i data-feather="map-pin"></i></div><div class="contact-detail-text"><span>Location</span><span class="contact-location">Kolkata, India</span></div></div></div>
+                 <div class="aurora-bg"></div>
+                 <div class="contact-form-container">
+                     <h3 style="font-size: 2rem; margin-bottom: 2rem;">Send a Message</h3>
+                     <div id="contact-form">
+                         <!-- Contact form will be dynamically loaded here -->
+                     </div>
+                 </div>
+                 <div class="contact-details-group">
+                     <h3 style="font-size: 2rem; margin-bottom: 1rem;">Contact Details</h3>
+                     <div id="contact-details">
+                         <!-- Contact details will be dynamically loaded here -->
+                     </div>
+                 </div>
              </div>
         </section>
     </main>
@@ -1258,16 +1725,14 @@
         <div class="footer-container">
              <div class="footer-left">
                 <a href="#home" class="logo"><img src="https://anwe.sh/work/sclogo1.png" alt="Soumita C. Logo"></a>
-                <a href="https://soumita.space" target="_blank" rel="noopener noreferrer">Soumita.Space</a>
+                <span>Soumita.Space</span>
             </div>
             <div class="footer-center">
                  <p>&copy; 2025 Soumita Chatterjee. All Rights Reserved.</p>
             </div>
             <div class="footer-right">
                 <div class="footer-legal">
-                    <a href="/disclaimer.html">Disclaimer</a>
-                    <a href="/privacy.html">Privacy Policy</a>
-                    <a href="/terms.html">Terms</a>
+                    <a href="#" onclick="openLegalModal()">Legal</a>
                 </div>
                  <div class="footer-credits">
                     <p>Created with <svg class="gradient-heart" viewBox="0 0 24 24" aria-hidden="true"><path class="heart-fill" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> by <a href="https://anwe.sh" target="_blank" rel="noopener noreferrer">Anwesh</a></p>
@@ -1302,6 +1767,213 @@
                 }, 1000); 
             }
         });
+
+        // Function to open legal modal with all pages
+        window.openLegalModal = function() {
+            const supabaseUrl = 'https://wwpjacyzmteiexchtnfj.supabase.co';
+            const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3cGphY3l6bXRlaWV4Y2h0bmZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5Njk2MDIsImV4cCI6MjA2NDU0NTYwMn0.cq4SuNwcmk2a7vfV9XnaXZkbv-r-LQXuWy06u75C97Q';
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: #1a1a1a;
+                color: #ffffff;
+                max-width: 900px;
+                width: 100%;
+                max-height: 90vh;
+                overflow-y: auto;
+                border-radius: 10px;
+                position: relative;
+                padding: 30px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            `;
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '×';
+            closeBtn.style.cssText = `
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #ffffff;
+                font-weight: bold;
+                z-index: 10001;
+            `;
+            closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                document.body.removeChild(modal);
+            };
+            
+            // Close modal when clicking outside
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            };
+            
+            const loadingDiv = document.createElement('div');
+            loadingDiv.innerHTML = '<p>Loading legal information...</p>';
+            loadingDiv.style.textAlign = 'center';
+            
+            modalContent.appendChild(closeBtn);
+            modalContent.appendChild(loadingDiv);
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Fetch data from Supabase
+            fetch(`${supabaseUrl}/rest/v1/legal_pages?select=*&limit=1`, {
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': `Bearer ${supabaseKey}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    const legalData = data[0];
+                    
+                    const content = `
+                        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #ffffff;">
+                            <h1 style="color: #ffffff; border-bottom: 2px solid #6a5acd; padding-bottom: 10px; margin-bottom: 30px;">
+                                Legal Information
+                            </h1>
+                            
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="color: #6a5acd; margin-bottom: 15px;">Privacy Policy</h2>
+                                ${generatePrivacyPolicy(legalData)}
+                            </div>
+                            
+                            <hr style="margin: 30px 0; border: none; border-top: 1px solid #333;">
+                            
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="color: #6a5acd; margin-bottom: 15px;">Terms of Service</h2>
+                                ${generateTermsOfService(legalData)}
+                            </div>
+                            
+                            <hr style="margin: 30px 0; border: none; border-top: 1px solid #333;">
+                            
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="color: #6a5acd; margin-bottom: 15px;">Disclaimer</h2>
+                                ${generateDisclaimer(legalData)}
+                            </div>
+                            
+                            <hr style="margin: 30px 0; border: none; border-top: 1px solid #333;">
+                            
+                            <div style="margin-bottom: 40px;">
+                                <h2 style="color: #6a5acd; margin-bottom: 15px;">Cookie Policy</h2>
+                                ${generateCookiePolicy(legalData)}
+                            </div>
+                        </div>
+                    `;
+                    
+                    modalContent.innerHTML = closeBtn.outerHTML + content;
+                } else {
+                    modalContent.innerHTML = closeBtn.outerHTML + '<p>No legal information found.</p>';
+                }
+            })
+            .catch(error => {
+                modalContent.innerHTML = closeBtn.outerHTML + '<p>Error loading legal information.</p>';
+                console.error('Error:', error);
+            });
+        }
+
+
+        
+        // Legal page generation functions
+        function generatePrivacyPolicy(data) {
+            const companyName = data.company_name || data.companyName || 'Our Company';
+            const websiteUrl = window.location.origin || 'our website';
+            const contactEmail = data.legal_email || data.legalEmail || 'contact@example.com';
+            const address = data.business_address || data.businessAddress || 'Our Address';
+            const phone = data.legal_phone || data.legalPhone || 'Our Phone';
+            
+            return `
+                <h1>Privacy Policy</h1>
+                <p><strong>Last updated:</strong> ${new Date().toLocaleDateString()}</p>
+                
+                <h2>1. Information We Collect</h2>
+                <p>${companyName} ("we," "our," or "us") collects information you provide directly to us when you visit our website at ${websiteUrl}.</p>
+                
+                <h2>2. How We Use Your Information</h2>
+                <p>We use the information we collect to provide, maintain, and improve our services, communicate with you, and ensure compliance with legal obligations.</p>
+                
+                <h2>3. Contact Information</h2>
+                <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+                <p><strong>Email:</strong> ${contactEmail}<br>
+                <strong>Address:</strong> ${address}<br>
+                <strong>Phone:</strong> ${phone}</p>
+            `;
+        }
+        
+        function generateTermsOfService(data) {
+            const companyName = data.company_name || data.companyName || 'Our Company';
+            const contactEmail = data.legal_email || data.legalEmail || 'contact@example.com';
+            
+            return `
+                <h1>Terms of Service</h1>
+                <p><strong>Last updated:</strong> ${new Date().toLocaleDateString()}</p>
+                
+                <h2>1. Acceptance of Terms</h2>
+                <p>By accessing and using this website, you accept and agree to be bound by the terms and provision of this agreement.</p>
+                
+                <h2>2. Use License</h2>
+                <p>Permission is granted to temporarily download one copy of the materials on ${companyName}'s website for personal, non-commercial transitory viewing only.</p>
+                
+                <h2>3. Contact</h2>
+                <p>For questions about these Terms of Service, contact us at: ${contactEmail}</p>
+            `;
+        }
+        
+        function generateDisclaimer(data) {
+            const companyName = data.company_name || data.companyName || 'Our Company';
+            
+            return `
+                <h1>Disclaimer</h1>
+                <p><strong>Last updated:</strong> ${new Date().toLocaleDateString()}</p>
+                
+                <h2>1. Information Accuracy</h2>
+                <p>The information on this website is provided by ${companyName} on an "as is" basis. We make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability, or availability of the information.</p>
+                
+                <h2>2. No Professional Advice</h2>
+                <p>The information provided on this website is for general informational purposes only and should not be construed as professional advice.</p>
+            `;
+        }
+        
+        function generateCookiePolicy(data) {
+            const companyName = data.company_name || data.companyName || 'Our Company';
+            
+            return `
+                <h1>Cookie Policy</h1>
+                <p><strong>Last updated:</strong> ${new Date().toLocaleDateString()}</p>
+                
+                <h2>1. What Are Cookies</h2>
+                <p>Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience.</p>
+                
+                <h2>2. How We Use Cookies</h2>
+                <p>${companyName} uses cookies to analyze website traffic, personalize content, and improve your browsing experience.</p>
+                
+                <h2>3. Managing Cookies</h2>
+                <p>You can control and manage cookies through your browser settings. Please note that disabling cookies may affect the functionality of our website.</p>
+            `;
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             feather.replace();
@@ -1396,6 +2068,8 @@
             const nav = document.getElementById('navbar');
             const navToggle = document.getElementById('nav-toggle-main');
             const navMenu = document.getElementById('nav-menu');
+            const navOverlay = document.getElementById('nav-overlay');
+            
             if (navToggle) {
                 const navLinks = navMenu.querySelectorAll('a');
                 window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 50));
@@ -1407,16 +2081,33 @@
                     document.body.classList.add(newTheme);
                     localStorage.setItem('theme', newTheme);
                 });
+                
+                // Mobile menu toggle
                 navToggle.addEventListener('click', () => {
                     const isActive = navToggle.classList.toggle('is-active');
                     navMenu.classList.toggle('is-active');
+                    navOverlay.classList.toggle('is-active');
                     navToggle.setAttribute('aria-expanded', isActive);
+                    document.body.style.overflow = isActive ? 'hidden' : '';
                 });
+                
+                // Close menu when clicking overlay
+                navOverlay.addEventListener('click', () => {
+                    navMenu.classList.remove('is-active');
+                    navOverlay.classList.remove('is-active');
+                    navToggle.classList.remove('is-active');
+                    navToggle.setAttribute('aria-expanded', 'false');
+                    document.body.style.overflow = '';
+                });
+                
+                // Close menu when clicking links
                 navLinks.forEach(link => link.addEventListener('click', () => {
                     if (navMenu.classList.contains('is-active')) {
                         navMenu.classList.remove('is-active');
+                        navOverlay.classList.remove('is-active');
                         navToggle.classList.remove('is-active');
                         navToggle.setAttribute('aria-expanded', 'false');
+                        document.body.style.overflow = '';
                     }
                 }));
             }

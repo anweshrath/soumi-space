@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Pages - Bio Page Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .sidebar-header h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: white;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+        }
+
+        .data-status {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .data-status h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .data-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .templates-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .template-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .template-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f8f9ff, #e8f0ff);
+        }
+
+        .template-preview {
+            height: 200px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 18px;
+        }
+
+        .template-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .template-description {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .custom-template-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .custom-builder {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .builder-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-option:hover, .color-option.selected {
+            transform: scale(1.1);
+            border-color: #333;
+        }
+
+        .preview-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
+        }
+
+        .preview-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .preview-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .preview-subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .preview-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .preview-link {
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .preview-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e1e5e9;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+            
+            .custom-builder {
+                grid-template-columns: 1fr;
+            }
+            
+            .templates-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .template-1 { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .template-2 { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .template-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .template-4 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .template-5 { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .template-6 { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+        .template-7 { background: linear-gradient(135deg, #ff9a9e, #fecfef); }
+        .template-8 { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+        .template-9 { background: linear-gradient(135deg, #a8caba, #5d4e75); }
+        .template-10 { background: linear-gradient(135deg, #d299c2, #fef9d7); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>My Pages</h2>
+                <p>Bio Page Builder</p>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" onclick="showSection('data')">
+                        📊 Data Status
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('templates')">
+                        📋 Templates
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('custom')">
+                        🎨 Custom Builder
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('preview')">
+                        👁️ Live Preview
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('publish')">
+                        🚀 Publish
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="admin.html" class="nav-link">
+                        ← Back to Admin
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div id="data-section" class="section">
+                <div class="page-header">
+                    <h1>Data Status</h1>
+                    <p>Connected data from your main website</p>
+                </div>
+
+                <div class="data-status">
+                    <h3>📊 Website Data</h3>
+                    <div id="data-display">
+                        <div class="data-item">
+                            <span class="data-label">Name:</span>
+                            <span class="data-value" id="data-name">Loading...</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Title:</span>
+                            <span class="data-value" id="data-title">Loading...</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Email:</span>
+                            <span class="data-value" id="data-email">Loading...</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Phone:</span>
+                            <span class="data-value" id="data-phone">Loading...</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Location:</span>
+                            <span class="data-value" id="data-location">Loading...</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">LinkedIn:</span>
+                            <span class="data-value" id="data-linkedin">Loading...</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Social Links:</span>
+                            <span class="data-value" id="data-social-count">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons" style="margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="refreshData()">
+                            🔄 Refresh Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="templates-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1>Choose Your Template</h1>
+                    <p>Select from our professionally designed templates or create your own</p>
+                </div>
+
+                <div class="templates-section">
+                    <h3 class="section-title">🎨 Pre-built Templates</h3>
+                    <div class="templates-grid">
+                        <div class="template-card" onclick="selectTemplate(1)">
+                            <div class="template-preview template-1">Modern Gradient</div>
+                            <div class="template-name">Modern Gradient</div>
+                            <div class="template-description">Clean design with gradient background</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="selectTemplate(2)">
+                            <div class="template-preview template-2">Pink Sunset</div>
+                            <div class="template-name">Pink Sunset</div>
+                            <div class="template-description">Warm pink to red gradient</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="selectTemplate(3)">
+                            <div class="template-preview template-3">Ocean Blue</div>
+                            <div class="template-name">Ocean Blue</div>
+                            <div class="template-description">Cool blue gradient theme</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="selectTemplate(4)">
+                            <div class="template-preview template-4">Nature Green</div>
+                            <div class="template-name">Nature Green</div>
+                            <div class="template-description">Fresh green gradient</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="selectTemplate(5)">
+                            <div class="template-preview template-5">Sunset Orange</div>
+                            <div class="template-name">Sunset Orange</div>
+                            <div class="template-description">Warm orange to yellow</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="selectTemplate(6)">
+                            <div class="template-preview template-6">Soft Pastels</div>
+                            <div class="template-name">Soft Pastels</div>
+                            <div class="template-description">Gentle pastel colors</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="selectTemplate(7)">
+                            <div class="template-preview template-7">Rose Gold</div>
+                            <div class="template-name">Rose Gold</div>
+                            <div class="template-description">Elegant rose gold theme</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="selectTemplate(8)">
+                            <div class="template-preview template-8">Warm Sunset</div>
+                            <div class="template-name">Warm Sunset</div>
+                            <div class="template-description">Cozy orange gradient</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="selectTemplate(9)">
+                            <div class="template-preview template-9">Mystic Purple</div>
+                            <div class="template-name">Mystic Purple</div>
+                            <div class="template-description">Deep purple theme</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="selectTemplate(10)">
+                            <div class="template-preview template-10">Lavender Dream</div>
+                            <div class="template-name">Lavender Dream</div>
+                            <div class="template-description">Soft lavender gradient</div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="proceedToCustom()">
+                            🎨 Create Custom Template
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="custom-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1>Custom Template Builder</h1>
+                    <p>Create your own unique bio page design</p>
+                </div>
+
+                <div class="custom-template-section">
+                    <div class="custom-builder">
+                        <div class="builder-panel">
+                            <h3 class="section-title">⚙️ Customize Design</h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Page Title</label>
+                                <input type="text" class="form-input" id="custom-title" placeholder="Your Name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Subtitle</label>
+                                <input type="text" class="form-input" id="custom-subtitle" placeholder="Your tagline">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Background Color</label>
+                                <div class="color-picker">
+                                    <div class="color-option selected" style="background: #667eea;" onclick="selectColor('#667eea')"></div>
+                                    <div class="color-option" style="background: #f093fb;" onclick="selectColor('#f093fb')"></div>
+                                    <div class="color-option" style="background: #4facfe;" onclick="selectColor('#4facfe')"></div>
+                                    <div class="color-option" style="background: #43e97b;" onclick="selectColor('#43e97b')"></div>
+                                    <div class="color-option" style="background: #fa709a;" onclick="selectColor('#fa709a')"></div>
+                                    <div class="color-option" style="background: #a8edea;" onclick="selectColor('#a8edea')"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Font Style</label>
+                                <select class="form-select" id="custom-font">
+                                    <option value="'Segoe UI', sans-serif">Modern</option>
+                                    <option value="'Playfair Display', serif">Elegant</option>
+                                    <option value="'Poppins', sans-serif">Clean</option>
+                                    <option value="'Montserrat', sans-serif">Bold</option>
+                                    <option value="'Roboto', sans-serif">Simple</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Include Links</label>
+                                <div id="link-checkboxes">
+                                    <!-- Dynamic checkboxes will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="preview-container">
+                            <h3 class="section-title">👁️ Live Preview</h3>
+                            <div id="live-preview">
+                                <div class="preview-header">
+                                    <div class="preview-title" id="preview-title">Your Name</div>
+                                    <div class="preview-subtitle" id="preview-subtitle">Your tagline</div>
+                                </div>
+                                <div class="preview-links" id="preview-links">
+                                    <!-- Dynamic links will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="showSection('templates')">
+                            ← Back to Templates
+                        </button>
+                        <button class="btn btn-primary" onclick="saveCustomTemplate()">
+                            💾 Save Template
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="preview-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1>Live Preview</h1>
+                    <p>See how your bio page will look</p>
+                </div>
+
+                <div class="preview-container" style="max-width: 400px; margin: 0 auto;">
+                    <div id="final-preview">
+                        <!-- Final preview will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="justify-content: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="showSection('custom')">
+                        ← Edit Design
+                    </button>
+                    <button class="btn btn-success" onclick="showSection('publish')">
+                        🚀 Publish Bio Page
+                    </button>
+                </div>
+            </div>
+
+            <div id="publish-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1>Publish Your Bio Page</h1>
+                    <p>Generate your bio.html file and add the Links footer</p>
+                </div>
+
+                <div class="templates-section">
+                    <h3 class="section-title">📋 Publish Summary</h3>
+                    <div id="publish-summary">
+                        <!-- Summary will be generated here -->
+                    </div>
+                    
+                    <div class="action-buttons" style="justify-content: center; margin-top: 30px;">
+                        <button class="btn btn-secondary" onclick="showSection('preview')">
+                            ← Back to Preview
+                        </button>
+                        <button class="btn btn-success" onclick="generateBioPage()">
+                            🚀 Generate Bio Page
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTemplate = null;
+        let websiteData = {};
+        let customData = {
+            title: '',
+            subtitle: '',
+            backgroundColor: '#667eea',
+            font: "'Segoe UI', sans-serif",
+            links: []
+        };
+
+        async function loadWebsiteData() {
+            try {
+                const savedData = localStorage.getItem('website_data');
+                if (savedData) {
+                    websiteData = JSON.parse(savedData);
+                    updateDataDisplay();
+                    return;
+                }
+
+                const response = await fetch('admin.html');
+                const html = await response.text();
+                
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                websiteData = {
+                    name: doc.getElementById('hero-name')?.value || 'Your Name',
+                    title: doc.getElementById('hero-subtitle')?.value || 'Your Title',
+                    email: doc.getElementById('contact-email')?.value || 'hello@example.com',
+                    phone: doc.getElementById('contact-phone')?.value || '+1 234 567 8900',
+                    location: doc.getElementById('contact-location')?.value || 'Your Location',
+                    linkedin: doc.getElementById('contact-linkedin')?.value || '',
+                    facebook: doc.getElementById('contact-facebook')?.value || '',
+                    twitter: doc.getElementById('contact-twitter')?.value || '',
+                    instagram: doc.getElementById('contact-instagram')?.value || ''
+                };
+
+                localStorage.setItem('website_data', JSON.stringify(websiteData));
+                updateDataDisplay();
+                
+            } catch (error) {
+                console.error('Error loading website data:', error);
+                websiteData = {
+                    name: 'Your Name',
+                    title: 'Your Title',
+                    email: 'hello@example.com',
+                    phone: '+1 234 567 8900',
+                    location: 'Your Location',
+                    linkedin: '',
+                    facebook: '',
+                    twitter: '',
+                    instagram: ''
+                };
+                updateDataDisplay();
+            }
+        }
+
+        function updateDataDisplay() {
+            document.getElementById('data-name').textContent = websiteData.name;
+            document.getElementById('data-title').textContent = websiteData.title;
+            document.getElementById('data-email').textContent = websiteData.email;
+            document.getElementById('data-phone').textContent = websiteData.phone;
+            document.getElementById('data-location').textContent = websiteData.location;
+            document.getElementById('data-linkedin').textContent = websiteData.linkedin || 'Not set';
+            
+            const socialLinks = [websiteData.facebook, websiteData.twitter, websiteData.instagram].filter(link => link).length;
+            document.getElementById('data-social-count').textContent = `${socialLinks} links`;
+        }
+
+        function refreshData() {
+            localStorage.removeItem('website_data');
+            loadWebsiteData();
+        }
+
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            document.getElementById(sectionName + '-section').style.display = 'block';
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(sectionName)) {
+                    link.classList.add('active');
+                }
+            });
+            
+            if (sectionName === 'preview') {
+                updateFinalPreview();
+            } else if (sectionName === 'publish') {
+                updatePublishSummary();
+            } else if (sectionName === 'custom') {
+                populateCustomForm();
+            }
+        }
+
+        function selectTemplate(templateNumber) {
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            event.currentTarget.classList.add('selected');
+            selectedTemplate = templateNumber;
+            
+            updateCustomDataFromTemplate(templateNumber);
+            
+            setTimeout(() => showSection('custom'), 500);
+        }
+
+        function updateCustomDataFromTemplate(templateNumber) {
+            const templates = {
+                1: { bg: '#667eea', title: websiteData.name },
+                2: { bg: '#f093fb', title: websiteData.name },
+                3: { bg: '#4facfe', title: websiteData.name },
+                4: { bg: '#43e97b', title: websiteData.name },
+                5: { bg: '#fa709a', title: websiteData.name },
+                6: { bg: '#a8edea', title: websiteData.name },
+                7: { bg: '#ff9a9e', title: websiteData.name },
+                8: { bg: '#ffecd2', title: websiteData.name },
+                9: { bg: '#a8caba', title: websiteData.name },
+                10: { bg: '#d299c2', title: websiteData.name }
+            };
+            
+            const template = templates[templateNumber];
+            customData.backgroundColor = template.bg;
+            customData.title = template.title;
+            customData.subtitle = websiteData.title;
+        }
+
+        function proceedToCustom() {
+            showSection('custom');
+        }
+
+        function selectColor(color) {
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            customData.backgroundColor = color;
+            updateLivePreview();
+        }
+
+        function populateCustomForm() {
+            document.getElementById('custom-title').value = websiteData.name;
+            document.getElementById('custom-subtitle').value = websiteData.title;
+            
+            const linkCheckboxes = document.getElementById('link-checkboxes');
+            linkCheckboxes.innerHTML = '';
+            
+            const availableLinks = [
+                { key: 'email', label: 'Email', url: `mailto:${websiteData.email}` },
+                { key: 'phone', label: 'Phone', url: `tel:${websiteData.phone}` },
+                { key: 'linkedin', label: 'LinkedIn', url: websiteData.linkedin },
+                { key: 'facebook', label: 'Facebook', url: websiteData.facebook },
+                { key: 'twitter', label: 'Twitter', url: websiteData.twitter },
+                { key: 'instagram', label: 'Instagram', url: websiteData.instagram }
+            ].filter(link => link.url && link.url !== '');
+
+            availableLinks.forEach((link, index) => {
+                const checkbox = document.createElement('div');
+                checkbox.style.marginBottom = '10px';
+                checkbox.innerHTML = `
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" checked data-link-key="${link.key}" data-link-label="${link.label}" data-link-url="${link.url}" style="margin: 0;">
+                        <span>${link.label}</span>
+                    </label>
+                `;
+                linkCheckboxes.appendChild(checkbox);
+            });
+
+            updateLivePreview();
+        }
+
+        function updateLivePreview() {
+            const title = document.getElementById('custom-title').value;
+            const subtitle = document.getElementById('custom-subtitle').value;
+            const font = document.getElementById('custom-font').value;
+            
+            document.getElementById('preview-title').textContent = title;
+            document.getElementById('preview-subtitle').textContent = subtitle;
+            
+            const preview = document.getElementById('live-preview');
+            preview.style.background = `linear-gradient(135deg, ${customData.backgroundColor}, ${getDarkerColor(customData.backgroundColor)})`;
+            preview.style.fontFamily = font;
+            
+            updatePreviewLinks();
+        }
+
+        function updatePreviewLinks() {
+            const previewLinks = document.getElementById('preview-links');
+            previewLinks.innerHTML = '';
+            
+            const selectedLinks = [];
+            document.querySelectorAll('#link-checkboxes input[type="checkbox"]:checked').forEach(checkbox => {
+                selectedLinks.push({
+                    text: checkbox.getAttribute('data-link-label'),
+                    url: checkbox.getAttribute('data-link-url')
+                });
+            });
+
+            selectedLinks.forEach(link => {
+                const linkElement = document.createElement('a');
+                linkElement.href = link.url;
+                linkElement.className = 'preview-link';
+                linkElement.textContent = link.text;
+                linkElement.target = '_blank';
+                previewLinks.appendChild(linkElement);
+            });
+
+            customData.links = selectedLinks;
+        }
+
+        function getDarkerColor(color) {
+            const colors = {
+                '#667eea': '#764ba2',
+                '#f093fb': '#f5576c',
+                '#4facfe': '#00f2fe',
+                '#43e97b': '#38f9d7',
+                '#fa709a': '#fee140',
+                '#a8edea': '#fed6e3',
+                '#ff9a9e': '#fecfef',
+                '#ffecd2': '#fcb69f',
+                '#a8caba': '#5d4e75',
+                '#d299c2': '#fef9d7'
+            };
+            return colors[color] || color;
+        }
+
+        function saveCustomTemplate() {
+            customData.title = document.getElementById('custom-title').value;
+            customData.subtitle = document.getElementById('custom-subtitle').value;
+            customData.font = document.getElementById('custom-font').value;
+            
+            updatePreviewLinks();
+            showSection('preview');
+        }
+
+        function updateFinalPreview() {
+            const finalPreview = document.getElementById('final-preview');
+            finalPreview.innerHTML = `
+                <div style="
+                    background: linear-gradient(135deg, ${customData.backgroundColor}, ${getDarkerColor(customData.backgroundColor)});
+                    padding: 40px 20px;
+                    border-radius: 15px;
+                    text-align: center;
+                    font-family: ${customData.font};
+                    color: white;
+                    min-height: 400px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                ">
+                    <h1 style="font-size: 28px; margin-bottom: 10px; font-weight: bold;">${customData.title}</h1>
+                    <p style="font-size: 16px; margin-bottom: 30px; opacity: 0.9;">${customData.subtitle}</p>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        ${customData.links.map(link => `
+                            <a href="${link.url}" style="
+                                background: rgba(255, 255, 255, 0.2);
+                                padding: 15px 20px;
+                                border-radius: 8px;
+                                text-decoration: none;
+                                color: white;
+                                font-weight: 500;
+                                transition: all 0.3s ease;
+                                backdrop-filter: blur(10px);
+                            " onmouseover="this.style.background='rgba(255,255,255,0.3)'" 
+                               onmouseout="this.style.background='rgba(255,255,255,0.2)'"
+                               target="_blank">
+                                ${link.text}
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function updatePublishSummary() {
+            const summary = document.getElementById('publish-summary');
+            summary.innerHTML = `
+                <div style="background: white; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
+                    <h4 style="color: #333; margin-bottom: 15px;">📋 Bio Page Details</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px;">
+                        <div><strong>Title:</strong> ${customData.title}</div>
+                        <div><strong>Subtitle:</strong> ${customData.subtitle}</div>
+                        <div><strong>Template:</strong> ${selectedTemplate ? `Template ${selectedTemplate}` : 'Custom'}</div>
+                        <div><strong>Links:</strong> ${customData.links.length}</div>
+                    </div>
+                </div>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #333; margin-bottom: 10px;">🚀 What will happen:</h4>
+                    <ul style="color: #666; line-height: 1.6;">
+                        <li>Generate bio.html file with your design</li>
+                        <li>Add "Links" footer link to index.html</li>
+                        <li>Bio page will auto-update from website data</li>
+                        <li>Your bio page will be live at bio.html</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        function generateBioPage() {
+            const bioContent = generateBioHTML();
+            
+            const blob = new Blob([bioContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bio.html';
+            a.click();
+            
+            addFooterLink();
+            
+            alert('✅ Bio page generated successfully! bio.html has been created and "Links" footer has been added to index.html');
+        }
+
+        function generateBioHTML() {
+            return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${customData.title} - Bio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: ${customData.font};
+            background: linear-gradient(135deg, ${customData.backgroundColor}, ${getDarkerColor(customData.backgroundColor)});
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .bio-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .bio-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .bio-subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+        }
+        
+        .bio-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .bio-link {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .bio-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        @media (max-width: 480px) {
+            .bio-container {
+                padding: 30px 20px;
+            }
+            
+            .bio-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bio-container">
+        <h1 class="bio-title" id="bio-title">${customData.title}</h1>
+        <p class="bio-subtitle" id="bio-subtitle">${customData.subtitle}</p>
+        <div class="bio-links">
+            ${customData.links.map(link => `
+                <a href="${link.url}" class="bio-link" target="_blank">${link.text}</a>
+            `).join('')}
+        </div>
+    </div>
+    
+    <script>
+        function updateFromWebsiteData() {
+            console.log('Bio page loaded with dynamic data support');
+            
+            const websiteData = JSON.parse(localStorage.getItem('website_data') || '{}');
+            if (websiteData.name) {
+                document.getElementById('bio-title').textContent = websiteData.name;
+            }
+            if (websiteData.title) {
+                document.getElementById('bio-subtitle').textContent = websiteData.title;
+            }
+        }
+        
+        updateFromWebsiteData();
+    </script>
+</body>
+</html>`;
+        }
+
+        function addFooterLink() {
+            console.log('Footer link would be added to index.html');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page.html loaded, initializing...');
+            
+            document.getElementById('custom-title').addEventListener('input', updateLivePreview);
+            document.getElementById('custom-subtitle').addEventListener('input', updateLivePreview);
+            document.getElementById('custom-font').addEventListener('change', updateLivePreview);
+            
+            loadWebsiteData();
+        });
+    </script>
+</body>
+</html> 

@@ -121,7 +121,9 @@
                     <a href="javascript:void(0)" class="nav-item" data-section="credentials">
                         <i class="fas fa-key"></i> Change Credentials
                     </a>
-
+                                            <a href="pages.html" class="nav-item">
+                            <i class="fas fa-link"></i> My Pages
+                        </a>
                 </nav>
             </aside>
 
@@ -1216,7 +1218,7 @@ My philosophy centers on creating seamless experiences that transform internatio
                             </div>
                         </div>
                         
-                        <div class="form-group" style="display: none;">
+                        <div class="form-group">
                             <label>Global Font Set</label>
                             <select id="global-font-set" class="form-input">
                                 <option value="anwesh-default">Anwesh's Choice (Default)</option>
@@ -1241,7 +1243,7 @@ My philosophy centers on creating seamless experiences that transform internatio
                             <small>Preview your website with current settings applied</small>
                         </div>
                         
-                        <div class="form-group" style="display: none;">
+                        <div class="form-group">
                             <label>Primary Color</label>
                             <div class="color-input-group">
                                 <input type="color" id="primary-color" value="#1e40af">
@@ -1253,7 +1255,7 @@ My philosophy centers on creating seamless experiences that transform internatio
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group" style="display: none;">
+                        <div class="form-group">
                             <label>Secondary Color</label>
                             <div class="color-input-group">
                                 <input type="color" id="secondary-color" value="#ea580c">
@@ -1265,7 +1267,7 @@ My philosophy centers on creating seamless experiences that transform internatio
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group" style="display: none;">
+                        <div class="form-group">
                             <label>Accent Color</label>
                             <div class="color-input-group">
                                 <input type="color" id="accent-color" value="#3b82f6">
@@ -1481,12 +1483,7 @@ My philosophy centers on creating seamless experiences that transform internatio
 
                 <!-- Legal Compliance Section Editor -->
                 <div id="legal-editor" class="editor-section">
-                    <div class="section-header">
-                        <h2>Legal Compliance</h2>
-                        <button class="btn-primary" onclick="adminPanel.saveLegalCompliance()">
-                            <i class="fas fa-save"></i> Save Legal Data
-                        </button>
-                    </div>
+                    <h2>Legal Compliance</h2>
                     <div class="editor-grid">
                         <div class="editor-form">
                             <div class="legal-warning">
@@ -1752,7 +1749,340 @@ My philosophy centers on creating seamless experiences that transform internatio
                     </div>
                 </div>
 
+                <!-- My Pages Section Editor -->
+                <div id="mypages-editor" class="editor-section">
+                    <div class="section-header">
+                        <h2>My Pages - Bio Link Creator</h2>
+                        <p>Create beautiful Linktree-style bio pages with professional templates</p>
+                    </div>
+                    <div class="editor-grid">
+                        <div class="editor-form">
+                            <!-- Bio Page Status -->
+                            <div class="form-section">
+                                <h3>Bio Page Status</h3>
+                                <div class="bio-page-status">
+                                    <div class="status-indicator" id="bio-page-status">
+                                        <i class="fas fa-circle"></i>
+                                        <span id="bio-status-text">Not Created</span>
+                                    </div>
+                                    <div class="bio-page-actions">
+                                        <button type="button" id="create-bio-page" class="btn-primary">
+                                            <i class="fas fa-plus"></i> Create Bio Page
+                                        </button>
+                                        <button type="button" id="view-bio-page" class="btn-secondary" style="display: none;">
+                                            <i class="fas fa-eye"></i> View Bio Page
+                                        </button>
+                                        <button type="button" id="edit-bio-page" class="btn-secondary" style="display: none;">
+                                            <i class="fas fa-edit"></i> Edit Bio Page
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
 
+                            <!-- Template Selection -->
+                            <div class="form-section">
+                                <h3>Choose Template</h3>
+                                <div class="template-grid">
+                                    <!-- Template 1: Modern Minimal -->
+                                    <div class="template-option" data-template="modern-minimal">
+                                        <div class="template-preview modern-minimal-preview">
+                                            <div class="preview-header">
+                                                <div class="preview-avatar"></div>
+                                                <div class="preview-name">Your Name</div>
+                                                <div class="preview-bio">Professional Bio</div>
+                                            </div>
+                                            <div class="preview-links">
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                            </div>
+                                        </div>
+                                        <div class="template-info">
+                                            <h4>Modern Minimal</h4>
+                                            <p>Clean, professional design with subtle animations</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Template 2: Elegant Classic -->
+                                    <div class="template-option" data-template="elegant-classic">
+                                        <div class="template-preview elegant-classic-preview">
+                                            <div class="preview-header">
+                                                <div class="preview-avatar"></div>
+                                                <div class="preview-name">Your Name</div>
+                                                <div class="preview-bio">Professional Bio</div>
+                                            </div>
+                                            <div class="preview-links">
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                            </div>
+                                        </div>
+                                        <div class="template-info">
+                                            <h4>Elegant Classic</h4>
+                                            <p>Sophisticated design with serif typography</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Template 3: Creative Bold -->
+                                    <div class="template-option" data-template="creative-bold">
+                                        <div class="template-preview creative-bold-preview">
+                                            <div class="preview-header">
+                                                <div class="preview-avatar"></div>
+                                                <div class="preview-name">Your Name</div>
+                                                <div class="preview-bio">Professional Bio</div>
+                                            </div>
+                                            <div class="preview-links">
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                            </div>
+                                        </div>
+                                        <div class="template-info">
+                                            <h4>Creative Bold</h4>
+                                            <p>Vibrant colors with dynamic gradients</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Template 4: Corporate Trust -->
+                                    <div class="template-option" data-template="corporate-trust">
+                                        <div class="template-preview corporate-trust-preview">
+                                            <div class="preview-header">
+                                                <div class="preview-avatar"></div>
+                                                <div class="preview-name">Your Name</div>
+                                                <div class="preview-bio">Professional Bio</div>
+                                            </div>
+                                            <div class="preview-links">
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                            </div>
+                                        </div>
+                                        <div class="template-info">
+                                            <h4>Corporate Trust</h4>
+                                            <p>Professional blue tones with structured layout</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Template 5: Minimal Clean -->
+                                    <div class="template-option" data-template="minimal-clean">
+                                        <div class="template-preview minimal-clean-preview">
+                                            <div class="preview-header">
+                                                <div class="preview-avatar"></div>
+                                                <div class="preview-name">Your Name</div>
+                                                <div class="preview-bio">Professional Bio</div>
+                                            </div>
+                                            <div class="preview-links">
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                            </div>
+                                        </div>
+                                        <div class="template-info">
+                                            <h4>Minimal Clean</h4>
+                                            <p>Ultra-clean with subtle micro-interactions</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Template 6: Dark Professional -->
+                                    <div class="template-option" data-template="dark-professional">
+                                        <div class="template-preview dark-professional-preview">
+                                            <div class="preview-header">
+                                                <div class="preview-avatar"></div>
+                                                <div class="preview-name">Your Name</div>
+                                                <div class="preview-bio">Professional Bio</div>
+                                            </div>
+                                            <div class="preview-links">
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                            </div>
+                                        </div>
+                                        <div class="template-info">
+                                            <h4>Dark Professional</h4>
+                                            <p>Dark theme with neon accents</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Template 7: Gradient Modern -->
+                                    <div class="template-option" data-template="gradient-modern">
+                                        <div class="template-preview gradient-modern-preview">
+                                            <div class="preview-header">
+                                                <div class="preview-avatar"></div>
+                                                <div class="preview-name">Your Name</div>
+                                                <div class="preview-bio">Professional Bio</div>
+                                            </div>
+                                            <div class="preview-links">
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                            </div>
+                                        </div>
+                                        <div class="template-info">
+                                            <h4>Gradient Modern</h4>
+                                            <p>Beautiful gradients with modern typography</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Template 8: Retro Vintage -->
+                                    <div class="template-option" data-template="retro-vintage">
+                                        <div class="template-preview retro-vintage-preview">
+                                            <div class="preview-header">
+                                                <div class="preview-avatar"></div>
+                                                <div class="preview-name">Your Name</div>
+                                                <div class="preview-bio">Professional Bio</div>
+                                            </div>
+                                            <div class="preview-links">
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                            </div>
+                                        </div>
+                                        <div class="template-info">
+                                            <h4>Retro Vintage</h4>
+                                            <p>Nostalgic design with vintage elements</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Template 9: Tech Futuristic -->
+                                    <div class="template-option" data-template="tech-futuristic">
+                                        <div class="template-preview tech-futuristic-preview">
+                                            <div class="preview-header">
+                                                <div class="preview-avatar"></div>
+                                                <div class="preview-name">Your Name</div>
+                                                <div class="preview-bio">Professional Bio</div>
+                                            </div>
+                                            <div class="preview-links">
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                            </div>
+                                        </div>
+                                        <div class="template-info">
+                                            <h4>Tech Futuristic</h4>
+                                            <p>Futuristic design with tech-inspired elements</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Template 10: Artistic Creative -->
+                                    <div class="template-option" data-template="artistic-creative">
+                                        <div class="template-preview artistic-creative-preview">
+                                            <div class="preview-header">
+                                                <div class="preview-avatar"></div>
+                                                <div class="preview-name">Your Name</div>
+                                                <div class="preview-bio">Professional Bio</div>
+                                            </div>
+                                            <div class="preview-links">
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                                <div class="preview-link"></div>
+                                            </div>
+                                        </div>
+                                        <div class="template-info">
+                                            <h4>Artistic Creative</h4>
+                                            <p>Creative design with artistic elements</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Custom Template -->
+                                    <div class="template-option custom-template" data-template="custom">
+                                        <div class="template-preview custom-preview">
+                                            <div class="preview-header">
+                                                <i class="fas fa-palette"></i>
+                                            </div>
+                                            <div class="preview-content">
+                                                <div class="preview-name">Custom Design</div>
+                                                <div class="preview-bio">Create from scratch</div>
+                                            </div>
+                                        </div>
+                                        <div class="template-info">
+                                            <h4>Custom Template</h4>
+                                            <p>Build your own unique design from scratch</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bio Page Configuration -->
+                            <div class="form-section" id="bio-config-section" style="display: none;">
+                                <h3>Bio Page Configuration</h3>
+                                
+                                <!-- Basic Info -->
+                                <div class="form-group">
+                                    <label>Page Title</label>
+                                    <input type="text" id="bio-page-title" value="Soumita Chatterjee" placeholder="Your Name or Brand">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Profile Image</label>
+                                    <div class="image-upload-container">
+                                        <div class="image-input-group">
+                                            <label class="input-label">Image URL</label>
+                                            <input type="url" id="bio-profile-image" value="https://soumita.space/images/soumita-office-1.jpeg" placeholder="https://example.com/image.jpg">
+                                        </div>
+                                        <div class="image-input-group">
+                                            <label class="input-label">Or Upload Image</label>
+                                            <input type="file" id="bio-image-upload" accept="image/*" class="file-upload">
+                                            <small>Max 5MB, JPG, PNG, or GIF</small>
+                                        </div>
+                                        <div class="image-preview" id="bio-image-preview">
+                                            <img id="bio-preview-img" src="https://soumita.space/images/soumita-office-1.jpeg" alt="Profile preview">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Bio Description</label>
+                                    <textarea id="bio-description" rows="3" placeholder="Brief description about yourself or your brand">Australia Immigration Specialist | Team Leader | Certified Industrial Accountant</textarea>
+                                </div>
+
+                                <!-- Bio Links -->
+                                <div class="form-section">
+                                    <h4>Bio Links</h4>
+                                    <div id="bio-links-list">
+                                        <!-- Bio links will be added here -->
+                                    </div>
+                                    <button type="button" id="add-bio-link" class="btn-secondary">
+                                        <i class="fas fa-plus"></i> Add Link
+                                    </button>
+                                </div>
+
+                                <!-- Custom Styling -->
+                                <div class="form-section">
+                                    <h4>Custom Styling</h4>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Primary Color</label>
+                                            <input type="color" id="bio-primary-color" value="#6a5acd">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Secondary Color</label>
+                                            <input type="color" id="bio-secondary-color" value="#9370db">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Background Color</label>
+                                            <input type="color" id="bio-bg-color" value="#ffffff">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Text Color</label>
+                                            <input type="color" id="bio-text-color" value="#333333">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="editor-preview">
+                            <h3>Bio Page Preview</h3>
+                            <div id="bio-preview" class="preview-frame">
+                                <div class="bio-preview-content">
+                                    <p>Select a template to see preview</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
             </main>
